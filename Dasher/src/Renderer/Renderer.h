@@ -9,7 +9,7 @@ namespace Renderer
 
 	extern void EndScene();
 
-	void DrawShape(const BaseShape& shape);
-	void DrawShape(const BaseShape& shape, const Texture& texture);
+	void DrawShape(BaseShape& shape);
+	void DrawShape(BaseShape& shape, const Texture& texture);
 
 }

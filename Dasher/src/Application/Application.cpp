@@ -52,26 +52,36 @@ void Application::Run()
 	const float fCol = 0.18;
 	glClearColor(fCol, fCol, fCol, 1);
 
+	//Nice Quad Colour
+/*
+	QuadShape shape;
+	shape[0] = Vertex({ -0.5, -0.5, 0 }, { 0.3, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+*/
 	QuadShape shape;
 
-	shape[0] = Vertex({ -0.5, -0.5, 0 }, { 0.8, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.8, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.8, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.8, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[0] = Vertex({ -0.5, -0.5, 0 }, { 0.3, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 1.0, 0.0 });
+	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 1.0, 1.0 });
+	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 1.0 });
 
+	Texture tex;
+	tex.LoadTexture("Assets\\Textures\\img1.jpg");
 	QuadShape shape1;
 
-	shape1[0] = Vertex({ -1, -1, 0 }, { 0.1, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape1[1] = Vertex({ -0.7, -1, 0 }, { 0.5, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape1[2] = Vertex({ -0.7,  -0.7, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape1[3] = Vertex({ -1,  -0.7, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-
+	shape1[0] = Vertex({ -1, -1, 0 },		{ 0.1, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	shape1[1] = Vertex({ -0.7, -1, 0 },		{ 0.5, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	shape1[2] = Vertex({ -0.7,  -0.7, 0 },	{0.7, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	shape1[3] = Vertex({ -1,  -0.7, 0 },	{ 0.9, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	/*
 	QuadShape shape2;
 
-	shape2[0] = Vertex({ 0.7, 0.7, 0 }, { 0.1, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape2[1] = Vertex({ 1, 0.7, 0 },   { 0.5, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape2[2] = Vertex({ 1, 1, 0 },  { 0.7, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape2[3] = Vertex({ 0.7,  1, 0 },  { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape2[0] = Vertex({ 0.7, 0.7, 0 },		{ 0.1, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	shape2[1] = Vertex({ 1, 0.7, 0 },		{ 0.5, 0.2, 0.2, 1.0 },		{ 0.0, 1.0 });
+	shape2[2] = Vertex({ 1, 1, 0 },			{ 0.7, 0.2, 0.2, 1.0 },		{ 1.0, 1.0 });
+	shape2[3] = Vertex({ 0.7,  1, 0 },		{ 0.9, 0.2, 0.2, 1.0 },		{ 1.0, 0.0 });*/
 
 
 	const double dMaxDeltaTime = 1.0/30.0;
@@ -95,9 +105,9 @@ void Application::Run()
 		//clear screen
 		glcall(glClear (GL_COLOR_BUFFER_BIT));
 
-		Renderer::DrawShape(shape);
+		Renderer::DrawShape(shape, tex);
 		Renderer::DrawShape(shape1);
-		Renderer::DrawShape(shape2);
+		//Renderer::DrawShape(shape2);
 
 		Renderer::EndScene();
 		glfwSwapBuffers(m_pWindow);

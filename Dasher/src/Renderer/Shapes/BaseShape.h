@@ -11,7 +11,7 @@ struct Vertex
 	glm::vec3 m_pos;
 	glm::vec4 m_col;
 	glm::vec2 m_textureCoord;
-	int m_textureId;
+	float m_textureId;
 };
 
 class BaseShape
@@ -21,7 +21,9 @@ public:
 	virtual int GetIndicesCount() const = 0;
 	virtual int GetVertexCount()  const = 0;
 	virtual unsigned int* GetIndicesBuffer() const = 0;
+
 	virtual const Vertex* GetVertexBuffer() const = 0;
+	virtual Vertex*		  GetVertexBuffer() = 0;
 
 protected:
 };

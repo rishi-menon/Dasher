@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "GlBuffer.h"
 
+#include <unordered_map>
 
 namespace Renderer
 {
@@ -25,7 +26,14 @@ namespace Renderer
 	static GlBuffer s_vertexBuffer;
 	static GlBuffer s_indexBuffer;
 
+	//generic shader id
 	static unsigned int nShader = 0;
+
+	const int unsigned s_nMaxTextureSlots = 20;	//use slots 0 to 19... reset the counter when it hits 20.
+	static unsigned int s_nCurrentTextureSlot = 0;
+	static std::unordered_map <unsigned int, unsigned int> s_mapTexIdToTexSlot;
+
+	Texture s_whiteTexture;
 }
 
 namespace Renderer
@@ -45,7 +53,7 @@ namespace Renderer
 		glcall(glGetShaderiv(id, GL_COMPILE_STATUS, &status));
 
 
-		if (id == GL_FALSE)
+		if (status == GL_FALSE)
 		{
 			int size = 0;
 			glcall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &size));
@@ -141,7 +149,7 @@ namespace Renderer
 		s_vertexBuffer.AddLayout(0, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_pos));
 		s_vertexBuffer.AddLayout(1, 4, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_col));
 		s_vertexBuffer.AddLayout(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_textureCoord));
-		s_vertexBuffer.AddLayout(3, 1, GL_INT,   false, sizeof(Vertex), offsetof(Vertex, m_textureId));
+		s_vertexBuffer.AddLayout(3, 1, GL_FLOAT,   false, sizeof(Vertex), offsetof(Vertex, m_textureId));
 
 		//create index buffer
 		s_indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER, nMaxIndices * sizeof (unsigned int), nullptr, GL_DYNAMIC_DRAW);
@@ -175,6 +183,23 @@ namespace Renderer
 
 			glcall(glUseProgram(nShader));
 		}
+
+		s_mapTexIdToTexSlot.reserve(s_nMaxTextureSlots);
+
+		int u_textures = glGetUniformLocation(nShader, "u_textureSlots");
+		if (u_textures == -1)
+		{
+			LOG_WARN("Uniform u_textureSlots was not found.");
+		}
+		else
+		{
+			//texture sampler uniform
+			static const int u_samplerIndex[32] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
+			glUniform1iv(u_textures, 32, u_samplerIndex);
+		}
+		unsigned char whiteRgba[4] = { 255,255,255,255 };
+		s_whiteTexture.LoadTexture(whiteRgba, 1, 1);
+		return true;
 		
 	}
 	void Cleanup()
@@ -185,6 +210,47 @@ namespace Renderer
 		s_indexBuffer.Cleanup();
 	}
 
+
+	void InsertIndicesIntoBuffer(const BaseShape& shape)
+	{
+		int nIndicesToAdd = shape.GetIndicesCount();
+
+		if (nCurrentIndex + nIndicesToAdd > nMaxIndices)
+		{
+			EndScene();
+		}
+
+		ASSERT(nIndicesToAdd < 200, "The values are getting too big, use heap allocation instead");
+
+		unsigned int* indices = (unsigned int*)alloca(nIndicesToAdd * sizeof(unsigned int));
+
+		//this is the array that basically contains the order in which to render the vertices
+		//Eg: for a quad it would contain 0,1,2,2,3,0
+		unsigned int* baseIndices = shape.GetIndicesBuffer();
+
+#ifdef _DEBUG
+		int finalIndicesDebug[6];
+#endif // _DEBUG
+
+		for (int i = 0; i < nIndicesToAdd; i++)
+		{
+			indices[i] = nCurrentVertex + baseIndices[i];
+#if _DEBUG
+			finalIndicesDebug[i] = indices[i];
+#endif // _DEBUG
+
+		}
+		s_indexBuffer.UpdateData(nCurrentIndex * sizeof(unsigned int), nIndicesToAdd * sizeof(unsigned int), indices);
+	}
+
+	void InsertVerticesToBuffer(const Vertex* vertexBufferData, int nVertexToAdd)
+	{
+		if (nCurrentVertex + nVertexToAdd > nMaxVertices)
+		{
+			EndScene();
+		}
+		s_vertexBuffer.UpdateData(nCurrentVertex * sizeof(Vertex), nVertexToAdd * sizeof(Vertex), vertexBufferData);
+	}
 	//////////////////////////////////////////////////////////////////////////////////////
 	//								   Core Renderer Functions						    //
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -196,48 +262,69 @@ namespace Renderer
 			glcall(glDrawElements(GL_TRIANGLES, nCurrentIndex, GL_UNSIGNED_INT, 0));
 			nCurrentVertex = 0;
 			nCurrentIndex = 0;
+			s_nCurrentTextureSlot = 0;
+			s_mapTexIdToTexSlot.clear();
 		}
 	}
 
 	//Use this function to render solid colour
-	void DrawShape(const BaseShape& shape)
+	void DrawShape(BaseShape& shape)
+	{
+#if 0
+		int nIndicesToAdd = shape.GetIndicesCount();
+		int nVertexToAdd = shape.GetVertexCount();
+
+		Vertex* vertexBuffer = shape.GetVertexBuffer();
+		InsertVerticesToBuffer(vertexBuffer, nVertexToAdd);
+		InsertIndicesIntoBuffer(shape);
+
+		nCurrentIndex += nIndicesToAdd;
+		nCurrentVertex += nVertexToAdd;
+#else
+		DrawShape(shape, s_whiteTexture);
+#endif
+	}
+
+	//use this function to render textures
+	void DrawShape(BaseShape& shape, const Texture& texture)
 	{
 		int nIndicesToAdd = shape.GetIndicesCount();
 		int nVertexToAdd = shape.GetVertexCount();
 
-		if (nCurrentIndex + nIndicesToAdd > nMaxIndices ||
-			nCurrentVertex + nVertexToAdd > nMaxVertices)
+		Vertex* vertexBuffer = shape.GetVertexBuffer();
+		
+		std::unordered_map<unsigned int, unsigned int>::iterator it = s_mapTexIdToTexSlot.find(texture.GetRendererId());
+
+		unsigned int texSlot;
+		if (it != s_mapTexIdToTexSlot.end())
 		{
-			EndScene();
+			//texture is already bound to a certain slot
+			texSlot = it->second;
+		}
+		else
+		{
+			if (s_nCurrentTextureSlot >= s_nMaxTextureSlots)
+			{
+				EndScene();
+			}
+
+			s_mapTexIdToTexSlot.emplace(texture.GetRendererId(), (unsigned int)s_nCurrentTextureSlot);
+			glcall(glBindTextureUnit(s_nCurrentTextureSlot, texture.GetRendererId()));
+			texSlot = s_nCurrentTextureSlot;
+			s_nCurrentTextureSlot++;
 		}
 
-		ASSERT(nIndicesToAdd < 200 && nVertexToAdd < 200, "The values are getting too big, use heap allocation instead");
-		
-		unsigned int* indices = (unsigned int*)alloca(nIndicesToAdd * sizeof(unsigned int));
-		
-		//this is the array that basically contains the order in which to render the vertices
-		//Eg: for a quad it would contain 0,1,2,2,3,0
-		unsigned int* baseIndices = shape.GetIndicesBuffer();
-
-		int temp[6];
-		for (int i = 0; i < nIndicesToAdd; i++)
+		//Texture is bound, now you can add it to the vertex buffer
+		for (int i = 0; i < nVertexToAdd; i++)
 		{
-			temp[i] = indices[i] = nCurrentVertex + baseIndices[i];
-		
+			vertexBuffer[i].m_textureId = (float)texSlot;
 		}
 
-		const Vertex* vertexBufferData = shape.GetVertexBuffer();
-
-		s_vertexBuffer.UpdateData(nCurrentVertex * sizeof (Vertex), nVertexToAdd * sizeof(Vertex), vertexBufferData);
-		s_indexBuffer.UpdateData(nCurrentIndex * sizeof (unsigned int), nIndicesToAdd * sizeof(unsigned int), indices);
-
+		//upload vertex buffer to the gpu
+		InsertIndicesIntoBuffer(shape);
+		InsertVerticesToBuffer(vertexBuffer, nVertexToAdd);
 		nCurrentIndex += nIndicesToAdd;
 		nCurrentVertex += nVertexToAdd;
-	}
-
-	//use this function to render textures
-	void DrawShape(const BaseShape& shape, const Texture& texture)
-	{
 	}
 
 }
