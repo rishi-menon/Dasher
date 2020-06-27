@@ -20,7 +20,7 @@ namespace CoreLogger
 #define LOG_ERROR(...)	::CoreLogger::g_CoreLogger->error (__VA_ARGS__)
 #define LOG_FATAL(...)	::CoreLogger::g_CoreLogger->fatal (__VA_ARGS__)
 
-#define ASSERT(x,m)		if (!(x)) {LOG_WARN(m); __debugbreak();}
+#define ASSERT(x, ...)		if (!(x)) {LOG_WARN(__VA_ARGS__); __debugbreak();}
 
 #define glcall(x)		::CoreLogger::glClearError (); \
 						x; \

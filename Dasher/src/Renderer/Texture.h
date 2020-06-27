@@ -2,18 +2,12 @@
 
 class Texture
 {
-public:
 	Texture();
 	~Texture();
+public:
 
-	unsigned int GetRendererId() const { return m_nRendererId; }
-	unsigned int GetWidth() const { return m_nWidth; }
-	unsigned int GetHeight() const { return m_nHeight; }
+	static unsigned int LoadTexture(const char* const strPath, unsigned int* nOutWidth, unsigned int* nOutHeight);
+	static unsigned int LoadTexture(unsigned char bufferRgba[], int nSizeX, int nSizeY);
 
-	void LoadTexture(const char* const strPath);
-	void LoadTexture(unsigned char bufferRgba[], int nSizeX, int nSizeY);
 private:
-	unsigned int m_nRendererId;
-	unsigned int m_nWidth, m_nHeight;
-
 };

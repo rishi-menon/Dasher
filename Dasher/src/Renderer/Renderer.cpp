@@ -1,330 +1,377 @@
-#include "Renderer.h"
-#include <GL/glew.h>
-#include <fstream>
 
-#include "Shapes/BaseShape.h"
-#include "Texture.h"
+#include "Renderer.h"
+#include "GL/glew.h"
+#include <fstream>
+#include <string>
 
 #include "Log.h"
-#include "GlBuffer.h"
+#include "Texture.h"
 
-#include <unordered_map>
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace Renderer
+static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 {
-	//'Private' equivalent stuff
-	
-	static const int nMaxVertices = 8;
-	static const int nMaxIndices = ( 6 * nMaxVertices) / 4;
+	glcall(unsigned int id = glCreateShader(nShaderType));
+	glcall(glShaderSource(id, 1, &strCode, nullptr));
+	glcall(glCompileShader(id));
+
+	int status = 0;
+	glcall(glGetShaderiv(id, GL_COMPILE_STATUS, &status));
 
 
-	static int nCurrentVertex = 0;
-	static int nCurrentIndex = 0;
+	if (status == GL_FALSE)
+	{
+		int size = 0;
+		glcall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &size));
+		char* buff = new char[size];
 
-	static unsigned int nVao = 0;
+		std::string str = (nShaderType == GL_VERTEX_SHADER) ? "vertex" : "fragment";
 
-	static GlBuffer s_vertexBuffer;
-	static GlBuffer s_indexBuffer;
-
-	//generic shader id
-	static unsigned int nShader = 0;
-
-	const int unsigned s_nMaxTextureSlots = 20;	//use slots 0 to 19... reset the counter when it hits 20.
-	static unsigned int s_nCurrentTextureSlot = 0;
-	static std::unordered_map <unsigned int, unsigned int> s_mapTexIdToTexSlot;
-
-	Texture s_whiteTexture;
+		glcall(glGetShaderInfoLog(id, size, &size, buff));
+		LOG_ERROR("Failed to compile {0} shader: {1}", str.c_str(), buff);
+		ASSERT(false, "");
+		delete buff;
+		return 0;
+	}
+	return id;
 }
 
-namespace Renderer
+static int mystrlen(const char* str)
 {
+	int i = 0;
+	for (; str[i] != '\0'; i++);
+	return i;
+}
 
-	///////////////////////////////////////////////////////////////////////////////////////
-	//								Shader Helper Functions							     //
-	///////////////////////////////////////////////////////////////////////////////////////
+static bool mystrcmp(const char* strA, const char* strB, int len = -1)
+{
+	//return true if they are different strings
+	int lenA = mystrlen(strA);
+	int lenB = mystrlen(strB);
 
-	static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
+	if (len == -1)
 	{
-		glcall(unsigned int id = glCreateShader(nShaderType));
-		glcall(glShaderSource(id, 1, &strCode, nullptr));
-		glcall(glCompileShader(id));
-
-		int status = 0;
-		glcall(glGetShaderiv(id, GL_COMPILE_STATUS, &status));
-
-
-		if (status == GL_FALSE)
-		{
-			int size = 0;
-			glcall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &size));
-			char* buff = new char[size];
-
-			std::string str = (nShaderType == GL_VERTEX_SHADER) ? "vertex" : "fragment";
-
-			glcall(glGetShaderInfoLog(id, size, &size, buff));
-			LOG_ERROR("Failed to compile {0} shader: {1}", str.c_str(), buff);
-			ASSERT(false, "");
-			delete buff;
-			return 0;
-		}
-		return id;
+		if (lenA != lenB)	return true;
+	}
+	else
+	{
+		if (lenA < len || lenB < len) return true;
 	}
 
-	int strlen(const char* str)
+	if (len == -1 || len > lenA)	len = lenA;
+
+	for (int i = 0; i < len; i++)
 	{
-		int i = 0;
-		for (; str[i] != '\0'; i++);
-		return i;
+		if (strA[i] != strB[i])
+			return true;
 	}
-
-	bool strcmp(const char* strA, const char* strB, int len = -1)
+	return false;
+}
+void ParseShader(const char* const filePath, std::string& outVertex, std::string& outFrag)
+{
+	std::ifstream file;
+	file.open(filePath);
+	if (file.is_open())
 	{
-		//return true if they are different strings
-		int lenA = ::Renderer::strlen(strA);
-		int lenB = ::Renderer::strlen(strB);
-		
-		if (len == -1)
+		outVertex.reserve(2000);
+		outFrag.reserve(2000);
+		std::string* pCurrent = nullptr;
+
+		while (!file.eof())
 		{
-			if (lenA != lenB)	return true;
-		}
-		else
-		{
-			if (lenA < len || lenB < len) return true;
+			char buff[300];
+			file.getline(buff, 300);
+
+			if (!mystrcmp(buff, "#shader", 7))
+			{
+				//change type
+				char c = buff[8];
+				pCurrent = (c == 'v') ? &outVertex : &outFrag;
+			}
+			else
+			{
+				ASSERT(pCurrent, "Error: Currnet shader was nullptr while processing shader.");
+				if (pCurrent)
+				{
+					pCurrent->append(buff);
+					pCurrent->push_back('\n');
+				}
+			}
 		}
 
-		if (len == -1 || len > lenA)	len = lenA;
+		file.close();
+	}
+}
 
-		for (int i = 0; i < len; i++)
-		{
-			if (strA[i] != strB[i])
-				return true;
-		}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RendererVertex
+{
+	glm::vec3 m_pos;
+	glm::vec4 m_col;
+	glm::vec2 m_textureCoord;
+	float m_textureId;
+};
+
+struct RendererData
+{
+	unsigned int nVao;
+
+	unsigned int nVbo;
+	unsigned int nIbo;
+
+	const int nMaxVertexCount = 12;
+	const int nMaxIndexCount = (nMaxVertexCount * 6) / 4;
+
+	unsigned int nShader;
+
+	RendererVertex* localVertexBuffer = nullptr;
+	int nCurrentVertexLocation = 0;
+
+	unsigned int* localIndexBuffer = nullptr;
+	int nCurrentIndexLocation = 0;
+
+	unsigned int nTextureWhiteId;
+
+	const int nMaxTexSlots = 32;
+	int boundTextureSlots[32];
+	int nCurrentTextureSlot = 0;
+};
+
+static RendererData data;
+
+bool Renderer::Initialise()
+{
+	if (data.localVertexBuffer || data.localIndexBuffer)
+	{
+		ASSERT(false, "Renderer has already been initialsed");
 		return false;
 	}
-	void ParseShader(const char* const filePath, std::string& outVertex, std::string& outFrag)
+
+	glcall(glGenVertexArrays(1, &data.nVao));
+	glcall(glBindVertexArray(data.nVao));
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	//										 generate buffers						  			  //
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//OpenGl Buffers
+	glcall(glGenBuffers(1, &data.nVbo));
+	glcall(glBindBuffer(GL_ARRAY_BUFFER, data.nVbo));
+	glcall(glBufferData(GL_ARRAY_BUFFER, data.nMaxVertexCount * sizeof(RendererVertex), nullptr, GL_DYNAMIC_DRAW));
+	
+	glcall(glGenBuffers(1, &data.nIbo));
+	glcall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.nIbo));
+	glcall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.nMaxIndexCount * sizeof(unsigned int), nullptr, GL_DYNAMIC_DRAW));
+
+	//specify layout
+	glcall(glEnableVertexAttribArray(0));
+	glcall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RendererVertex), (const void*)offsetof(RendererVertex, m_pos)));
+
+	glcall(glEnableVertexAttribArray(1));
+	glcall(glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(RendererVertex), (const void*)offsetof(RendererVertex, m_col)));
+
+	glcall(glEnableVertexAttribArray(2));
+	glcall(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(RendererVertex), (const void*)offsetof(RendererVertex, m_textureCoord)));
+	
+	glcall(glEnableVertexAttribArray(3));
+	glcall(glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(RendererVertex), (const void*)offsetof(RendererVertex, m_textureId)));
+
+	data.localIndexBuffer = new unsigned int[data.nMaxIndexCount];
+	data.localVertexBuffer = new RendererVertex[data.nMaxVertexCount];
+
+	//create shader
 	{
-		std::ifstream file;
-		file.open(filePath);
-		if (file.is_open())
+		std::string strVertex, strFrag;
+		ParseShader("Assets\\Shaders\\vertex.shader", strVertex, strFrag);
+
+		data.nShader = glCreateProgram();
+		int nVertex = CompileShader(GL_VERTEX_SHADER, strVertex.c_str());
+		int nFrag = CompileShader(GL_FRAGMENT_SHADER, strFrag.c_str());
+		
+		glcall(glAttachShader(data.nShader, nVertex));
+		glcall(glAttachShader(data.nShader, nFrag));
+		glcall(glLinkProgram(data.nShader));
+		glcall(glValidateProgram(data.nShader));
+
+		int nLinkStatus = 0, nValidateStatus = 0;
+
+		glcall(glGetProgramiv(data.nShader, GL_LINK_STATUS, &nLinkStatus));
+		glcall(glGetProgramiv(data.nShader, GL_VALIDATE_STATUS, &nValidateStatus));
+		if (nValidateStatus == GL_FALSE || nLinkStatus == GL_FALSE)
 		{
-			outVertex.reserve(2000);
-			outFrag.reserve(2000);
-			std::string* pCurrent = nullptr;
-
-			while (!file.eof())
-			{
-				char buff[300];
-				file.getline(buff, 300);
-
-				if (!::Renderer::strcmp (buff, "#shader", 7))
-				{
-					//change type
-					char c = buff[8];
-					pCurrent = (c == 'v') ? &outVertex : &outFrag;
-				}
-				else
-				{
-					ASSERT(pCurrent, "Error: Currnet shader was nullptr while processing shader.");
-					if (pCurrent)
-					{
-						pCurrent->append(buff);
-						pCurrent->push_back('\n');
-					}
-				}
-			}
-			
-			file.close();
+			ASSERT(false, "Could not link/validate shader");
+			return false;
 		}
-	}
+		
+		glcall(glUseProgram(data.nShader));
+		//set uniforms
 
-	///////////////////////////////////////////////////////////////////////////////////////
-	bool Initialise()
-	{
-		glcall(glGenVertexArrays(1, &nVao));
-		glcall(glBindVertexArray(nVao));
-
-		//Create a large vertex buffer
-		s_vertexBuffer.Create(GL_ARRAY_BUFFER, nMaxVertices * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
-
-		s_vertexBuffer.AddLayout(0, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_pos));
-		s_vertexBuffer.AddLayout(1, 4, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_col));
-		s_vertexBuffer.AddLayout(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, m_textureCoord));
-		s_vertexBuffer.AddLayout(3, 1, GL_FLOAT,   false, sizeof(Vertex), offsetof(Vertex, m_textureId));
-
-		//create index buffer
-		s_indexBuffer.Create(GL_ELEMENT_ARRAY_BUFFER, nMaxIndices * sizeof (unsigned int), nullptr, GL_DYNAMIC_DRAW);
-
+		glcall(int texSlotsLocation = glGetUniformLocation(data.nShader, "u_textureSlots"));
+		if (texSlotsLocation != -1)
 		{
-			//Create shaders
-			std::string vertexCode, fragCode;
-			ParseShader("Assets\\Shaders\\vertex.shader", vertexCode, fragCode);
-
-			unsigned int vertexId = CompileShader(GL_VERTEX_SHADER, vertexCode.c_str());
-			unsigned int fragId = CompileShader(GL_FRAGMENT_SHADER, fragCode.c_str());
-
-			glcall(nShader = glCreateProgram());
-			glAttachShader(nShader, vertexId);
-			glAttachShader(nShader, fragId);
-			glLinkProgram(nShader);
-			glValidateProgram(nShader);
-
-			//check if the shader compiled properly
-			int linkStatus = 0, validateStatus = 0;
-			glGetProgramiv(nShader, GL_LINK_STATUS, &linkStatus);
-			glGetProgramiv(nShader, GL_VALIDATE_STATUS, &validateStatus);
-			ASSERT(linkStatus == GL_TRUE, "Error: Could not link program");
-			ASSERT(validateStatus == GL_TRUE, "Error: Could not validate program");
-
-			if (linkStatus != GL_TRUE || validateStatus != GL_TRUE)
-			{
-				LOG_ERROR("Error Could not link/validate the shaders");
-				return false;
-			}
-
-			glcall(glUseProgram(nShader));
-		}
-
-		s_mapTexIdToTexSlot.reserve(s_nMaxTextureSlots);
-
-		int u_textures = glGetUniformLocation(nShader, "u_textureSlots");
-		if (u_textures == -1)
-		{
-			LOG_WARN("Uniform u_textureSlots was not found.");
+			int u_TexSlots[32];
+			for (int i = 0; i < 32; u_TexSlots[i] = i, i++);
+			glcall(glUniform1iv(texSlotsLocation, 32, u_TexSlots));
 		}
 		else
 		{
-			//texture sampler uniform
-			static const int u_samplerIndex[32] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
-			glUniform1iv(u_textures, 32, u_samplerIndex);
+			LOG_WARN("uniform u_textureSlots was not found");
 		}
-		unsigned char whiteRgba[4] = { 255,255,255,255 };
-		s_whiteTexture.LoadTexture(whiteRgba, 1, 1);
-		return true;
+	}
+
+
+	//Load the textures
+	unsigned char whiteColor[4] = { 255,255,255,255 };
+	data.nTextureWhiteId = Texture::LoadTexture(whiteColor, 1, 1);
+	//data.nTextureWhiteId = Texture::LoadTexture("Assets\\Textures\\img1.jpg", 0, 0);
+
+	memset(data.boundTextureSlots + 1, -1, 31 * sizeof(int));
+	data.boundTextureSlots[0] = data.nTextureWhiteId;
+	data.nCurrentTextureSlot = 1;
+	return true;
+}
+
+void Renderer::Cleanup()
+{
+	delete[] data.localVertexBuffer;
+	delete[] data.localIndexBuffer;
+	data.localVertexBuffer = nullptr;
+	data.localIndexBuffer = nullptr;
+
+	glcall(glDeleteVertexArrays(1, &data.nVao));
+	glcall(glDeleteBuffers(1, &data.nVbo));
+	glcall(glDeleteBuffers(1, &data.nIbo));
+}
+
+void Renderer::Flush()
+{
+
+	if (!data.nCurrentVertexLocation || !data.nCurrentIndexLocation)
+	{
+		return;
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, data.nTextureWhiteId);
+
+	glcall(glBufferSubData(GL_ARRAY_BUFFER, 0, data.nCurrentVertexLocation * sizeof(RendererVertex), data.localVertexBuffer));
+	glcall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data.nCurrentIndexLocation * sizeof(unsigned int), data.localIndexBuffer));
+
+	//Setup uniforms here ?
+	glcall(glDrawElements(GL_TRIANGLES, data.nCurrentIndexLocation, GL_UNSIGNED_INT, 0));
+
+
+	//reset data
+	memset(data.boundTextureSlots+1, -1, 31 * sizeof(unsigned int));	//slot 0 is white texture... do not reset it
+	data.nCurrentIndexLocation = 0;
+	data.nCurrentVertexLocation = 0;
+	data.nCurrentTextureSlot = 1;	//slot 0 is white texture
+
+	data.boundTextureSlots[0] = data.nTextureWhiteId; //precaution
+}
+
+static void GenerateQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, float texId, RendererVertex outQuad[4])
+{
+	//Set the position
+	float halfx = size.x / 2, halfy = size.y / 2;
+	outQuad[0].m_pos = { pos.x - halfx, pos.y - halfy, 0.0 };
+	outQuad[1].m_pos = { pos.x + halfx, pos.y - halfy, 0.0 };
+	outQuad[2].m_pos = { pos.x + halfx, pos.y + halfy, 0.0 };
+	outQuad[3].m_pos = { pos.x - halfx, pos.y + halfy, 0.0 };
+
+	outQuad[0].m_textureCoord = { 0.0, 0.0 };
+	outQuad[1].m_textureCoord = { 1.0, 0.0 };
+	outQuad[2].m_textureCoord = { 1.0, 1.0 };
+	outQuad[3].m_textureCoord = { 0.0, 1.0 };
+
+	//set col 
+	for (int i = 0; i < 4; i++)
+	{
+		outQuad[i].m_col = col;
+		outQuad[i].m_textureId = texId;
+	}
+}
+void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
+{
+
+	//RendererVertex v[3];
+	//v[0] = { {0,0,0}, {0.9,0.9,0.4,1.0}, {0,0}, 0 };
+	//v[1] = { {0.5,0,0}, {0.9,0.9,0.4,1.0}, {0,0}, 0 };
+	//v[2] = { {0.5,0.5,0}, {0.9,0.9,0.4,1.0}, {0,0}, 0 };
+	//
+	//unsigned int index[3] = { 0,1,2 };
+	//glcall(glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(RendererVertex), v));
+	//glcall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, 3 * sizeof(unsigned int), index));
+
+	////Setup uniforms here ?
+	//glcall(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+	//
+	//return;
+	DrawQuad(pos, size, col, data.nTextureWhiteId);
+}
+
+void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, unsigned int nTexId)
+{
+	if (data.nCurrentVertexLocation + 4 > data.nMaxVertexCount || data.nCurrentIndexLocation + 6 > data.nMaxIndexCount)
+	{
+		Renderer::Flush();
+	}
+	
+	//Calculate texture slot for the generated quad
+	unsigned int nTextureSlot = 0xffff;
+	for (unsigned int i = 0; i < 32; i++)
+	{
+		if ((unsigned int)data.boundTextureSlots[i] == nTexId)
+		{
+			//texture is already bound
+			nTextureSlot = i;
+			break;
+		}
+	}
+
+	if (nTextureSlot == 0xffff)
+	{
+		//texture was not found... bind it to a slot and add it to the cache which keeps track of bound textures
+		int& curSlot = data.nCurrentTextureSlot;
+		if (curSlot >= data.nMaxTexSlots)
+		{
+			//there are no free spots available to bind... so flush and create a new batch
+			Renderer::Flush();
+		}
 		
+		glcall(glActiveTexture(GL_TEXTURE0 + curSlot));
+		glcall(glBindTexture(GL_TEXTURE_2D, nTexId));
+		data.boundTextureSlots[curSlot] = nTexId;
+		nTextureSlot = curSlot;
+		curSlot++;
 	}
-	void Cleanup()
+
+	RendererVertex quad[4];
+	GenerateQuad(pos, size, col, (float)nTextureSlot, quad);
+
+	//save to local buffer
+	RendererVertex* curVertexPosition = data.localVertexBuffer + data.nCurrentVertexLocation;
+	unsigned int* curIndexPosition = data.localIndexBuffer + data.nCurrentIndexLocation;
+
+	unsigned int index[6] = { 0, 1, 2, 2, 3, 0 };
+
+	for (char i = 0; i < 6; i++)
 	{
-		glcall(glDeleteVertexArrays(1, &nVao));
-		glcall(glDeleteProgram(nShader));
-		s_vertexBuffer.Cleanup();
-		s_indexBuffer.Cleanup();
+		index[i] += data.nCurrentVertexLocation;
 	}
 
+	memcpy(curVertexPosition, quad, 4 * sizeof(RendererVertex));
+	memcpy(curIndexPosition, index, 6 * sizeof(unsigned int));
 
-	void InsertIndicesIntoBuffer(const BaseShape& shape)
-	{
-		int nIndicesToAdd = shape.GetIndicesCount();
+	data.nCurrentVertexLocation += 4;
+	data.nCurrentIndexLocation += 6;
+}
 
-		if (nCurrentIndex + nIndicesToAdd > nMaxIndices)
-		{
-			EndScene();
-		}
+void Renderer::DrawQuadColor(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount)
+{
 
-		ASSERT(nIndicesToAdd < 200, "The values are getting too big, use heap allocation instead");
-
-		unsigned int* indices = (unsigned int*)alloca(nIndicesToAdd * sizeof(unsigned int));
-
-		//this is the array that basically contains the order in which to render the vertices
-		//Eg: for a quad it would contain 0,1,2,2,3,0
-		unsigned int* baseIndices = shape.GetIndicesBuffer();
-
-#ifdef _DEBUG
-		int finalIndicesDebug[6];
-#endif // _DEBUG
-
-		for (int i = 0; i < nIndicesToAdd; i++)
-		{
-			indices[i] = nCurrentVertex + baseIndices[i];
-#if _DEBUG
-			finalIndicesDebug[i] = indices[i];
-#endif // _DEBUG
-
-		}
-		s_indexBuffer.UpdateData(nCurrentIndex * sizeof(unsigned int), nIndicesToAdd * sizeof(unsigned int), indices);
-	}
-
-	void InsertVerticesToBuffer(const Vertex* vertexBufferData, int nVertexToAdd)
-	{
-		if (nCurrentVertex + nVertexToAdd > nMaxVertices)
-		{
-			EndScene();
-		}
-		s_vertexBuffer.UpdateData(nCurrentVertex * sizeof(Vertex), nVertexToAdd * sizeof(Vertex), vertexBufferData);
-	}
-	//////////////////////////////////////////////////////////////////////////////////////
-	//								   Core Renderer Functions						    //
-	//////////////////////////////////////////////////////////////////////////////////////
-
-	void EndScene()
-	{
-		if (nCurrentIndex)
-		{
-			glcall(glDrawElements(GL_TRIANGLES, nCurrentIndex, GL_UNSIGNED_INT, 0));
-			nCurrentVertex = 0;
-			nCurrentIndex = 0;
-			s_nCurrentTextureSlot = 0;
-			s_mapTexIdToTexSlot.clear();
-		}
-	}
-
-	//Use this function to render solid colour
-	void DrawShape(BaseShape& shape)
-	{
-#if 0
-		int nIndicesToAdd = shape.GetIndicesCount();
-		int nVertexToAdd = shape.GetVertexCount();
-
-		Vertex* vertexBuffer = shape.GetVertexBuffer();
-		InsertVerticesToBuffer(vertexBuffer, nVertexToAdd);
-		InsertIndicesIntoBuffer(shape);
-
-		nCurrentIndex += nIndicesToAdd;
-		nCurrentVertex += nVertexToAdd;
-#else
-		DrawShape(shape, s_whiteTexture);
-#endif
-	}
-
-	//use this function to render textures
-	void DrawShape(BaseShape& shape, const Texture& texture)
-	{
-		int nIndicesToAdd = shape.GetIndicesCount();
-		int nVertexToAdd = shape.GetVertexCount();
-
-		Vertex* vertexBuffer = shape.GetVertexBuffer();
-		
-		std::unordered_map<unsigned int, unsigned int>::iterator it = s_mapTexIdToTexSlot.find(texture.GetRendererId());
-
-		unsigned int texSlot;
-		if (it != s_mapTexIdToTexSlot.end())
-		{
-			//texture is already bound to a certain slot
-			texSlot = it->second;
-		}
-		else
-		{
-			if (s_nCurrentTextureSlot >= s_nMaxTextureSlots)
-			{
-				EndScene();
-			}
-
-			s_mapTexIdToTexSlot.emplace(texture.GetRendererId(), (unsigned int)s_nCurrentTextureSlot);
-			glcall(glBindTextureUnit(s_nCurrentTextureSlot, texture.GetRendererId()));
-			texSlot = s_nCurrentTextureSlot;
-			s_nCurrentTextureSlot++;
-		}
-
-		//Texture is bound, now you can add it to the vertex buffer
-		for (int i = 0; i < nVertexToAdd; i++)
-		{
-			vertexBuffer[i].m_textureId = (float)texSlot;
-		}
-
-		//upload vertex buffer to the gpu
-		InsertIndicesIntoBuffer(shape);
-		InsertVerticesToBuffer(vertexBuffer, nVertexToAdd);
-		nCurrentIndex += nIndicesToAdd;
-		nCurrentVertex += nVertexToAdd;
-	}
+}
+void Renderer::DrawQuadTexture(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
+{
 
 }

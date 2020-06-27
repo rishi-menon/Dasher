@@ -1,15 +1,25 @@
 #pragma once
-#include "Shapes/BaseShape.h"
-#include "Texture.h"
 
-namespace Renderer
+#include "glm.hpp"
+
+struct Vertex
 {
-	extern bool Initialise();
-	extern void Cleanup();
+	glm::vec3 m_pos;
+	glm::vec4 m_col;
+	glm::vec2 m_textureCoord;
+};
 
-	extern void EndScene();
+class Renderer
+{
+public:
+	static bool Initialise();
+	static void Cleanup();
 
-	void DrawShape(BaseShape& shape);
-	void DrawShape(BaseShape& shape, const Texture& texture);
+	static void Flush();
 
-}
+	static void DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col);
+	static void DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, unsigned int nTexId);
+
+	static void DrawQuadColor(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount);
+	static void DrawQuadTexture(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId);
+};

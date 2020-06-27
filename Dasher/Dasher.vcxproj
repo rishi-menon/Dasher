@@ -156,23 +156,16 @@
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Renderer\Shapes\BaseShape.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Renderer\Shapes\QuadShape.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
-    <ClCompile Include="src\Renderer\GlBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\AllShapes.h" />
-    <ClInclude Include="src\Renderer\Shapes\BaseShape.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
-    <ClInclude Include="src\Renderer\Shapes\QuadShape.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
-    <ClInclude Include="src\Renderer\GlBuffer.h" />
     <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <ItemGroup>

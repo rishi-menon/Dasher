@@ -4,8 +4,8 @@
 #include <thread>
 #include <chrono>
 
+#include "Renderer/Texture.h"
 #include "Renderer/Renderer.h"
-#include "AllShapes.h"
 
 #include "Log.h"
 #include "Timer.h"
@@ -42,14 +42,14 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	glcall(glEnable(GL_BLEND));
 	glcall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-	bool bSucecss = Renderer::Initialise();
-	ASSERT(bSucecss, "Error: Failed to initialise renderer");
+	bool bSuccess = Renderer::Initialise();
+	ASSERT(bSuccess, "Error: Failed to initialise renderer");
 
-	return bSucecss;
+	return bSuccess;
 }
 void Application::Run()
 {
-	const float fCol = 0.18;
+	const float fCol = 0.18f;
 	glClearColor(fCol, fCol, fCol, 1);
 
 	//Nice Quad Colour
@@ -59,22 +59,9 @@ void Application::Run()
 	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
 	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
 	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
+	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
 */
-	QuadShape shape;
-
-	shape[0] = Vertex({ -0.5, -0.5, 0 }, { 0.3, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 1.0, 0.0 });
-	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 1.0, 1.0 });
-	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 1.0 });
-
-	Texture tex;
-	tex.LoadTexture("Assets\\Textures\\img1.jpg");
-	QuadShape shape1;
-
-	shape1[0] = Vertex({ -1, -1, 0 },		{ 0.1, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
-	shape1[1] = Vertex({ -0.7, -1, 0 },		{ 0.5, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
-	shape1[2] = Vertex({ -0.7,  -0.7, 0 },	{0.7, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
-	shape1[3] = Vertex({ -1,  -0.7, 0 },	{ 0.9, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
+	
 	/*
 	QuadShape shape2;
 
@@ -82,6 +69,8 @@ void Application::Run()
 	shape2[1] = Vertex({ 1, 0.7, 0 },		{ 0.5, 0.2, 0.2, 1.0 },		{ 0.0, 1.0 });
 	shape2[2] = Vertex({ 1, 1, 0 },			{ 0.7, 0.2, 0.2, 1.0 },		{ 1.0, 1.0 });
 	shape2[3] = Vertex({ 0.7,  1, 0 },		{ 0.9, 0.2, 0.2, 1.0 },		{ 1.0, 0.0 });*/
+
+	unsigned int idTemp = Texture::LoadTexture("Assets\\Textures\\img1.jpg", 0, 0);
 
 
 	const double dMaxDeltaTime = 1.0/30.0;
@@ -101,18 +90,39 @@ void Application::Run()
 		}
 		timer.SetDeltaTime(dDeltaTime);
 		timer.SetGameTime(dCurrentTime);
-		
+
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 		//clear screen
 		glcall(glClear (GL_COLOR_BUFFER_BIT));
 
-		Renderer::DrawShape(shape, tex);
-		Renderer::DrawShape(shape1);
-		//Renderer::DrawShape(shape2);
 
-		Renderer::EndScene();
+		Renderer::DrawQuad({ 0,0 }, { 0.5, 0.5 }, { 0.9,0.7,0.1,1.0 });
+		Renderer::DrawQuad({ -0.5,-0.5 }, { 0.5, 0.5 }, { 0.3,0.2,0.8,1.0 }, idTemp);
+		Renderer::DrawQuad({ +0.5,+0.5 }, { 0.5, 0.5 }, { 0.1,0.5,0.8,1.0 }, idTemp);
+		Renderer::DrawQuad({ +0.5,-0.5 }, { 0.5, 0.5 }, { 0.8,0.2,0.8,1.0 }, idTemp);
+
+		Renderer::Flush();
+
 		glfwSwapBuffers(m_pWindow);
 		glfwPollEvents();
 
+
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		///////////////////////////////////////////////////////////
 		//////                  Sleep                  ////////////
 		long dSleepTime = 1; // in ms

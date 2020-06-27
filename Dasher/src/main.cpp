@@ -23,7 +23,7 @@ int main()
 	Application* pApplication = new Application;
 	const int nStartingWidth = 1200, nStartingHeight = 1000;
 
-	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Survivor"))
+	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Dasher"))
 	{
 		pApplication->Run();
 	}
