@@ -10,9 +10,10 @@ out vec4 v_col;
 out vec2 v_texCord;
 out float v_texIndex;
 
+uniform mat4 u_mvp;
 void main()
 {
-	gl_Position = a_pos;
+	gl_Position = u_mvp * a_pos;
 	v_col = a_col;
 	v_texCord = a_texCord;
 	v_texIndex = a_texIndex;

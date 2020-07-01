@@ -6,6 +6,9 @@
 
 #include "Log.h"
 #include "Texture.h"
+#include "Application/Application.h"
+
+#include "gtc/matrix_transform.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -104,13 +107,6 @@ void ParseShader(const char* const filePath, std::string& outVertex, std::string
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct RendererVertex
-{
-	glm::vec3 m_pos;
-	glm::vec4 m_col;
-	glm::vec2 m_textureCoord;
-	float m_textureId;
-};
 
 struct RendererData
 {
@@ -119,7 +115,7 @@ struct RendererData
 	unsigned int nVbo;
 	unsigned int nIbo;
 
-	const int nMaxVertexCount = 12;
+	const int nMaxVertexCount = 52;
 	const int nMaxIndexCount = (nMaxVertexCount * 6) / 4;
 
 	unsigned int nShader;
@@ -135,6 +131,10 @@ struct RendererData
 	const int nMaxTexSlots = 32;
 	int boundTextureSlots[32];
 	int nCurrentTextureSlot = 0;
+
+
+	glm::mat4 matProjection;
+	int u_mvpLocation;
 };
 
 static RendererData data;
@@ -219,6 +219,16 @@ bool Renderer::Initialise()
 		}
 	}
 
+	glcall(data.u_mvpLocation = glGetUniformLocation(data.nShader, "u_mvp"));
+	if (data.u_mvpLocation == -1)
+	{
+		LOG_WARN("uniform u_mvp was not found");
+	}
+
+	int nWidth = Application::GetCurrentApp()->GetWidth();
+	int nHeight = Application::GetCurrentApp()->GetHeight();
+
+	OnWindowResize(nWidth, nHeight);
 
 	//Load the textures
 	unsigned char whiteColor[4] = { 255,255,255,255 };
@@ -257,6 +267,8 @@ void Renderer::Flush()
 	glcall(glBufferSubData(GL_ARRAY_BUFFER, 0, data.nCurrentVertexLocation * sizeof(RendererVertex), data.localVertexBuffer));
 	glcall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data.nCurrentIndexLocation * sizeof(unsigned int), data.localIndexBuffer));
 
+	glcall(glUniformMatrix4fv(data.u_mvpLocation, 1, GL_FALSE, &data.matProjection[0][0]));
+
 	//Setup uniforms here ?
 	glcall(glDrawElements(GL_TRIANGLES, data.nCurrentIndexLocation, GL_UNSIGNED_INT, 0));
 
@@ -288,9 +300,10 @@ static void GenerateQuad(const glm::vec2& pos, const glm::vec2& size, const glm:
 	for (int i = 0; i < 4; i++)
 	{
 		outQuad[i].m_col = col;
-		outQuad[i].m_textureId = texId;
+		outQuad[i].SetTexId(texId);
 	}
 }
+
 void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
 {
 
@@ -367,11 +380,81 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	data.nCurrentIndexLocation += 6;
 }
 
-void Renderer::DrawQuadColor(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount)
+void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount)
 {
-
+	DrawQuadTexture(vertexBuffer, nVertexCount, indexBuffer, nIndexCount, data.nTextureWhiteId);
 }
-void Renderer::DrawQuadTexture(Vertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
+void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
 {
+	if (data.nCurrentVertexLocation + nVertexCount > data.nMaxVertexCount || data.nCurrentIndexLocation + nIndexCount > data.nMaxIndexCount)
+	{
+		Renderer::Flush();
+	}
 
+	//Calculate texture slot for the generated quad
+	unsigned int nTextureSlot = 0xffff;
+	for (unsigned int i = 0; i < 32; i++)
+	{
+		if ((unsigned int)data.boundTextureSlots[i] == nTextureId)
+		{
+			//texture is already bound
+			nTextureSlot = i;
+			break;
+		}
+	}
+
+	if (nTextureSlot == 0xffff)
+	{
+		//texture was not found... bind it to a slot and add it to the cache which keeps track of bound textures
+		int& curSlot = data.nCurrentTextureSlot;
+		if (curSlot >= data.nMaxTexSlots)
+		{
+			//there are no free spots available to bind... so flush and create a new batch
+			Renderer::Flush();
+		}
+
+		glcall(glActiveTexture(GL_TEXTURE0 + curSlot));
+		glcall(glBindTexture(GL_TEXTURE_2D, nTextureId));
+		data.boundTextureSlots[curSlot] = nTextureId;
+		nTextureSlot = curSlot;
+		curSlot++;
+	}
+
+	for (int i = 0; i < nVertexCount; i++)
+	{
+		vertexBuffer[i].SetTexId(nTextureSlot);
+	}
+
+	//save to local buffer
+	RendererVertex* curVertexPosition = data.localVertexBuffer + data.nCurrentVertexLocation;
+	unsigned int* curIndexPosition = data.localIndexBuffer + data.nCurrentIndexLocation;
+
+	const int nHeapAllocThreshhold = 40;	//max number of indices that would be created on the stack
+	unsigned int* index;
+	if (nIndexCount < nHeapAllocThreshhold)
+		index = (unsigned int*)alloca(nIndexCount * sizeof(unsigned int));
+	else {
+		LOG_INFO("Dynamic memory allocation for the index buffer");
+		index = new unsigned int[nIndexCount];
+	}
+
+	for (char i = 0; i < nIndexCount; i++)
+	{
+		index[i] = data.nCurrentVertexLocation + indexBuffer[i];
+	}
+
+	memcpy(curVertexPosition, vertexBuffer, nVertexCount * sizeof(RendererVertex));
+	memcpy(curIndexPosition, index, nIndexCount * sizeof(unsigned int));
+
+	if (nIndexCount >= nHeapAllocThreshhold)
+		delete[] index;
+
+	data.nCurrentVertexLocation += nVertexCount;
+	data.nCurrentIndexLocation += nIndexCount;
+}
+
+void Renderer::OnWindowResize(int nWidth, int nHeight)
+{
+	data.matProjection = glm::ortho<float>(0, nWidth, 0, nHeight);
+	glViewport(0, 0, nWidth, nHeight);
 }

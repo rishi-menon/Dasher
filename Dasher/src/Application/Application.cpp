@@ -10,6 +10,8 @@
 #include "Log.h"
 #include "Timer.h"
 
+#include "Events/Layer.h"
+
 Application* Application::ms_currentApp = nullptr;
 
 
@@ -22,6 +24,9 @@ Application::Application() :
 
 bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle)
 {
+
+	m_nWidth = nWidth;
+	m_nHeight = nHeight;
 	m_pWindow = glfwCreateWindow(nWidth, nHeight, strTitle, nullptr, nullptr);
 	if (!m_pWindow)
 	{
@@ -37,8 +42,106 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		ASSERT(false, "Could not initialise GLEW");
 	}
 
-	//Enable blending and depth buffer
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//										Set Callbacks											 //
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	glfwSetWindowUserPointer(m_pWindow, this);
+	glfwSetWindowSizeCallback(m_pWindow, [](GLFWwindow* pWindow, int nWidth, int nHeight)
+		{
+			//LOG_INFO("Window Resize Event: width: {0} height: {1}", nWidth, nHeight);
+			Application* pApp = (Application*)glfwGetWindowUserPointer(pWindow);
+			ASSERT(pApp, "pApplication was nullptr");
+			
+			pApp->SetWidth(nWidth);
+			pApp->SetHeight(nHeight);
+
+			Renderer::OnWindowResize(nWidth, nHeight);
+			const std::vector<Layer*>& vec = pApp->GetLayers();
+			for (Layer* pLayer : vec)
+			{
+				if (pLayer->OnWindowResize(nWidth, nHeight))
+				{
+					break;
+				}
+
+			}
+		});
+
+	glfwSetMouseButtonCallback(m_pWindow, [](GLFWwindow* window, int button, int action, int mods)
+		{
+			//LOG_INFO("Mouse Press Event: {0}, {1}, {2}", button, action, mods);
+			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
+			ASSERT(pApp, "pApplication was nullptr");
+
+			const std::vector<Layer*>& vec = pApp->GetLayers();
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					for (Layer* pLayer : vec)
+					{
+						if (pLayer->OnMouseDown(button)) break;
+					}
+				}
+				case GLFW_RELEASE:
+				{
+					for (Layer* pLayer : vec)
+					{
+						if (pLayer->OnMouseUp(button)) break;
+					}
+				}
+			}
+
+		});
+
+	glfwSetCursorPosCallback(m_pWindow, [](GLFWwindow* window, double xpos, double ypos)
+		{
+			//LOG_INFO("Mouse Move Event: {0}, {1}", xpos, ypos);
+			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
+			ASSERT(pApp, "pApplication was nullptr");
+
+			const std::vector<Layer*>& vec = pApp->GetLayers();
+			for (Layer* pLayer : vec)
+			{
+				if (pLayer->OnMouseMove(xpos, ypos)) break;
+			}
+		});
+
+	glfwSetKeyCallback(m_pWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			//LOG_INFO("Key Press Event: {0}, {1}, {2}, {3}", key, scancode, action, mods);
+			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
+			ASSERT(pApp, "pApplication was nullptr");
+
+			const std::vector<Layer*>& vec = pApp->GetLayers();
+			switch (action)
+			{
+				case GLFW_PRESS:
+				{
+					for (Layer* pLayer : vec)
+					{
+						if (pLayer->OnKeyDown(key)) break;
+					}
+				}
+				case GLFW_RELEASE:
+				{
+					for (Layer* pLayer : vec)
+					{
+						if (pLayer->OnKeyUp(key)) break;
+					}
+				}
+				case GLFW_REPEAT:
+				{
+					for (Layer* pLayer : vec)
+					{
+						if (pLayer->OnKey(key)) break;
+					}
+				}
+			}
+		});
+
+	//Enable blending and depth buffer
 	glcall(glEnable(GL_BLEND));
 	glcall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
@@ -76,6 +179,8 @@ void Application::Run()
 	const double dMaxDeltaTime = 1.0/30.0;
 	const double dTargetDeltaTime = 1.0 / 60.0;
 
+	
+
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
 
@@ -99,15 +204,28 @@ void Application::Run()
 		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 		//clear screen
 		glcall(glClear (GL_COLOR_BUFFER_BIT));
 
 
-		Renderer::DrawQuad({ 0,0 }, { 0.5, 0.5 }, { 0.9,0.7,0.1,1.0 });
-		Renderer::DrawQuad({ -0.5,-0.5 }, { 0.5, 0.5 }, { 0.3,0.2,0.8,1.0 }, idTemp);
-		Renderer::DrawQuad({ +0.5,+0.5 }, { 0.5, 0.5 }, { 0.1,0.5,0.8,1.0 }, idTemp);
-		Renderer::DrawQuad({ +0.5,-0.5 }, { 0.5, 0.5 }, { 0.8,0.2,0.8,1.0 }, idTemp);
+		//Renderer::DrawQuad({ 0,0 }, { 0.5, 0.5 }, { 0.9,0.7,0.1,1.0 });
+		Renderer::DrawQuad({ 100, 100 }, { 100,100 }, { 0.3,0.2,0.8,1.0 }, idTemp);
+		Renderer::DrawQuad({ 200, 200 }, { 100,100 }, { 0.1,0.5,0.8,1.0 }, idTemp);
+		Renderer::DrawQuad({ 300, 300 }, { 100,100 }, { 0.8,0.2,0.8,1.0 }, idTemp);
+
+		/*RendererVertex v[6];
+		unsigned int i[15] = { 0,1,2,0,2,3,0,3,4,0,4,5,0,5,1 };	
+		
+		v[0].SetPosColTex({ 0,0, 0 }, { 0.8,0.2,0.1, 1.0 }			,{0,0});
+		v[1].SetPosColTex({ 0,0.3, 0 }, { 0.8,0.2,0.1, 1.0 }		,{0,1});
+		v[2].SetPosColTex({ 0.2,0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{1,1});
+		v[4].SetPosColTex({ 0.2,-0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{1,0});
+		v[5].SetPosColTex({ -0.2,-0.1, 0 }, { 0.8,0.2,0.1, 1.0 }	,{0,0});
+		v[3].SetPosColTex({ -0.2,0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{0,0});
+		
+		Renderer::DrawQuadTexture(v, 6, i, 15, idTemp);*/
 
 		Renderer::Flush();
 
