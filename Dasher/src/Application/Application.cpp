@@ -10,7 +10,10 @@
 #include "Log.h"
 #include "Timer.h"
 
+#include "EventCallbacks.h"
+
 #include "Events/Layer.h"
+#include "Events/PlayerLayer.h"
 
 Application* Application::ms_currentApp = nullptr;
 
@@ -24,7 +27,7 @@ Application::Application() :
 
 bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle)
 {
-
+	m_vLayers.reserve(30);
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
 	m_pWindow = glfwCreateWindow(nWidth, nHeight, strTitle, nullptr, nullptr);
@@ -42,104 +45,12 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		ASSERT(false, "Could not initialise GLEW");
 	}
 
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//										Set Callbacks											 //
-	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//Set callbacks
 	glfwSetWindowUserPointer(m_pWindow, this);
-	glfwSetWindowSizeCallback(m_pWindow, [](GLFWwindow* pWindow, int nWidth, int nHeight)
-		{
-			//LOG_INFO("Window Resize Event: width: {0} height: {1}", nWidth, nHeight);
-			Application* pApp = (Application*)glfwGetWindowUserPointer(pWindow);
-			ASSERT(pApp, "pApplication was nullptr");
-			
-			pApp->SetWidth(nWidth);
-			pApp->SetHeight(nHeight);
-
-			Renderer::OnWindowResize(nWidth, nHeight);
-			const std::vector<Layer*>& vec = pApp->GetLayers();
-			for (Layer* pLayer : vec)
-			{
-				if (pLayer->OnWindowResize(nWidth, nHeight))
-				{
-					break;
-				}
-
-			}
-		});
-
-	glfwSetMouseButtonCallback(m_pWindow, [](GLFWwindow* window, int button, int action, int mods)
-		{
-			//LOG_INFO("Mouse Press Event: {0}, {1}, {2}", button, action, mods);
-			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
-			ASSERT(pApp, "pApplication was nullptr");
-
-			const std::vector<Layer*>& vec = pApp->GetLayers();
-			switch (action)
-			{
-				case GLFW_PRESS:
-				{
-					for (Layer* pLayer : vec)
-					{
-						if (pLayer->OnMouseDown(button)) break;
-					}
-				}
-				case GLFW_RELEASE:
-				{
-					for (Layer* pLayer : vec)
-					{
-						if (pLayer->OnMouseUp(button)) break;
-					}
-				}
-			}
-
-		});
-
-	glfwSetCursorPosCallback(m_pWindow, [](GLFWwindow* window, double xpos, double ypos)
-		{
-			//LOG_INFO("Mouse Move Event: {0}, {1}", xpos, ypos);
-			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
-			ASSERT(pApp, "pApplication was nullptr");
-
-			const std::vector<Layer*>& vec = pApp->GetLayers();
-			for (Layer* pLayer : vec)
-			{
-				if (pLayer->OnMouseMove(xpos, ypos)) break;
-			}
-		});
-
-	glfwSetKeyCallback(m_pWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			//LOG_INFO("Key Press Event: {0}, {1}, {2}, {3}", key, scancode, action, mods);
-			Application* pApp = (Application*)glfwGetWindowUserPointer(window);
-			ASSERT(pApp, "pApplication was nullptr");
-
-			const std::vector<Layer*>& vec = pApp->GetLayers();
-			switch (action)
-			{
-				case GLFW_PRESS:
-				{
-					for (Layer* pLayer : vec)
-					{
-						if (pLayer->OnKeyDown(key)) break;
-					}
-				}
-				case GLFW_RELEASE:
-				{
-					for (Layer* pLayer : vec)
-					{
-						if (pLayer->OnKeyUp(key)) break;
-					}
-				}
-				case GLFW_REPEAT:
-				{
-					for (Layer* pLayer : vec)
-					{
-						if (pLayer->OnKey(key)) break;
-					}
-				}
-			}
-		});
+	glfwSetWindowSizeCallback(m_pWindow, WindowResizeCallback);
+	glfwSetMouseButtonCallback(m_pWindow, MouseButtonCallback);
+	glfwSetCursorPosCallback(m_pWindow, MousePositionCallback);
+	glfwSetKeyCallback(m_pWindow, KeyCallback);
 
 	//Enable blending and depth buffer
 	glcall(glEnable(GL_BLEND));
@@ -148,7 +59,46 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	bool bSuccess = Renderer::Initialise();
 	ASSERT(bSuccess, "Error: Failed to initialise renderer");
 
+	///////////////////////////////////////////////////////////////////////////////
+	//								Create Layers here							 //
+	///////////////////////////////////////////////////////////////////////////////
+	
+	InsertLayer(new PlayerLayer);
 	return bSuccess;
+}
+
+
+void Application::InsertLayer(Layer* pLayer)
+{
+	std::vector<Layer*>::iterator it = std::find(m_vLayers.begin(), m_vLayers.end(), pLayer);
+	if (it != m_vLayers.end())
+	{
+		int index = it - m_vLayers.begin();
+		ASSERT(false, "Layer is already inserted");
+	}
+	else
+	{
+		int index = m_vLayers.size();
+		m_vLayers.push_back (pLayer);
+		pLayer->RegisterEvents(this, index);
+	}
+
+	//Call OnStart for the inserted layer
+	pLayer->OnStart();
+}
+void Application::RegisterEvents(Layers layerId, LayerIndex index)
+{
+	std::list <LayerIndex>& list = m_listLayersIndex[layerId];
+
+	std::list <LayerIndex>::iterator it = std::find(list.begin(), list.end(), index);
+	if (it != list.end())
+	{
+		LOG_WARN("Layer {0} with index {1} was already registered", layerId, index);
+	}
+	else
+	{
+		list.push_back(index);
+	}
 }
 void Application::Run()
 {
@@ -187,10 +137,10 @@ void Application::Run()
 		///////////////////////////////////////////////////////////
 		//////                  Set Time               ////////////
 		double dCurrentTime = glfwGetTime();
-		double dDeltaTime = dCurrentTime - timer.GetGameTime();
+		double dDeltaTime = dCurrentTime - timer.GetGameTime();	//in seconds
 		if (dDeltaTime > dMaxDeltaTime)
 		{
-			LOG_INFO("Frame rate is slowing down: {0} ms", dDeltaTime * 1000);
+			//LOG_INFO("Frame rate is slowing down: {0} ms", dDeltaTime * 1000);
 			dDeltaTime = dMaxDeltaTime;
 		}
 		timer.SetDeltaTime(dDeltaTime);
@@ -227,6 +177,10 @@ void Application::Run()
 		
 		Renderer::DrawQuadTexture(v, 6, i, 15, idTemp);*/
 
+		for (Layer* pLayer : m_vLayers)
+		{
+			pLayer->OnUpdate(dDeltaTime);
+		}
 		Renderer::Flush();
 
 		glfwSwapBuffers(m_pWindow);
@@ -264,4 +218,11 @@ void Application::Cleanup()
 		glfwDestroyWindow(m_pWindow);
 		m_pWindow = nullptr;
 	}
+
+	std::vector <Layer*>& vec = m_vLayers;
+	for (Layer* pLayer : vec)
+	{
+		delete pLayer;
+	}
+	m_vLayers.clear();
 }

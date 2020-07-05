@@ -1,8 +1,28 @@
 #pragma once
 
+using LayerIndex = unsigned short;
+
+enum Layers : unsigned short
+{
+	LayerMouseMove = 0x0000,
+	LayerMouseDown,
+	LayerMouseUp,
+
+	LayerKey,
+	LayerKeyDown,
+	LayerKeyUp,
+
+	LayerWindowResize,
+
+	LayerCount
+};
+
+class Application;
+
 class Layer
 {
 public:
+	virtual void RegisterEvents(Application* pApp, int nIndex) {}
 
 	virtual void OnStart() {}
 	virtual void OnUpdate(float deltaTime) {}	//in seconds

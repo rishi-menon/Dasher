@@ -6,6 +6,7 @@
 #include "Events/Layer.h"
 
 #include <vector>
+#include <list>
 
 class Application
 {
@@ -15,6 +16,7 @@ public:
 	inline static Application* GetCurrentApp() { ASSERT(ms_currentApp, "Application was nullptr"); return ms_currentApp; }
 
 	inline const std::vector<Layer*>& GetLayers() const { return m_vLayers; }
+	inline const std::list<LayerIndex>& GetLayerIndex(Layers layer) const { return m_listLayersIndex[layer]; }
 
 	inline int GetWidth() const { return m_nWidth; }
 	inline int GetHeight() const { return m_nHeight; }
@@ -24,6 +26,9 @@ public:
 
 	bool Initialise(int nWidth, int nHeight, const char* const strTitle);
 	void Run();
+
+	void InsertLayer(Layer* pLayer);
+	void RegisterEvents(Layers layerId, LayerIndex index);
 
 private:
 	void Cleanup();
@@ -38,4 +43,6 @@ private:
 
 	std::vector<Layer*> m_vLayers;
 	
+	//create a vector for each event callback. The vector stores the index position in the actual m_vLayers array. When the event occurs, the corresponding OnEvent function will be called for all the layers stored in the corresponding index array.
+	std::list<LayerIndex> m_listLayersIndex[LayerCount];
 };

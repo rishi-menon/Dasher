@@ -154,7 +154,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application\Application.cpp" />
+    <ClCompile Include="src\Application\EventCallbacks.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
+    <ClCompile Include="src\Events\PlayerLayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
@@ -165,7 +167,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h" />
+    <ClInclude Include="src\Application\EventCallbacks.h" />
     <ClInclude Include="src\Events\Layer.h" />
+    <ClInclude Include="src\Events\PlayerLayer.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\RendererVertex.h" />
