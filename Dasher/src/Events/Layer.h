@@ -22,7 +22,10 @@ class Application;
 class Layer
 {
 public:
+	virtual ~Layer() {}
+
 	virtual void RegisterEvents(Application* pApp, int nIndex) {}
+	virtual void ResetLayer() {}
 
 	virtual void OnStart() {}
 	virtual void OnUpdate(float deltaTime) {}	//in seconds

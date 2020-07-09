@@ -262,12 +262,12 @@ void Renderer::Flush()
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, data.nTextureWhiteId);
+	//bind this here because while creating new textures, texture slot 0 is used and that could potentially unbind the blank white color texture thats used for rendering color.
+	glBindTexture(GL_TEXTURE_2D, data.nTextureWhiteId);	
 
 	glcall(glBufferSubData(GL_ARRAY_BUFFER, 0, data.nCurrentVertexLocation * sizeof(RendererVertex), data.localVertexBuffer));
 	glcall(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, data.nCurrentIndexLocation * sizeof(unsigned int), data.localIndexBuffer));
 
-	glcall(glUniformMatrix4fv(data.u_mvpLocation, 1, GL_FALSE, &data.matProjection[0][0]));
 
 	//Setup uniforms here ?
 	glcall(glDrawElements(GL_TRIANGLES, data.nCurrentIndexLocation, GL_UNSIGNED_INT, 0));
@@ -456,5 +456,7 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 void Renderer::OnWindowResize(int nWidth, int nHeight)
 {
 	data.matProjection = glm::ortho<float>(0, nWidth, 0, nHeight);
+	glcall(glUniformMatrix4fv(data.u_mvpLocation, 1, GL_FALSE, &data.matProjection[0][0]));
+
 	glViewport(0, 0, nWidth, nHeight);
 }

@@ -1,63 +1,76 @@
 #include "PlayerLayer.h"
 #include "Application/Application.h"
+#include "Renderer/Renderer.h"
 
+PlayerLayer::PlayerLayer()
+{
+	PlayerLayer::ResetLayer();
+}
+void PlayerLayer::ResetLayer()
+{
+	m_vPos = glm::vec2(100, 300);
+	m_vVel = glm::vec2(0, 0);
+	m_bIsFalling = true;
+}
 void PlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	//pApp->RegisterEvents(LayerMouseMove, nIndex);
-	pApp->RegisterEvents(LayerMouseDown, nIndex);
-	pApp->RegisterEvents(LayerMouseUp, nIndex);
+	//pApp->RegisterEvents(LayerMouseDown, nIndex);
+	//pApp->RegisterEvents(LayerMouseUp, nIndex);
 
 	//pApp->RegisterEvents(LayerKey, nIndex);
 	pApp->RegisterEvents(LayerKeyDown, nIndex);
 	pApp->RegisterEvents(LayerKeyUp, nIndex);
 
-	pApp->RegisterEvents(LayerWindowResize, nIndex);
+	//pApp->RegisterEvents(LayerWindowResize, nIndex);
 	
 }
 void PlayerLayer::OnStart()
 {
-	LOG_INFO("On Start");
+	
 }
 
 void PlayerLayer::OnUpdate(float deltaTime)
 {
-}
+	if (!m_bIsFalling)
+	{
+		const float offset = 200; 
+		float multiplier = (m_vVel.y < offset) ? 5.0f : 1.0;
+		m_vVel.y += multiplier * mc_fEnginePower;
+		
+	}
+	else
+	{
+		const float offset = 0;
+		float multiplier = (m_vVel.y > offset) ? 1.4f : 1.0;
+		m_vVel.y += multiplier * mc_fGravity;
+	}
+	m_vVel.y = Math::Clamp(-1200, 1200, m_vVel.y);
+	m_vPos += m_vVel * deltaTime;
 
-bool PlayerLayer::OnMouseMove(double x, double y)  
-{ 
-	LOG_INFO("Mouse Move");
-	return false; 
-}
-bool PlayerLayer::OnMouseDown(int nButton)		  
-{
-	LOG_INFO("Mouse Down");
-	return false; 
-}
+	//LOG_INFO("Player pos x: {0} y: {1}", m_vVel.x, m_vVel.y);
 
-bool PlayerLayer::OnMouseUp(int nButton)			  
-{
-	LOG_INFO("Mouse Up");
-	return false; 
+	//Draw
+	Renderer::DrawQuad(m_vPos, mc_vSize, mc_vCol);
 }
 
 bool PlayerLayer::OnKey(int key)		 
 { 
-	LOG_INFO("Key");
 	return false; 
 }
 bool PlayerLayer::OnKeyDown(int key)  
 {
-	LOG_INFO("Key down");
+	if (key == mc_nJumpKey)
+	{
+		m_bIsFalling = false;
+	}
 	return false; 
 }
 bool PlayerLayer::OnKeyUp(int key)    
 {
-	LOG_INFO("Key up");
-	return false;
-}
-
-bool PlayerLayer::OnWindowResize(int x, int y)  
-{
-	LOG_INFO("window resize");
+	if (key == mc_nJumpKey)
+	{
+		m_bIsFalling = true;
+	}
 	return false;
 }

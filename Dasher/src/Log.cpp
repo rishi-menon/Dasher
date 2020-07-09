@@ -6,12 +6,16 @@
 namespace CoreLogger
 {
 	std::shared_ptr<spdlog::logger> g_CoreLogger;
+	std::shared_ptr<spdlog::logger> g_ClientLogger;
 
 	void Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 		g_CoreLogger = spdlog::stdout_color_mt("Core");
 		g_CoreLogger->set_level(spdlog::level::trace);
+		
+		g_ClientLogger = spdlog::stdout_color_mt("Logger");
+		g_ClientLogger->set_level(spdlog::level::trace);
 
 		LOG_TRACE("Initialised logging");
 	}

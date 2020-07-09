@@ -8,7 +8,6 @@
 #include "Renderer/Renderer.h"
 
 #include "Log.h"
-#include "Timer.h"
 
 #include "EventCallbacks.h"
 
@@ -17,9 +16,12 @@
 
 Application* Application::ms_currentApp = nullptr;
 
+bool s_bResetGame = false;
 
 Application::Application() :
-	m_pWindow(nullptr)
+	m_pWindow(nullptr),
+	m_dCurrentTime (0),
+	m_dDeltaTime (0)
 {
 	ASSERT(!ms_currentApp, "A second Application was created");
 	ms_currentApp = this;
@@ -100,112 +102,79 @@ void Application::RegisterEvents(Layers layerId, LayerIndex index)
 		list.push_back(index);
 	}
 }
+
+void Application::ResetGame()
+{
+	s_bResetGame = true;
+}
+void Application::StartGame()
+{
+	s_bResetGame = false;
+	Renderer::Flush();
+	glcall(glClear(GL_COLOR_BUFFER_BIT));
+	for (Layer* pLayer : m_vLayers)
+	{
+		pLayer->ResetLayer();
+	}
+}
+
 void Application::Run()
 {
 	const float fCol = 0.18f;
 	glClearColor(fCol, fCol, fCol, 1);
 
-	//Nice Quad Colour
-/*
-	QuadShape shape;
-	shape[0] = Vertex({ -0.5, -0.5, 0 }, { 0.3, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[1] = Vertex({  0.5, -0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[2] = Vertex({  0.5,  0.5, 0 }, { 0.7, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-	shape[3] = Vertex({ -0.5,  0.5, 0 }, { 0.9, 0.2, 0.2, 1.0 }, { 0.0, 0.0 });
-*/
-	
-	/*
-	QuadShape shape2;
-
-	shape2[0] = Vertex({ 0.7, 0.7, 0 },		{ 0.1, 0.2, 0.2, 1.0 },		{ 0.0, 0.0 });
-	shape2[1] = Vertex({ 1, 0.7, 0 },		{ 0.5, 0.2, 0.2, 1.0 },		{ 0.0, 1.0 });
-	shape2[2] = Vertex({ 1, 1, 0 },			{ 0.7, 0.2, 0.2, 1.0 },		{ 1.0, 1.0 });
-	shape2[3] = Vertex({ 0.7,  1, 0 },		{ 0.9, 0.2, 0.2, 1.0 },		{ 1.0, 0.0 });*/
-
-	unsigned int idTemp = Texture::LoadTexture("Assets\\Textures\\img1.jpg", 0, 0);
-
-
 	const double dMaxDeltaTime = 1.0/30.0;
 	const double dTargetDeltaTime = 1.0 / 60.0;
 
-	
+	unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+
+
 
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
-
-		///////////////////////////////////////////////////////////
-		//////                  Set Time               ////////////
 		double dCurrentTime = glfwGetTime();
-		double dDeltaTime = dCurrentTime - timer.GetGameTime();	//in seconds
-		if (dDeltaTime > dMaxDeltaTime)
+		m_dDeltaTime = dCurrentTime - m_dCurrentTime;	//in seconds
+		m_dCurrentTime = dCurrentTime;
+		if (m_dDeltaTime > dMaxDeltaTime)
 		{
-			//LOG_INFO("Frame rate is slowing down: {0} ms", dDeltaTime * 1000);
-			dDeltaTime = dMaxDeltaTime;
+			m_dDeltaTime = dMaxDeltaTime;
 		}
-		timer.SetDeltaTime(dDeltaTime);
-		timer.SetGameTime(dCurrentTime);
-
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 		//clear screen
-		glcall(glClear (GL_COLOR_BUFFER_BIT));
-
-
-		//Renderer::DrawQuad({ 0,0 }, { 0.5, 0.5 }, { 0.9,0.7,0.1,1.0 });
-		Renderer::DrawQuad({ 100, 100 }, { 100,100 }, { 0.3,0.2,0.8,1.0 }, idTemp);
-		Renderer::DrawQuad({ 200, 200 }, { 100,100 }, { 0.1,0.5,0.8,1.0 }, idTemp);
-		Renderer::DrawQuad({ 300, 300 }, { 100,100 }, { 0.8,0.2,0.8,1.0 }, idTemp);
-
-		/*RendererVertex v[6];
-		unsigned int i[15] = { 0,1,2,0,2,3,0,3,4,0,4,5,0,5,1 };	
-		
-		v[0].SetPosColTex({ 0,0, 0 }, { 0.8,0.2,0.1, 1.0 }			,{0,0});
-		v[1].SetPosColTex({ 0,0.3, 0 }, { 0.8,0.2,0.1, 1.0 }		,{0,1});
-		v[2].SetPosColTex({ 0.2,0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{1,1});
-		v[4].SetPosColTex({ 0.2,-0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{1,0});
-		v[5].SetPosColTex({ -0.2,-0.1, 0 }, { 0.8,0.2,0.1, 1.0 }	,{0,0});
-		v[3].SetPosColTex({ -0.2,0.1, 0 }, { 0.8,0.2,0.1, 1.0 }		,{0,0});
-		
-		Renderer::DrawQuadTexture(v, 6, i, 15, idTemp);*/
+		glcall(glClear(GL_COLOR_BUFFER_BIT));
 
 		for (Layer* pLayer : m_vLayers)
 		{
-			pLayer->OnUpdate(dDeltaTime);
+			pLayer->OnUpdate(m_dDeltaTime);
+			if (s_bResetGame)
+			{
+				StartGame();
+				break;
+			}
 		}
+
+		RendererVertex v[4];
+
+		glm::vec4 col = { 0.8, 0.8, 0.8, 1.0 };
+		v[0].SetPosColTex({ 200, 200, 0 }, col, { -1.0, -1.0 });
+		v[1].SetPosColTex({ 400, 200, 0 }, col, { 1.0, -1.0 });
+		v[2].SetPosColTex({ 400, 400, 0 }, col, { 1.0, 1.0 });
+		v[3].SetPosColTex({ 200, 400, 0 }, col, { -1.0, 1.0 });
+
+		unsigned int i[6] = { 0,1,2,2,3,0 };
+		Renderer::DrawQuadTexture(v, 4, i, 6, nid);
+		
 		Renderer::Flush();
 
 		glfwSwapBuffers(m_pWindow);
-		glfwPollEvents();
+		glfwPollEvents(); 
 
-
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		//'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		///////////////////////////////////////////////////////////
-		//////                  Sleep                  ////////////
-		long dSleepTime = 1; // in ms
-		if (dDeltaTime < dTargetDeltaTime)
+		
+		if (m_dDeltaTime < 1.0 / 70.0)
 		{
-			double extraSleep = (dTargetDeltaTime - dDeltaTime) * 1000;
-			dSleepTime += (long) extraSleep;
+			std::chrono::milliseconds sleepDuration(1);
+			std::this_thread::sleep_for(sleepDuration);
 		}
-		std::chrono::microseconds sleepDuration(static_cast<long>(dSleepTime));
-		std::this_thread::sleep_for(sleepDuration);
-
 	}
 
 	Cleanup();

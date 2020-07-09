@@ -159,10 +159,10 @@
     <ClCompile Include="src\Events\PlayerLayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Maths.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Renderer\RendererVertex.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
-    <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,11 +170,11 @@
     <ClInclude Include="src\Application\EventCallbacks.h" />
     <ClInclude Include="src\Events\Layer.h" />
     <ClInclude Include="src\Events\PlayerLayer.h" />
+    <ClInclude Include="src\Maths.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\RendererVertex.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
-    <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vertex.shader" />

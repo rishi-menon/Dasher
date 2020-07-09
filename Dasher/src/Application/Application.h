@@ -30,16 +30,20 @@ public:
 	void InsertLayer(Layer* pLayer);
 	void RegisterEvents(Layers layerId, LayerIndex index);
 
+	void ResetGame();
 private:
+	void StartGame();
 	void Cleanup();
 
 private:
 	static Application* ms_currentApp;
-	static double ms_dCurrentTime;
-	static double ms_dDeltaTime;
+	
 private:
 	GLFWwindow* m_pWindow;
 	int m_nWidth, m_nHeight;
+
+	double m_dCurrentTime;
+	double m_dDeltaTime;
 
 	std::vector<Layer*> m_vLayers;
 	
