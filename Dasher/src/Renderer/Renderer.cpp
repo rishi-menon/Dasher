@@ -380,11 +380,11 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	data.nCurrentIndexLocation += 6;
 }
 
-void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount)
+void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount)
 {
 	DrawQuadTexture(vertexBuffer, nVertexCount, indexBuffer, nIndexCount, data.nTextureWhiteId);
 }
-void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
+void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
 {
 	if (data.nCurrentVertexLocation + nVertexCount > data.nMaxVertexCount || data.nCurrentIndexLocation + nIndexCount > data.nMaxIndexCount)
 	{

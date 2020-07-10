@@ -155,6 +155,8 @@
   <ItemGroup>
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\EventCallbacks.cpp" />
+    <ClCompile Include="src\Events\BackgroundLayer.cpp" />
+    <ClCompile Include="src\Events\BlockSpawnerLayer.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
     <ClCompile Include="src\Events\PlayerLayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
@@ -168,6 +170,8 @@
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\EventCallbacks.h" />
+    <ClInclude Include="src\Events\BackgroundLayer.h" />
+    <ClInclude Include="src\Events\BlockSpawnerLayer.h" />
     <ClInclude Include="src\Events\Layer.h" />
     <ClInclude Include="src\Events\PlayerLayer.h" />
     <ClInclude Include="src\Maths.h" />

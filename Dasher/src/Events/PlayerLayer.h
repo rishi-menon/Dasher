@@ -32,6 +32,5 @@ private:
 
 	glm::vec2 m_vVel;
 	
-
 	bool m_bIsFalling;
-};
+};   

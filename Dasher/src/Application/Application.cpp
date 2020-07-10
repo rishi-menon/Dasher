@@ -13,6 +13,8 @@
 
 #include "Events/Layer.h"
 #include "Events/PlayerLayer.h"
+#include "Events/BackgroundLayer.h"
+#include "Events/BlockSpawnerLayer.h"
 
 Application* Application::ms_currentApp = nullptr;
 
@@ -29,7 +31,7 @@ Application::Application() :
 
 bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle)
 {
-	m_vLayers.reserve(30);
+	m_vLayers.reserve(10);
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
 	m_pWindow = glfwCreateWindow(nWidth, nHeight, strTitle, nullptr, nullptr);
@@ -65,7 +67,9 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	//								Create Layers here							 //
 	///////////////////////////////////////////////////////////////////////////////
 	
+	InsertLayer(new BackgroundLayer);
 	InsertLayer(new PlayerLayer);
+	InsertLayer(new BlockSpawnerLayer);
 	return bSuccess;
 }
 
@@ -126,8 +130,7 @@ void Application::Run()
 	const double dMaxDeltaTime = 1.0/30.0;
 	const double dTargetDeltaTime = 1.0 / 60.0;
 
-	unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
-
+	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
 
 	while (!glfwWindowShouldClose (m_pWindow))
@@ -153,16 +156,16 @@ void Application::Run()
 			}
 		}
 
-		RendererVertex v[4];
+		/*RendererVertex v[4];
 
 		glm::vec4 col = { 0.8, 0.8, 0.8, 1.0 };
 		v[0].SetPosColTex({ 200, 200, 0 }, col, { -1.0, -1.0 });
 		v[1].SetPosColTex({ 400, 200, 0 }, col, { 1.0, -1.0 });
 		v[2].SetPosColTex({ 400, 400, 0 }, col, { 1.0, 1.0 });
-		v[3].SetPosColTex({ 200, 400, 0 }, col, { -1.0, 1.0 });
+		v[3].SetPosColTex({ 200, 400, 0 }, col, { -1.0, 1.0 });*/
 
-		unsigned int i[6] = { 0,1,2,2,3,0 };
-		Renderer::DrawQuadTexture(v, 4, i, 6, nid);
+		/*unsigned int i[6] = { 0,1,2,2,3,0 };
+		Renderer::DrawQuadTexture(v, 4, i, 6, nid);*/
 		
 		Renderer::Flush();
 
