@@ -18,10 +18,9 @@ int main()
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
 	
 	Application* pApplication = new Application;
-	const int nStartingWidth = 1200, nStartingHeight = 1000;
+	const int nStartingWidth = 1600, nStartingHeight = 1200;
 
 	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Dasher"))
 	{

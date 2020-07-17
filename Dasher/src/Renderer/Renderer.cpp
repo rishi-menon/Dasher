@@ -380,11 +380,11 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	data.nCurrentIndexLocation += 6;
 }
 
-void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount)
+void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, glm::mat4* transformation)
 {
-	DrawQuadTexture(vertexBuffer, nVertexCount, indexBuffer, nIndexCount, data.nTextureWhiteId);
+	DrawQuadTexture(vertexBuffer, nVertexCount, indexBuffer, nIndexCount, data.nTextureWhiteId, transformation);
 }
-void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId)
+void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId, glm::mat4* transformation)
 {
 	if (data.nCurrentVertexLocation + nVertexCount > data.nMaxVertexCount || data.nCurrentIndexLocation + nIndexCount > data.nMaxIndexCount)
 	{
@@ -442,9 +442,22 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 	{
 		index[i] = data.nCurrentVertexLocation + indexBuffer[i];
 	}
-
+	
 	memcpy(curVertexPosition, vertexBuffer, nVertexCount * sizeof(RendererVertex));
 	memcpy(curIndexPosition, index, nIndexCount * sizeof(unsigned int));
+
+	if (transformation)
+	{
+		//Apply the transformation on the vertices... in the future, consider doing this in the shader
+		for (int i = 0; i < nVertexCount; i++)
+		{
+			glm::vec3& vertexPos = curVertexPosition[i].m_pos;
+			glm::vec4 pos = { vertexPos.x, vertexPos.y, vertexPos.z, 1.0f };
+			pos = *transformation * pos;
+			vertexPos = { pos.x, pos.y, pos.z };
+			//vertexPos *= 1/pos.w; //Keep or delete ?
+		}
+	}
 
 	if (nIndexCount >= nHeapAllocThreshhold)
 		delete[] index;

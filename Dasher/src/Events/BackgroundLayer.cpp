@@ -6,7 +6,8 @@
 
 BackgroundLayer::BackgroundLayer()
 {
-	m_nTextureId = Texture::LoadTexture("Assets\\Textures\\Space.jpg", nullptr, nullptr, TextureProperties(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
+	//m_nTextureId = Texture::LoadTexture("Assets\\Textures\\Space.jpg", nullptr, nullptr, TextureProperties(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
+	m_nTextureId = Texture::LoadTexture("Assets\\Textures\\External\\bg3.png", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
 	ResetLayer();
 }

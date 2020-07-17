@@ -66,6 +66,7 @@ void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	const std::vector<Layer*>& layers = pApp->GetLayers();
 	const std::list<LayerIndex>& index = pApp->GetLayerIndex(LayerMouseMove);
 
+	ypos = pApp->GetHeight() - ypos;	//The origin of the game is in the bottom left corner. But the position returned by the mouse callback is with respect to the top left corner... Subtract the height to convert it to the standard coordinate system.
 	for (LayerIndex i : index)
 	{
 		ASSERT(i < (LayerIndex)layers.size(), "Index out of bounds");

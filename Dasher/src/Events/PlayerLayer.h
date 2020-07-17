@@ -23,7 +23,7 @@ private:
 	const int mc_nJumpKey = 32;
 	
 	const float mc_fEnginePower = 14;
-	const float mc_fGravity = -27;
+	const float mc_fGravity = /*-27;*/ 0;
 
 	const glm::vec2 mc_vSize = { 70,70 };
 	const glm::vec4 mc_vCol =  { 0.5, 0.4, 0.8,1.0 };
