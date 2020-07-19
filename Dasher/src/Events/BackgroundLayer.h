@@ -22,5 +22,5 @@ private:
 	const int m_nIndexCount = 6;
 	const unsigned int m_Index[6] = { 0,1,2,2,3,0 };
 
-	const float m_nVelocityX = -0.012;
+	const float m_nVelocityX = -0.012f;
 };

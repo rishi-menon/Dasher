@@ -2,6 +2,8 @@
 
 #include "glm.hpp"
 #include "RendererVertex.h"
+#include "RendererShapes.h"
+
 class Renderer
 {
 public:

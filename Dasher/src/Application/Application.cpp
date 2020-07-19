@@ -70,6 +70,12 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	InsertLayer(new BackgroundLayer);
 	InsertLayer(new PlayerLayer);
 	InsertLayer(new BlockSpawnerLayer);
+
+	//call OnStart for each layer once all the layes have been added
+	for (Layer* pLayer : m_vLayers)
+	{
+		pLayer->OnStart();
+	}
 	return bSuccess;
 }
 
@@ -88,9 +94,6 @@ void Application::InsertLayer(Layer* pLayer)
 		m_vLayers.push_back (pLayer);
 		pLayer->RegisterEvents(this, index);
 	}
-
-	//Call OnStart for the inserted layer
-	pLayer->OnStart();
 }
 void Application::RegisterEvents(Layers layerId, LayerIndex index)
 {
@@ -148,7 +151,7 @@ void Application::Run()
 
 		for (Layer* pLayer : m_vLayers)
 		{
-			pLayer->OnUpdate(m_dDeltaTime);
+			pLayer->OnUpdate((float)m_dDeltaTime);
 			if (s_bResetGame)
 			{
 				StartGame();

@@ -35,23 +35,25 @@ void PlayerLayer::OnUpdate(float deltaTime)
 	if (!m_bIsFalling)
 	{
 		const float offset = 200; 
-		float multiplier = (m_vVel.y < offset) ? 5.0f : 1.0;
+		float multiplier = (m_vVel.y < offset) ? 5.0f : 1.0f;
 		m_vVel.y += multiplier * mc_fEnginePower;
 		
 	}
 	else
 	{
 		const float offset = 0;
-		float multiplier = (m_vVel.y > offset) ? 1.4f : 1.0;
+		float multiplier = (m_vVel.y > offset) ? 1.4f : 1.0f;
 		m_vVel.y += multiplier * mc_fGravity;
 	}
-	m_vVel.y = Math::Clamp(-1200, 1200, m_vVel.y);
+	m_vVel.y = (float)Math::Clamp(-1200, 1200, m_vVel.y);
 	m_vPos += m_vVel * deltaTime;
 
 	//LOG_INFO("Player pos x: {0} y: {1}", m_vVel.x, m_vVel.y);
 
 	//Draw
-	Renderer::DrawQuad(m_vPos, mc_vSize, mc_vCol);
+	RendererShapes::Rectangle(m_vPos, mc_vSize, mc_vCol, m_Vertex);
+	Renderer::DrawQuadColor(m_Vertex, m_nVertexCount, RendererShapes::indexBufferQuad, 6);
+	//Renderer::DrawQuad(m_vPos, mc_vSize, mc_vCol);
 }
 
 bool PlayerLayer::OnKey(int key)		 

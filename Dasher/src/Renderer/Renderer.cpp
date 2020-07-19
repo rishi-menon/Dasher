@@ -282,27 +282,6 @@ void Renderer::Flush()
 	data.boundTextureSlots[0] = data.nTextureWhiteId; //precaution
 }
 
-static void GenerateQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, float texId, RendererVertex outQuad[4])
-{
-	//Set the position
-	float halfx = size.x / 2, halfy = size.y / 2;
-	outQuad[0].m_pos = { pos.x - halfx, pos.y - halfy, 0.0 };
-	outQuad[1].m_pos = { pos.x + halfx, pos.y - halfy, 0.0 };
-	outQuad[2].m_pos = { pos.x + halfx, pos.y + halfy, 0.0 };
-	outQuad[3].m_pos = { pos.x - halfx, pos.y + halfy, 0.0 };
-
-	outQuad[0].m_textureCoord = { 0.0, 0.0 };
-	outQuad[1].m_textureCoord = { 1.0, 0.0 };
-	outQuad[2].m_textureCoord = { 1.0, 1.0 };
-	outQuad[3].m_textureCoord = { 0.0, 1.0 };
-
-	//set col 
-	for (int i = 0; i < 4; i++)
-	{
-		outQuad[i].m_col = col;
-		outQuad[i].SetTexId(texId);
-	}
-}
 
 void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
 {
@@ -360,7 +339,8 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	}
 
 	RendererVertex quad[4];
-	GenerateQuad(pos, size, col, (float)nTextureSlot, quad);
+	RendererShapes::Rectangle(pos, size, col, quad);
+	for (int i = 0; i < 4; quad[i].SetTexId((float)nTextureSlot), i++);
 
 	//save to local buffer
 	RendererVertex* curVertexPosition = data.localVertexBuffer + data.nCurrentVertexLocation;
@@ -386,7 +366,7 @@ void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexC
 }
 void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId, glm::mat4* transformation)
 {
-	if (data.nCurrentVertexLocation + nVertexCount > data.nMaxVertexCount || data.nCurrentIndexLocation + nIndexCount > data.nMaxIndexCount)
+	if (data.nCurrentVertexLocation + (int)nVertexCount > data.nMaxVertexCount || data.nCurrentIndexLocation + (int)nIndexCount > data.nMaxIndexCount)
 	{
 		Renderer::Flush();
 	}
@@ -420,9 +400,9 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 		curSlot++;
 	}
 
-	for (int i = 0; i < nVertexCount; i++)
+	for (unsigned int i = 0; i < nVertexCount; i++)
 	{
-		vertexBuffer[i].SetTexId(nTextureSlot);
+		vertexBuffer[i].SetTexId((float)nTextureSlot);
 	}
 
 	//save to local buffer
@@ -438,7 +418,7 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 		index = new unsigned int[nIndexCount];
 	}
 
-	for (char i = 0; i < nIndexCount; i++)
+	for (unsigned int i = 0; i < nIndexCount; i++)
 	{
 		index[i] = data.nCurrentVertexLocation + indexBuffer[i];
 	}
@@ -449,7 +429,7 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 	if (transformation)
 	{
 		//Apply the transformation on the vertices... in the future, consider doing this in the shader
-		for (int i = 0; i < nVertexCount; i++)
+		for (unsigned int i = 0; i < nVertexCount; i++)
 		{
 			glm::vec3& vertexPos = curVertexPosition[i].m_pos;
 			glm::vec4 pos = { vertexPos.x, vertexPos.y, vertexPos.z, 1.0f };
@@ -468,7 +448,7 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 
 void Renderer::OnWindowResize(int nWidth, int nHeight)
 {
-	data.matProjection = glm::ortho<float>(0, nWidth, 0, nHeight);
+	data.matProjection = glm::ortho<float>(0.0f, (float)nWidth, 0.0f, (float)nHeight);
 	glcall(glUniformMatrix4fv(data.u_mvpLocation, 1, GL_FALSE, &data.matProjection[0][0]));
 
 	glViewport(0, 0, nWidth, nHeight);

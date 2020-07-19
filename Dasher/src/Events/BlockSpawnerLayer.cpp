@@ -5,6 +5,9 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Renderer.h"
 
+#include "Collision/Collision.h"
+#include "PlayerLayer.h"
+
 struct BlockAdditionalData
 {
 	RendererVertex vertex[6];
@@ -70,7 +73,7 @@ static void GetVertexData(const Block& block, RendererVertex outVertex[])
 
 	memcpy(outVertex, data.vertex, data.nVertexCount * sizeof(RendererVertex));
 
-	for (int i = 0; i < data.nVertexCount; i++)
+	for (unsigned int i = 0; i < data.nVertexCount; i++)
 	{
 		glm::vec3& vertexPos = outVertex[i].m_pos;
 		glm::vec4 pos = { vertexPos.x, vertexPos.y, vertexPos.z, 1.0f };
@@ -78,7 +81,8 @@ static void GetVertexData(const Block& block, RendererVertex outVertex[])
 		vertexPos = { pos.x, pos.y, pos.z };
 	}
 }
-BlockSpawnerLayer::BlockSpawnerLayer()
+BlockSpawnerLayer::BlockSpawnerLayer() :
+	m_pPlayerLayer (nullptr)
 {
 	m_blocks.Reserve(5);
 
@@ -97,6 +101,19 @@ void BlockSpawnerLayer::ResetLayer()
 
 void BlockSpawnerLayer::OnStart()
 {
+	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
+	for (Layer* pLayer : layers)
+	{
+		if (dynamic_cast<PlayerLayer*> (pLayer))
+		{
+			m_pPlayerLayer = static_cast<PlayerLayer*>(pLayer);
+			break;
+		}
+	}
+	ASSERT(m_pPlayerLayer, "Player layer was not found");
+
+
+	//Temporary code
 	Block& block = *m_blocks.Push ();
 	block.blockId = 0;
 	block.position = { 400, 400, 0 };
@@ -110,32 +127,43 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 	int index = m_blocks.Begin();
 	
 	//Check if the first block in the queue is out of bounds. Blocks move at the same speed so the first one in the queue is the only one that needs to be checked instead of every single block
-	
 	if (m_blocks.Count())
 	{
-		bool bInsideScreen = true;
-		Block& curBlock = buffer[0];
 		//Block has reached passed the screen
-		if (curBlock.position.x + curBlock.scale.x < 0)
+		if (buffer[0].position.x + buffer[0].scale.x < 0)
 		{
 			m_blocks.Pop();
 		}
 	}
+	
+	bool bTemp = false;
 
-	for (int i = 0; i < m_blocks.Count(); i++, index++, index %= m_blocks.Size())
+	const RendererVertex* playerVertex = m_pPlayerLayer->GetVertex();
+	unsigned int nPlayerVertexCount = m_pPlayerLayer->GetVertexCount();
+	for (unsigned int i = 0; i < m_blocks.Count(); i++, index++, index %= m_blocks.Size())
 	{
 		//Move the block
 		Block& curBlock = buffer[index];
 		curBlock.position += curBlock.velocity * deltaTime;
-		
-		
+
+
 		//Render the block
 		BlockAdditionalData& data = blockData[curBlock.blockId];
-		RendererVertex v[6];
-		GetVertexData(curBlock, v);
+		RendererVertex blockVertex[6];
+		GetVertexData(curBlock, blockVertex);
 
-		Renderer::DrawQuadColor(v, data.nVertexCount, data.index, data.nIndexCount);
+		if (Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, data.nVertexCount))
+		{
+			bTemp = true;
+		}
+
+		Renderer::DrawQuadColor(blockVertex, data.nVertexCount, data.index, data.nIndexCount);
 	}
+
+	glm::vec4 col = (bTemp) ? glm::vec4{1.0, 0.0, 0.0, 1.0} : glm::vec4{0.7, 0.7, 0.7, 1.0};
+	for (int i = 0; i < 3; i++)
+		blockData[0].vertex[i].m_col = col;
+
 }
 bool BlockSpawnerLayer::OnWindowResize(int width, int height)
 {

@@ -5,6 +5,7 @@
 #include "Maths.h"
 
 class RendererVertex;
+class PlayerLayer;
 struct Block
 {
 	glm::vec3 position;
@@ -27,5 +28,5 @@ public:
 
 private:
 	CircularQueue<Block> m_blocks;
-
+	PlayerLayer* m_pPlayerLayer;
 };
