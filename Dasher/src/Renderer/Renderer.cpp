@@ -283,7 +283,7 @@ void Renderer::Flush()
 }
 
 
-void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
+void Renderer::DrawRectangle(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
 {
 
 	//RendererVertex v[3];
@@ -299,10 +299,10 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	//glcall(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
 	//
 	//return;
-	DrawQuad(pos, size, col, data.nTextureWhiteId);
+	DrawRectangle(pos, size, col, data.nTextureWhiteId);
 }
 
-void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, unsigned int nTexId)
+void Renderer::DrawRectangle(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col, unsigned int nTexId)
 {
 	if (data.nCurrentVertexLocation + 4 > data.nMaxVertexCount || data.nCurrentIndexLocation + 6 > data.nMaxIndexCount)
 	{
@@ -339,7 +339,7 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 	}
 
 	RendererVertex quad[4];
-	RendererShapes::Rectangle(pos, size, col, quad);
+	RendererShapes::Rectangle(quad, pos, size, col);
 	for (int i = 0; i < 4; quad[i].SetTexId((float)nTextureSlot), i++);
 
 	//save to local buffer
@@ -358,6 +358,16 @@ void Renderer::DrawQuad(const glm::vec2& pos, const glm::vec2& size, const glm::
 
 	data.nCurrentVertexLocation += 4;
 	data.nCurrentIndexLocation += 6;
+}
+
+
+void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, RendererShapes::Shape shape, glm::mat4* transformation /*= nullptr*/)
+{
+	DrawQuadTexture(vertexBuffer, RendererShapes::genericVertexBufferCount[shape], RendererShapes::genericIndexBuffer[shape], RendererShapes::genericIndexBufferCount[shape], data.nTextureWhiteId, transformation);
+}
+void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, RendererShapes::Shape shape, unsigned int nTextureId, glm::mat4* transformation /*= nullptr*/)
+{
+	DrawQuadTexture(vertexBuffer, RendererShapes::genericVertexBufferCount[shape], RendererShapes::genericIndexBuffer[shape], RendererShapes::genericIndexBufferCount[shape], nTextureId, transformation);
 }
 
 void Renderer::DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, glm::mat4* transformation)

@@ -45,22 +45,16 @@ void BackgroundLayer::OnUpdate(float deltaTime)
 		m_vertex[i].m_textureCoord.x -= m_nVelocityX * deltaTime;
 	}
 	
-	//float value = m_vertex[0].m_textureCoord.x;
-	//if (value < -2)
-	//{
-	//	//shift coords to the right by 1
-	//	for (int i = 0; i < 4; i++)
-	//	{
-	//		m_vertex[i].m_textureCoord.x += 1;
-	//	}
-	//} 
-	//else if (value > 1)
-	//{
-	//	for (int i = 0; i < 4; i++)
-	//	{
-	//		m_vertex[i].m_textureCoord.x -= 1;
-	//	}
-	//}
+	float value = m_vertex[0].m_textureCoord.x;
+	//Shift the coordinates to the left or right to prevent them from getting too large or small and overflowing
+	if (value < -2)
+	{
+		for (int i = 0; i < 4; m_vertex[i].m_textureCoord.x += 1, i++);
+	} 
+	else if (value > 2)
+	{
+		for (int i = 0; i < 4; m_vertex[i].m_textureCoord.x -= 1, i++);
+	}
 
 	Renderer::DrawQuadTexture(m_vertex, 6, m_Index, m_nIndexCount, m_nTextureId);
 }

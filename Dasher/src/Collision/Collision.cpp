@@ -47,7 +47,22 @@ namespace Collision
 		if (shapeA == shapeB)
 			return true;
 
-		return CheckCollisionHelper(shapeA, countA, shapeB, countB) &&
-			CheckCollisionHelper(shapeB, countB, shapeA, countA);
+		//To Do: Add some optimization code here to speed up collision checks ?
+
+
+		if (countA < countB)
+		{
+			//Check polygon A first and then B
+			return CheckCollisionHelper(shapeA, countA, shapeB, countB) &&
+				CheckCollisionHelper(shapeB, countB, shapeA, countA);
+		}
+		else
+		{
+			//Check polygon B first and then A
+			return CheckCollisionHelper(shapeB, countB, shapeA, countA) &&
+				CheckCollisionHelper(shapeA, countA, shapeB, countB);
+				
+		}
+
 	}
 }

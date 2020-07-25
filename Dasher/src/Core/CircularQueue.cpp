@@ -13,9 +13,16 @@ CircularQueue<T>::CircularQueue() :
 	m_nEndIndex (0),
 	m_Buffer (0)
 {
-
 }
 
+template <typename T>
+CircularQueue<T>::~CircularQueue()
+{
+	if (m_Buffer)
+	{
+		delete[] m_Buffer;
+	}
+}
 template <typename T>
 void CircularQueue<T>::Reserve(SizeT size)
 {
@@ -90,7 +97,7 @@ T* CircularQueue<T>::Pop()
 }
 
 template <typename T>
-T* CircularQueue<T>::GetAt(SizeT queuePosition) 
+T* CircularQueue<T>::GetAtPosition(SizeT queuePosition)
 {
 	if (queuePosition >= m_nCount)
 	{
@@ -101,7 +108,7 @@ T* CircularQueue<T>::GetAt(SizeT queuePosition)
 	return m_Buffer + nIndex;
 }
 template <typename T>
-const T* CircularQueue<T>::GetAt(SizeT queuePosition) const
+const T* CircularQueue<T>::GetAtPosition(SizeT queuePosition) const
 {
 	if (queuePosition >= m_nCount)
 	{
@@ -122,5 +129,19 @@ void CircularQueue<T>::Print() const
 		LOG_CLIENT_INFO("{0}", m_Buffer[index]);
 	}
 	LOG_CLIENT_WARN("Finished...");
+}
+
+template <typename T>
+void CircularQueue<T>::ClearAll(bool bDeallocateBuffer /*= false*/)
+{
+	m_nCount = 0;
+	m_nStartIndex = 0;
+	m_nEndIndex = 0;
+	if (bDeallocateBuffer)
+	{
+		delete[] m_Buffer;
+		m_Buffer = nullptr;
+		m_nBufferSize = 0;
+	}
 }
 #endif CIRCULAR_QUEUE_CPP

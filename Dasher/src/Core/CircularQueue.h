@@ -1,4 +1,5 @@
 #pragma once
+#include "Log.h"
 
 template <typename T>
 class CircularQueue
@@ -7,6 +8,7 @@ class CircularQueue
 
 public:
 	CircularQueue();
+	~CircularQueue();
 
 	inline T* Buffer() { return m_Buffer; }
 	inline const T* Buffer() const { return m_Buffer; }
@@ -17,8 +19,12 @@ public:
 	inline SizeT Count() const { return m_nCount; }
 	inline SizeT Size() const { return m_nBufferSize; }
 
-	T* GetAt(SizeT queuePosition);
-	const T* GetAt(SizeT queuePosition) const;
+	inline T* GetAtRaw(SizeT rawBufferIndex) { ASSERT(rawBufferIndex < m_nCount && rawBufferIndex < m_nBufferSize, "Out of bounds"); return (m_Buffer+rawBufferIndex); }
+
+	inline const T* GetAtRaw(SizeT rawBufferIndex) const { ASSERT(rawBufferIndex < m_nCount&& rawBufferIndex < m_nBufferSize, "Out of bounds"); return (m_Buffer + rawBufferIndex); }
+	
+	T* GetAtPosition(SizeT queuePosition);
+	const T* GetAtPosition(SizeT queuePosition) const;
 
 	void Reserve(SizeT size);
 
@@ -26,6 +32,7 @@ public:
 	T* Push();
 	
 	T* Pop(); 
+	void ClearAll(bool bDeallocateBuffer = false);
 
 	void Print() const;
 

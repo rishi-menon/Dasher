@@ -3,16 +3,21 @@
 #include "Layer.h"
 #include "Core/CircularQueue.h"
 #include "Maths.h"
+#include "Renderer/RendererShapes.h"
 
 class RendererVertex;
 class PlayerLayer;
+
 struct Block
 {
 	glm::vec3 position;
 	glm::vec3 scale;
+	glm::vec4 color;
+
 	glm::vec3 velocity;
-	unsigned char blockId;	//used as an index for the vertexBuffer
+	RendererShapes::Shape shape;
 };
+
 class BlockSpawnerLayer : public Layer
 {
 public:
@@ -25,7 +30,8 @@ public:
 	virtual bool OnWindowResize(int width, int height) override;
 	virtual bool OnMouseMove(double x, double y) override;
 
-
+private:
+	inline void ClearOutOfBoundsBlocks();
 private:
 	CircularQueue<Block> m_blocks;
 	PlayerLayer* m_pPlayerLayer;

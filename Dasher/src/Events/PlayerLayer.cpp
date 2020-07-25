@@ -51,8 +51,8 @@ void PlayerLayer::OnUpdate(float deltaTime)
 	//LOG_INFO("Player pos x: {0} y: {1}", m_vVel.x, m_vVel.y);
 
 	//Draw
-	RendererShapes::Rectangle(m_vPos, mc_vSize, mc_vCol, m_Vertex);
-	Renderer::DrawQuadColor(m_Vertex, m_nVertexCount, RendererShapes::indexBufferQuad, 6);
+	RendererShapes::Rectangle(m_Vertex, m_vPos, mc_vSize, mc_vCol);
+	Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
 	//Renderer::DrawQuad(m_vPos, mc_vSize, mc_vCol);
 }
 
