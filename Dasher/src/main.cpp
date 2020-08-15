@@ -1,9 +1,11 @@
 #include "Application/Application.h"
 #include "Log.h"
+#include "Maths.h"
 
 int main()
 {
 	CoreLogger::Init();
+	Random::Init();
 
 	glfwSetErrorCallback([](int error, const char* const desc)
 	{

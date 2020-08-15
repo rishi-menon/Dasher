@@ -25,6 +25,8 @@ public:
 	//Change this to non static if ever m_nVertexCount becomes a non static member
 	inline static constexpr int GetVertexCount() { return m_nVertexCount; }
 
+	void TakeDamage(double damage);
+
 private:
 	const int mc_nJumpKey = 32;
 	
@@ -32,7 +34,7 @@ private:
 	const float mc_fGravity = -27;
 
 	const glm::vec2 mc_vSize = { 70,70 };
-	const glm::vec4 mc_vCol =  { 0.5, 0.4, 0.8,1.0 };
+	glm::vec4 m_vCol =  { 0.5, 0.4, 0.8,1.0 };
 private:	
 	glm::vec2 m_vPos;
 	glm::vec2 m_vVel;

@@ -14,6 +14,7 @@ public:
 	Application();
 
 	inline static Application* GetCurrentApp() { ASSERT(ms_currentApp, "Application was nullptr"); return ms_currentApp; }
+	inline static double GetGameTime() { return glfwGetTime();}
 
 	inline const std::vector<Layer*>& GetLayers() const { return m_vLayers; }
 	inline const std::list<LayerIndex>& GetLayerIndex(Layers layer) const { return m_listLayersIndex[layer]; }

@@ -1,15 +1,31 @@
 #include "Maths.h"
 
+#include <random>
+#include <chrono>
+
 namespace Math {
-	double Lerp(double a, double b, double percent)
+
+}
+
+namespace Random
+{
+	static std::default_random_engine generator;
+	static std::uniform_real_distribution<double> distReal(0.0f, 1.0f);
+
+	extern void Init()
 	{
-		const double val = a + (b - a) * percent;
-		return val;
+		//Get system time/time since epoch for the initial seed value
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		long long value = std::chrono::time_point_cast <std::chrono::milliseconds> (timeNow).time_since_epoch().count();
+
+		generator.seed(value);
 	}
-	double Clamp(double min, double max, double value)
+	extern double Rand()
 	{
-		if (value < min)	return min;
-		if (value > max)	return max;
-		return value;
+		return distReal(generator);
+	}
+	extern double Rand(double min, double max)
+	{
+		return Math::Lerp(min, max, distReal(generator));
 	}
 }

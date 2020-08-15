@@ -35,4 +35,17 @@ private:
 private:
 	CircularQueue<Block> m_blocks;
 	PlayerLayer* m_pPlayerLayer;
+
+	//spawn blocks
+	const double m_dTimeBwSpawnMin;
+	const double m_dTimeBwSpawnMax;
+
+	//size
+	const double m_dSizeXMin;
+	const double m_dSizeXMax;
+	const double m_dSizeYMin;
+	const double m_dSizeYMax;
+	
+
+	double m_dNextSpawnTime;
 };

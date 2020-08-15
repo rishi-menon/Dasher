@@ -19,7 +19,21 @@ public:
 	inline SizeT Count() const { return m_nCount; }
 	inline SizeT Size() const { return m_nBufferSize; }
 
-	inline T* GetAtRaw(SizeT rawBufferIndex) { ASSERT(rawBufferIndex < m_nCount && rawBufferIndex < m_nBufferSize, "Out of bounds"); return (m_Buffer+rawBufferIndex); }
+	inline T* GetAtRaw(SizeT rawBufferIndex) {
+		
+#if _DEBUG
+		SizeT i = rawBufferIndex;
+		if (m_nStartIndex <= m_nEndIndex)
+		{
+			ASSERT(i >= m_nStartIndex && i <= m_nEndIndex, "Out of bounds");
+		}
+		else {
+			ASSERT((i >= m_nStartIndex && i < m_nBufferSize) || (i <= m_nEndIndex), "Out of bounds");
+		}
+#endif
+		return (m_Buffer+rawBufferIndex); 
+	
+	}
 
 	inline const T* GetAtRaw(SizeT rawBufferIndex) const { ASSERT(rawBufferIndex < m_nCount&& rawBufferIndex < m_nBufferSize, "Out of bounds"); return (m_Buffer + rawBufferIndex); }
 	
