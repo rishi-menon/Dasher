@@ -139,7 +139,7 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 		}
 		
 		block.velocity = { -400, 0, 0 };
-		block.color = { 0.8,0.8,0.8,1.0 };
+		block.color = { 0.0,0.4,0.79,0.5 };
 		block.shape = RendererShapes::ShapeTriangleRegular;
 	}
 }

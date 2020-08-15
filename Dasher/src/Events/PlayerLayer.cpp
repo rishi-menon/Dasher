@@ -53,7 +53,7 @@ void PlayerLayer::OnUpdate(float deltaTime)
 
 	//LOG_INFO("Player pos x: {0} y: {1}", m_vVel.x, m_vVel.y);
 
-	//m_vPos.y = 400*(1 + glm::sin(3*Application::GetGameTime()));
+	m_vPos.y = 400*(1 + glm::sin(3*Application::GetGameTime()));
 
 	//Draw
 	RendererShapes::Rectangle(m_Vertex, m_vPos, mc_vSize, m_vCol);
