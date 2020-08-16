@@ -149,7 +149,7 @@ bool BlockSpawnerLayer::OnWindowResize(int width, int height)
 }
 
 //Temp code
-bool BlockSpawnerLayer::OnMouseMove(double x, double y)
+bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 {
 	//if (m_blocks.Count())
 	//{

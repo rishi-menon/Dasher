@@ -30,7 +30,7 @@ public:
 	virtual void OnStart() {}
 	virtual void OnUpdate(float deltaTime) {}	//in seconds
 
-	virtual bool OnMouseMove(double x, double y) { return false; }
+	virtual bool OnMouseMove(int x, int y) { return false; }
 	virtual bool OnMouseDown(int nButton) { return false; }
 	virtual bool OnMouseUp(int nButton) { return false; }
 

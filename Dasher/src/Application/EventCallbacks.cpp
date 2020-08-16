@@ -70,7 +70,7 @@ void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	for (LayerIndex i : index)
 	{
 		ASSERT(i < (LayerIndex)layers.size(), "Index out of bounds");
-		if (layers[i]->OnMouseMove(xpos, ypos)) break;
+		if (layers[i]->OnMouseMove((int)xpos, (int)ypos)) break;
 	}
 }
 

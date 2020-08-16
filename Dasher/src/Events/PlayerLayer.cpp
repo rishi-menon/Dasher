@@ -8,22 +8,25 @@ PlayerLayer::PlayerLayer()
 }
 void PlayerLayer::ResetLayer()
 {
-	m_vPos = glm::vec2(100, 800);
-	m_vVel = glm::vec2(0, 0);
+	m_dPhaseAngle = 0;
+	m_dAngVelocity = 1;
+	m_dApparantVelocityX = 400;
 
-		//To Do: implement a health API and a take damage method to be called when a collision occurs
-		//       Also Add a random number generator and start spawning blocks
-	m_bIsFalling = true;
+	m_nWidth = Application::GetCurrentApp()->GetWidth();
+	m_nHeight = Application::GetCurrentApp()->GetHeight();
+	m_vPos = glm::vec2 { 80, 400 };
+	m_dAmplitude = (m_nHeight * 0.5 - m_fAmplitudeOffset);
 }
 void PlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
-	//pApp->RegisterEvents(LayerMouseMove, nIndex);
+	pApp->RegisterEvents(LayerWindowResize, nIndex);
+	pApp->RegisterEvents(LayerMouseMove, nIndex);
 	//pApp->RegisterEvents(LayerMouseDown, nIndex);
 	//pApp->RegisterEvents(LayerMouseUp, nIndex);
 
 	//pApp->RegisterEvents(LayerKey, nIndex);
-	pApp->RegisterEvents(LayerKeyDown, nIndex);
-	pApp->RegisterEvents(LayerKeyUp, nIndex);
+	//pApp->RegisterEvents(LayerKeyDown, nIndex);
+	//pApp->RegisterEvents(LayerKeyUp, nIndex);
 
 	//pApp->RegisterEvents(LayerWindowResize, nIndex);
 	
@@ -34,53 +37,37 @@ void PlayerLayer::OnStart()
 
 void PlayerLayer::OnUpdate(float deltaTime)
 {
+	//divide by 2
+	m_vPos.y = (m_nHeight >> 1) + m_dAmplitude * glm::sin(m_dPhaseAngle);
+	m_dPhaseAngle += m_dAngVelocity * deltaTime;
 
-	if (!m_bIsFalling)
-	{
-		const float offset = 200; 
-		float multiplier = (m_vVel.y < offset) ? 5.0f : 1.0f;
-		m_vVel.y += multiplier * mc_fEnginePower;
-		
-	}
-	else
-	{
-		const float offset = 0;
-		float multiplier = (m_vVel.y > offset) ? 1.4f : 1.0f;
-		m_vVel.y += multiplier * mc_fGravity;
-	}
-	m_vVel.y = (float)Math::Clamp(-1200, 1200, m_vVel.y);
-	m_vPos += m_vVel * deltaTime;
-
-	//LOG_INFO("Player pos x: {0} y: {1}", m_vVel.x, m_vVel.y);
-
-	m_vPos.y = 400*(1 + glm::sin(3*Application::GetGameTime()));
-
-	//Draw
+	////Draw
 	RendererShapes::Rectangle(m_Vertex, m_vPos, mc_vSize, m_vCol);
 	Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
-	//Renderer::DrawQuad(m_vPos, mc_vSize, mc_vCol);
+	DrawTrajectory(2.2);
 }
 
-bool PlayerLayer::OnKey(int key)		 
-{ 
-	return false; 
-}
-bool PlayerLayer::OnKeyDown(int key)  
+bool PlayerLayer::OnMouseMove(int x, int y)
 {
-	if (key == mc_nJumpKey)
-	{
-		m_bIsFalling = false;
-	}
-	return false; 
-}
-bool PlayerLayer::OnKeyUp(int key)    
-{
-	if (key == mc_nJumpKey)
-	{
-		m_bIsFalling = true;
-	}
+	const int MouseLeftPadding = 200;
+	const int MouseRightPadding = 200;
+
+	double percentY = Math::GetPercent(MouseLeftPadding, m_nWidth- MouseRightPadding, x);
+	percentY = Math::Clamp01(percentY);
+	LOG_INFO(percentY);
+
+	m_dAngVelocity = Math::Lerp(m_dAngVelocityMin, m_dAngVelocityMax, percentY);
+
 	return false;
 }
+bool PlayerLayer::OnWindowResize(int x, int y)
+{
+	m_nWidth = x;
+	m_nHeight = y;
+	m_dAmplitude = (m_nHeight * 0.5 - m_fAmplitudeOffset);
+	return false;
+}
+
 void PlayerLayer::TakeDamage(double damage)
 {
 	if (damage >= 5)
@@ -90,5 +77,29 @@ void PlayerLayer::TakeDamage(double damage)
 	else
 	{
 		m_vCol = { 0.5, 0.4, 0.8,1.0 };
+	}
+}
+
+void PlayerLayer::DrawTrajectory(double timeIntoFuture)
+{
+	int numOfPoints = 15;
+	const glm::vec2 size = {20,20};
+	const glm::vec4 color = { 1.0, 1.0, 1.0, 1.0 };
+
+	double timeIncrement = timeIntoFuture / numOfPoints;
+	
+	double phase = m_dPhaseAngle;
+	double angleIncrement = m_dAngVelocity *  timeIncrement;
+	
+	glm::vec2 pos = m_vPos;
+	double posIncrement = m_dApparantVelocityX * timeIncrement;
+
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		phase += angleIncrement;
+		pos.x += posIncrement;
+		pos.y = (m_nHeight >> 1) + m_dAmplitude * glm::sin(phase);
+
+		Renderer::DrawRectangle(pos, size, color);
 	}
 }

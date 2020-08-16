@@ -28,7 +28,7 @@ public:
 	virtual void OnStart();
 	virtual void OnUpdate(float deltaTime);	//in seconds
 	virtual bool OnWindowResize(int width, int height) override;
-	virtual bool OnMouseMove(double x, double y) override;
+	virtual bool OnMouseMove(int x, int y) override;
 
 private:
 	inline void ClearOutOfBoundsBlocks();

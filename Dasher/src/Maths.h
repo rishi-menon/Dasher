@@ -5,14 +5,23 @@
 namespace Math {
 	inline double Lerp(double a, double b, double percent)
 	{
-		const double val = a + (b - a) * percent;
-		return val;
+		return a + (b - a) * percent;
 	}
 	inline double Clamp(double min, double max, double value)
 	{
-		if (value < min)	return min;
-		if (value > max)	return max;
-		return value;
+		if (value < min)		return min;
+		else if (value > max)	return max;
+		else					return value;
+	}
+	inline double Clamp01(double value)
+	{
+		if (value < 0.0)		return 0.0;
+		else if (value > 1.0)	return 1.0;
+		else					return value;
+	}
+	inline double GetPercent(double min, double max, double value)
+	{
+		return (value - min) / (max - min);
 	}
 }
 
