@@ -225,8 +225,8 @@ bool Renderer::Initialise()
 		LOG_WARN("uniform u_mvp was not found");
 	}
 
-	int nWidth = Application::GetCurrentApp()->GetWidth();
-	int nHeight = Application::GetCurrentApp()->GetHeight();
+	int nWidth = Application::GetWidth();
+	int nHeight = Application::GetHeight();
 
 	OnWindowResize(nWidth, nHeight);
 

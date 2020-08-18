@@ -37,6 +37,7 @@ public:
 	inline static constexpr int GetVertexCount() { return m_nVertexCount; }
 
 	void TakeDamage(double damage);
+	void TakeNoDamage();
 
 	inline double GetPhasePercent() const { return Math::GetPercent(m_dAngVelocityMin, m_dAngVelocityMax, m_dAngVelocity); }
 private:

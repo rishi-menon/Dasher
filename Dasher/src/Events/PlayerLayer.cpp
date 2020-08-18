@@ -13,8 +13,8 @@ void PlayerLayer::ResetLayer()
 	m_dAngVelocity = 1;
 	m_dApparantVelocityX = 400;
 
-	m_nWidth = Application::GetCurrentApp()->GetWidth();
-	m_nHeight = Application::GetCurrentApp()->GetHeight();
+	m_nWidth = Application::GetWidth();
+	m_nHeight = Application::GetHeight();
 	m_vPos = glm::vec2 { 80, 400 };
 	m_dAmplitude = (m_nHeight * 0.5 - m_fAmplitudeOffset);
 
@@ -76,14 +76,13 @@ bool PlayerLayer::OnWindowResize(int x, int y)
 
 void PlayerLayer::TakeDamage(double damage)
 {
-	if (damage >= 5)
-	{
- 		m_vCol = { 1.0, 0.2, 0.2, 1.0 };
-	}
-	else
-	{
-		m_vCol = { 0.5, 0.4, 0.8,1.0 };
-	}
+
+ 	m_vCol = { 1.0, 0.2, 0.2, 1.0 };
+
+}
+void PlayerLayer::TakeNoDamage()
+{
+	m_vCol = { 0.5, 0.4, 0.8,1.0 };
 }
 
 void PlayerLayer::DrawTrajectory(double timeIntoFuture, int numOfPoints)

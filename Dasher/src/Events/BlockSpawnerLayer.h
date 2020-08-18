@@ -11,8 +11,8 @@ class PlayerLayer;
 struct Block
 {
 	Block() = default;
-	Block(Block&) = default;
-
+	Block(const Block&) = default;
+	
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::vec4 color;
@@ -20,7 +20,7 @@ struct Block
 	glm::vec3 velocity;
 	RendererShapes::Shape shape;
 
-	double phasePercent;
+	glm::vec2 phaseRange;
 	bool isPhasable;
 };
 
@@ -36,12 +36,13 @@ public:
 	
 #if 0
 	virtual bool OnWindowResize(int width, int height) override;
-	virtual bool OnMouseMove(int x, int y) override;
 #endif
+	virtual bool OnMouseMove(int x, int y) override;
 
 private:
 	inline void ClearOutOfBoundsBlocks();
 	void CreateBlock();
+	void MoveCollisionRenderBlocks(float deltaTime);
 private:
 	CircularQueue<Block> m_blocks;
 	PlayerLayer* m_pPlayerLayer;

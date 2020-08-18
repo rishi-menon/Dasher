@@ -33,9 +33,6 @@ uniform sampler2D u_textureSlots[32];
 void main()
 {
 	int texId = int(v_texIndex);
-	
 	col = v_col * texture(u_textureSlots[texId], v_texCord);
-	//col = vec4 (v_texCord.xy, 0, 1.0);
-	//col = vec4 (v_texIndex, v_texIndex, v_texIndex, 1.0);
 }
 

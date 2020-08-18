@@ -17,13 +17,16 @@
 #include "Events/BlockSpawnerLayer.h"
 
 Application* Application::ms_currentApp = nullptr;
-
-bool s_bResetGame = false;
+int Application::m_nWidth = 0;
+int Application::m_nHeight = 0;
 
 Application::Application() :
 	m_pWindow(nullptr),
 	m_dCurrentTime (0),
-	m_dDeltaTime (0)
+	m_dDeltaTime (0),
+	m_CurMenu (Menu::MainMenu),
+	m_NextMenu (Menu::MainMenu)
+
 {
 	ASSERT(!ms_currentApp, "A second Application was created");
 	ms_currentApp = this;
@@ -63,19 +66,9 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	bool bSuccess = Renderer::Initialise();
 	ASSERT(bSuccess, "Error: Failed to initialise renderer");
 
-	///////////////////////////////////////////////////////////////////////////////
-	//								Create Layers here							 //
-	///////////////////////////////////////////////////////////////////////////////
-	
-	InsertLayer(new BackgroundLayer);
-	InsertLayer(new PlayerLayer);
-	InsertLayer(new BlockSpawnerLayer);
+	m_NextMenu = Menu::MainMenu;
+	ChangeMenuState();
 
-	//call OnStart for each layer once all the layes have been added
-	for (Layer* pLayer : m_vLayers)
-	{
-		pLayer->OnStart();
-	}
 	return bSuccess;
 }
 
@@ -110,21 +103,6 @@ void Application::RegisterEvents(Layers layerId, LayerIndex index)
 	}
 }
 
-void Application::ResetGame()
-{
-	s_bResetGame = true;
-}
-void Application::StartGame()
-{
-	s_bResetGame = false;
-	Renderer::Flush();
-	glcall(glClear(GL_COLOR_BUFFER_BIT));
-	for (Layer* pLayer : m_vLayers)
-	{
-		pLayer->ResetLayer();
-	}
-}
-
 void Application::Run()
 {
 	const float fCol = 0.18f;
@@ -152,30 +130,16 @@ void Application::Run()
 		for (Layer* pLayer : m_vLayers)
 		{
 			pLayer->OnUpdate((float)m_dDeltaTime);
-			if (s_bResetGame)
-			{
-				StartGame();
-				break;
-			}
 		}
 
-		/*RendererVertex v[4];
+		//Change the menu mode if applicable
+		if (m_CurMenu != m_NextMenu) { ChangeMenuState(); }
 
-		glm::vec4 col = { 0.8, 0.8, 0.8, 1.0 };
-		v[0].SetPosColTex({ 200, 200, 0 }, col, { -1.0, -1.0 });
-		v[1].SetPosColTex({ 400, 200, 0 }, col, { 1.0, -1.0 });
-		v[2].SetPosColTex({ 400, 400, 0 }, col, { 1.0, 1.0 });
-		v[3].SetPosColTex({ 200, 400, 0 }, col, { -1.0, 1.0 });*/
-
-		/*unsigned int i[6] = { 0,1,2,2,3,0 };
-		Renderer::DrawQuadTexture(v, 4, i, 6, nid);*/
-		
 		Renderer::Flush();
 
 		glfwSwapBuffers(m_pWindow);
 		glfwPollEvents(); 
 
-		
 		if (m_dDeltaTime < 1.0 / 70.0)
 		{
 			std::chrono::milliseconds sleepDuration(1);
@@ -193,11 +157,90 @@ void Application::Cleanup()
 		glfwDestroyWindow(m_pWindow);
 		m_pWindow = nullptr;
 	}
+	ClearLayers();
+}
 
+
+void Application::ClearLayers()
+{
 	std::vector <Layer*>& vec = m_vLayers;
 	for (Layer* pLayer : vec)
 	{
 		delete pLayer;
 	}
 	m_vLayers.clear();
+
+	for (unsigned int i = 0; i < LayerCount; i++)
+	{
+		m_listLayersIndex[i].clear();
+	}
+}
+void Application::OnStart()
+{
+	//call OnStart for each layer once all the layes have been added
+	for (Layer* pLayer : m_vLayers)
+	{
+		pLayer->OnStart();
+	}
+}
+
+void Application::ChangeMenuState()
+{
+	m_CurMenu = m_NextMenu;
+	switch (m_NextMenu)
+	{
+		case Menu::MainMenu:
+		{
+			StartMenuMainMenu();
+			break;
+		}
+		case Menu::NormalMode:
+		{
+			StartMenuNormalMode();
+			break;
+		}
+		case Menu::PracticeMode:
+		{
+			StartMenuPracticeMode();
+			break;
+		}
+		case Menu::TutorialMode:
+		{
+			StartMenuTutorialMode();
+			break;
+		}
+		case Menu::Credits:
+		{
+			StartMenuCredits();
+			break;
+		}
+	}
+}
+
+//Menus
+void Application::StartMenuMainMenu()
+{
+	ClearLayers();
+	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg2.png")));
+	OnStart();
+}
+void Application::StartMenuNormalMode()
+{
+	ClearLayers();
+	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg3.png")));
+	InsertLayer(new PlayerLayer);
+	InsertLayer(new BlockSpawnerLayer);
+	OnStart();
+}
+void  Application::StartMenuPracticeMode()
+{
+
+}
+void  Application::StartMenuTutorialMode()
+{
+
+}
+void  Application::StartMenuCredits()
+{
+
 }

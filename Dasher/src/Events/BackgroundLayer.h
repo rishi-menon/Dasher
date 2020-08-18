@@ -4,12 +4,23 @@
 #include "Maths.h"
 #include "Renderer/RendererVertex.h"
 
+struct BackgroundLayerProps
+{
+	BackgroundLayerProps();
+	BackgroundLayerProps(const char* const path, float velocity = -0.012f);
+	BackgroundLayerProps(const BackgroundLayerProps&) = default;
+	void SetInitTexCoords(const glm::vec2& bottomLeft, const glm::vec2& topRight);
+
+	float velocityX;
+	glm::vec2 initTexCoords[4];
+	const char* const path;
+
+};
 class BackgroundLayer : public Layer
 {
 public:
-	BackgroundLayer();
+	BackgroundLayer(const BackgroundLayerProps& props);
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
-	virtual void ResetLayer() override;
 
 	virtual void OnStart();
 	virtual void OnUpdate(float deltaTime);	//in seconds
@@ -19,8 +30,5 @@ private:
 
 	unsigned int m_nTextureId;
 	RendererVertex m_vertex[4];
-	const int m_nIndexCount = 6;
-	const unsigned int m_Index[6] = { 0,1,2,2,3,0 };
-
-	const float m_nVelocityX = -0.012f;
+	float m_nVelocityX;
 };

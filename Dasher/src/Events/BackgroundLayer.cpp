@@ -4,32 +4,45 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Renderer.h"
 
-BackgroundLayer::BackgroundLayer()
+BackgroundLayerProps::BackgroundLayerProps() :
+	velocityX (-0.012f),
+	path (nullptr)
 {
-	//m_nTextureId = Texture::LoadTexture("Assets\\Textures\\Space.jpg", nullptr, nullptr, TextureProperties(GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
-	m_nTextureId = Texture::LoadTexture("Assets\\Textures\\External\\bg3.png", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	SetInitTexCoords(glm::vec2(0.0f, 0.0f), glm::vec2(0.75f, 1.0f));
+}
+BackgroundLayerProps::BackgroundLayerProps(const char* const path, float velocity /*= -0.012f*/) :
+	velocityX(velocity),
+	path (path)
+{
+	SetInitTexCoords(glm::vec2(0.0f, 0.0f), glm::vec2(0.75f, 1.0f));
+}
+void BackgroundLayerProps::SetInitTexCoords(const glm::vec2& bottomLeft, const glm::vec2& topRight)
+{
+	initTexCoords[0] = { bottomLeft.x, bottomLeft.y };
+	initTexCoords[1] = { topRight.x, bottomLeft.y };
+	initTexCoords[2] = { topRight.x, topRight.y };
+	initTexCoords[3] = { bottomLeft.x, topRight.y };
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
+	m_nVelocityX (props.velocityX)
+{
+	ASSERT(props.path, "Image path was null");
+	m_nTextureId = Texture::LoadTexture(props.path, nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
-	ResetLayer();
+	const glm::vec4 col = { 1.0,1.0,1.0,1.0 };
+
+	int width = Application::GetWidth();
+	int height = Application::GetHeight();
+
+	m_vertex[0].SetPosColTex({ 0.0f, 0.0f, -0.5f }, col, props.initTexCoords[0]);
+	m_vertex[1].SetPosColTex({ width, 0.0f,-0.5f }, col, props.initTexCoords[1]);
+	m_vertex[2].SetPosColTex({ width, height, -0.5f }, col, props.initTexCoords[2]);
+	m_vertex[3].SetPosColTex({ 0.0f, height, -0.5f }, col, props.initTexCoords[3]);
 }
 void BackgroundLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	pApp->RegisterEvents(LayerWindowResize, nIndex);
-}
-void BackgroundLayer::ResetLayer()
-{
-	const glm::vec4 col = { 1.0,1.0,1.0,1.0 };
-	const glm::vec2 texCordBottomLeft = { 0.0f, 0.0f };
-	const glm::vec2 texCordBottomRight = { 0.75f, 0.0f };
-	const glm::vec2 texCordTopRight = { 0.75f, 1.0f };
-	const glm::vec2 texCordTopLeft = { 0.0f, 1.0f };
-
-	int width  = Application::GetCurrentApp()->GetWidth();
-	int height = Application::GetCurrentApp()->GetHeight();
-
-	m_vertex[0].SetPosColTex({ 0.0f, 0.0f, -0.5f },	  col, texCordBottomLeft);
-	m_vertex[1].SetPosColTex({ width, 0.0f,-0.5f },	  col, texCordBottomRight);
-	m_vertex[2].SetPosColTex({ width, height, -0.5f }, col, texCordTopRight);
-	m_vertex[3].SetPosColTex({ 0.0f, height, -0.5f },  col, texCordTopLeft);
 }
 
 void BackgroundLayer::OnStart()
@@ -38,7 +51,6 @@ void BackgroundLayer::OnStart()
 }
 void BackgroundLayer::OnUpdate(float deltaTime)
 {
-
 	for (int i = 0; i < 4; i++)
 	{
 		//subtract the value because when the speed is positive, the texture coordinates should be decreasing to give the effect of the background moving towards the right
@@ -56,7 +68,7 @@ void BackgroundLayer::OnUpdate(float deltaTime)
 		for (int i = 0; i < 4; m_vertex[i].m_textureCoord.x -= 1, i++);
 	}
 
-	Renderer::DrawQuadTexture(m_vertex, 6, m_Index, m_nIndexCount, m_nTextureId);
+	Renderer::DrawQuadTexture(m_vertex, RendererShapes::Shape::ShapeQuad, m_nTextureId);
 }
 bool BackgroundLayer::OnWindowResize(int width, int height)
 {

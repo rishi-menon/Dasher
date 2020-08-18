@@ -66,7 +66,6 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 {
 	////////////////////////////////////////////////////////////////////////////////////
 	//								Game Logic										  //
-	//																				  //
 	//		1. Clear out of bounds blocks											  //
 	//		2. For each existing block												  //
 	//				- Update position												  //
@@ -78,39 +77,8 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 	//1. Clear out of bound blocks
 	ClearOutOfBoundsBlocks();
 	
-	const RendererVertex* playerVertex = m_pPlayerLayer->GetVertex();
-	constexpr unsigned int nPlayerVertexCount = (unsigned int)PlayerLayer::GetVertexCount();
-	Block* buffer = m_blocks.Buffer();
-	int index = m_blocks.Begin();
-
-	//To do: Delete temp code
-	bool TempPlayerCollision = false;
-
-	//2. Update position, check collision and render
-	for (unsigned int i = 0; i < m_blocks.Count(); i++, index++, index %= m_blocks.Size())
-	{
-		//Update the block's position
-		Block& curBlock = buffer[index];
-		curBlock.position += curBlock.velocity * deltaTime;
-
-		RendererVertex blockVertex[3];
-		RendererShapes::TriangleRegular(blockVertex, curBlock.position, curBlock.scale, curBlock.color);
-
-		if (Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, 3))
-		{
-			TempPlayerCollision = true;
-			//To Do: player collided with a block... Do stuff....
-			m_pPlayerLayer->TakeDamage(10);
-			//for (int i = 0; i < 3; i++)	blockVertex[i].m_col = { 1.0, 0.2, 0.2, 1.0 };
-		}
-		Renderer::DrawQuadColor(blockVertex, curBlock.shape);
-	}
-
-	//To do: remove this 'Temp' Code 
-	if (!TempPlayerCollision)
-	{
-		m_pPlayerLayer->TakeDamage(0);
-	}
+	//2.
+	MoveCollisionRenderBlocks(deltaTime);
 
 	//3.Add new blocks 
 	double dCurTime = Application::GetGameTime();	//in seconds
@@ -121,6 +89,62 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 	}
 }
 
+void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
+{
+	const RendererVertex* playerVertex = m_pPlayerLayer->GetVertex();
+	constexpr unsigned int nPlayerVertexCount = (unsigned int)PlayerLayer::GetVertexCount();
+
+	//This is for optimization, We dont have to check collision with every single block. Since its a queue, if the blocks position is more than the players x position, then we can skip collision for all the blcoks after that
+	float playerMaxPosX = -1000;
+	for (unsigned int i = 0; i < nPlayerVertexCount; i++)
+	{
+		playerMaxPosX = glm::max(playerMaxPosX, playerVertex[i].m_pos.x);
+	}
+
+	Block* buffer = m_blocks.Buffer();
+	int index = m_blocks.Begin();
+
+	bool playerCollided = false;
+	bool checkCollision = true;
+	for (unsigned int i = 0; i < m_blocks.Count(); i++)
+	{
+		//Update the block's position
+		Block& curBlock = buffer[index];
+		curBlock.position += curBlock.velocity * deltaTime;
+
+		RendererVertex blockVertex[3];
+		RendererShapes::TriangleRegular(blockVertex, curBlock.position, curBlock.scale, curBlock.color);
+
+		//Check Collision if need be
+		if (checkCollision)
+		{
+			float minBlockPosX = 100000;
+			for (unsigned int i = 0; i < RendererShapes::genericVertexBufferCount[curBlock.shape]; i++)
+			{
+				minBlockPosX = glm::min(minBlockPosX, blockVertex[i].m_pos.x);
+			}
+
+			if (minBlockPosX > playerMaxPosX)
+			{
+				checkCollision = false;
+			} 
+			else if (!curBlock.isPhasable && Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, 3))
+			{
+				playerCollided = true;
+				m_pPlayerLayer->TakeDamage(10);
+			}
+		}
+
+		//Render
+		Renderer::DrawQuadColor(blockVertex, curBlock.shape);
+		index = (index + 1) % m_blocks.Size();
+	}
+
+	if (!playerCollided)
+	{
+		m_pPlayerLayer->TakeNoDamage();
+	}
+}
 void BlockSpawnerLayer::CreateBlock()
 {
 	Block& block = *m_blocks.Push();
@@ -128,8 +152,7 @@ void BlockSpawnerLayer::CreateBlock()
 	if (Random::Rand() >= 0.5)
 	{
 		//Block Top
-		Application* pApp = Application::GetCurrentApp();
-		block.position = { pApp->GetWidth(), pApp->GetHeight() - 2, 0 };
+		block.position = { Application::GetWidth(), Application::GetHeight() - 2, 0 };
 		//Negative sign so that the triangle appears upside down
 		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), -Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
 	}
@@ -142,26 +165,55 @@ void BlockSpawnerLayer::CreateBlock()
 	}
 
 	block.velocity = { -400, 0, 0 };
-	block.color = { 0.0,0.4,0.79,0.5 };
+	block.color = { 0.0,0.4,0.79,1.0 };
 	block.shape = RendererShapes::ShapeTriangleRegular;
+	block.phaseRange = { 0.0, 0.2 };
+
+
+	double curPhase = m_pPlayerLayer->GetPhasePercent();
+	if (block.phaseRange.x <= curPhase && block.phaseRange.y >= curPhase)
+	{
+		block.isPhasable = true;
+		block.color.a = 0.5f;
+	}
+	else
+	{
+		block.isPhasable = false;
+		block.color.a = 1.0f;
+	}	
+}
+
+
+bool BlockSpawnerLayer::OnMouseMove(int x, int y)
+{
+	if (!m_pPlayerLayer) { ASSERT(false, "PlayerLayer was null"); return false; }
+
+	//Recalculate phasable blocks
+	int index = m_blocks.Begin();
+	Block* buffer = m_blocks.Buffer();
+
+	double curPhase = m_pPlayerLayer->GetPhasePercent();
+	for (int i = 0; i < m_blocks.Count(); i++)
+	{
+		Block& curBlock = buffer[index];
+		if (curBlock.phaseRange.x <= curPhase && curBlock.phaseRange.y >= curPhase)
+		{
+			curBlock.isPhasable = true;
+			curBlock.color.a = 0.5f;
+		}
+		else
+		{
+			curBlock.isPhasable = false;
+			curBlock.color.a = 1.0f;
+		}
+		index = (index + 1) % m_blocks.Size();
+	}
+	return false;
 }
 
 #if 0
 bool BlockSpawnerLayer::OnWindowResize(int width, int height)
 {
-	return false;
-}
-
-//Temp code
-bool BlockSpawnerLayer::OnMouseMove(int x, int y)
-{
-	//if (m_blocks.Count())
-	//{
-	//	Block* block = m_blocks.GetAt(0);
-	//	//LOG_INFO("x {0}, y{1}", x, y);
-	//	block->position = { x, y, 1 };
-	//}
-
 	return false;
 }
 #endif

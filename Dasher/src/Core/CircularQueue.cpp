@@ -18,16 +18,7 @@ CircularQueue<T>::CircularQueue() :
 template <typename T>
 CircularQueue<T>::~CircularQueue()
 {
-	if (m_Buffer)
-	{
-		int index = m_nStartIndex;
-		for (SizeT i = 0; i < m_nCount; i++)
-		{
-			index = (index + 1) % m_nBufferSize;
-			m_Buffer[index].~T();
-		}
-		free(m_Buffer);
-	}
+	ClearAll(true);
 }
 template <typename T>
 void CircularQueue<T>::Reserve(SizeT size)
@@ -43,9 +34,9 @@ void CircularQueue<T>::Reserve(SizeT size)
 		int index = m_nStartIndex;
 		for (SizeT i = 0; i < m_nCount; i++)
 		{
-			index = (index + 1) % m_nBufferSize;
-			newBuffer[i] = std::move(m_Buffer[index]);
+			new(newBuffer+i) T(std::move(m_Buffer[index]));
 			m_Buffer[index].~T();
+			index = (index + 1) % m_nBufferSize;
 		}
 	}
 
@@ -136,14 +127,22 @@ const T* CircularQueue<T>::GetAtPosition(SizeT queuePosition) const
 template <typename T>
 void CircularQueue<T>::ClearAll(bool bDeallocateBuffer /*= false*/)
 {
-	m_nCount = 0;
-	m_nStartIndex = 0;
-	m_nEndIndex = 0;
-	if (bDeallocateBuffer)
+	int index = m_nStartIndex;
+	for (int i = 0; i < m_nCount; i++)
 	{
-		delete[] m_Buffer;
+		m_Buffer[i].~T();
+		index = (index + 1) % m_nBufferSize;
+	}
+
+	if (m_Buffer && bDeallocateBuffer)
+	{
+		free(m_Buffer);
 		m_Buffer = nullptr;
 		m_nBufferSize = 0;
 	}
+
+	m_nCount = 0;
+	m_nStartIndex = 0;
+	m_nEndIndex = 0;
 }
 #endif CIRCULAR_QUEUE_CPP
