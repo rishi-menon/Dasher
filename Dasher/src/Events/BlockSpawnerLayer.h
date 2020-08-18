@@ -10,12 +10,18 @@ class PlayerLayer;
 
 struct Block
 {
+	Block() = default;
+	Block(Block&) = default;
+
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::vec4 color;
 
 	glm::vec3 velocity;
 	RendererShapes::Shape shape;
+
+	double phasePercent;
+	bool isPhasable;
 };
 
 class BlockSpawnerLayer : public Layer
@@ -27,11 +33,15 @@ public:
 
 	virtual void OnStart();
 	virtual void OnUpdate(float deltaTime);	//in seconds
+	
+#if 0
 	virtual bool OnWindowResize(int width, int height) override;
 	virtual bool OnMouseMove(int x, int y) override;
+#endif
 
 private:
 	inline void ClearOutOfBoundsBlocks();
+	void CreateBlock();
 private:
 	CircularQueue<Block> m_blocks;
 	PlayerLayer* m_pPlayerLayer;

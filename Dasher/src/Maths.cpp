@@ -18,7 +18,7 @@ namespace Random
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		long long value = std::chrono::time_point_cast <std::chrono::milliseconds> (timeNow).time_since_epoch().count();
 
-		generator.seed(value);
+		generator.seed(static_cast<unsigned int>(value));
 	}
 	extern double Rand()
 	{

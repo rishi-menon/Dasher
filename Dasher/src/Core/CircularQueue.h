@@ -45,10 +45,8 @@ public:
 	void Push(const T& element);
 	T* Push();
 	
-	T* Pop(); 
+	void Pop(); 
 	void ClearAll(bool bDeallocateBuffer = false);
-
-	void Print() const;
 
 private:
 	SizeT m_nBufferSize, m_nCount;

@@ -3,6 +3,14 @@
 #include "Layer.h"
 #include "Maths.h"
 #include "Renderer/RendererVertex.h"
+#include "Core/CircularQueue.h"
+
+struct TrajectoryPoint
+{
+	TrajectoryPoint() = default;
+	TrajectoryPoint(TrajectoryPoint&) = default;
+	glm::vec2 pos;
+};
 
 class PlayerLayer : public Layer
 {
@@ -30,8 +38,9 @@ public:
 
 	void TakeDamage(double damage);
 
+	inline double GetPhasePercent() const { return Math::GetPercent(m_dAngVelocityMin, m_dAngVelocityMax, m_dAngVelocity); }
 private:
-	void DrawTrajectory(double timeIntoFuture);
+	void DrawTrajectory(double timeIntoFuture, int numOfPoints);
 	
 private:
 	//constants
@@ -58,4 +67,7 @@ private:
 	static constexpr unsigned int m_nVertexCount = 4;
 	RendererVertex m_Vertex[m_nVertexCount];
 
+
+	double m_dPointPosX;	//This is the x coordinate of the first point of the trajectory
+	double m_dPointPhase;	//This is the phase of the first point
 };   

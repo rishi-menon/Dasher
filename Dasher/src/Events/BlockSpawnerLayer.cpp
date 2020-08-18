@@ -8,6 +8,7 @@
 #include "Collision/Collision.h"
 #include "PlayerLayer.h"
 
+
 BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_pPlayerLayer (nullptr),
 	m_dNextSpawnTime (0.0),
@@ -105,44 +106,47 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 		Renderer::DrawQuadColor(blockVertex, curBlock.shape);
 	}
 
+	//To do: remove this 'Temp' Code 
 	if (!TempPlayerCollision)
 	{
 		m_pPlayerLayer->TakeDamage(0);
 	}
 
 	//3.Add new blocks 
-	
 	double dCurTime = Application::GetGameTime();	//in seconds
 	if (dCurTime >= m_dNextSpawnTime)
 	{
-
-		//To do: delete temp in future
-		double temp = Random::Rand(m_dTimeBwSpawnMin, m_dTimeBwSpawnMax);
-		m_dNextSpawnTime = dCurTime + temp;
-
-		Block& block = *m_blocks.Push();
-
-		if (Random::Rand() >= 0.5)
-		{
-			//Block Top
-			Application* pApp = Application::GetCurrentApp();
-			block.position = { pApp->GetWidth(), pApp->GetHeight()-2, 0 };
-			//Negative sign so that the triangle appears upside down
-			block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), -Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
-		}
-		else
-		{
-			//block bottom
-			Application* pApp = Application::GetCurrentApp();
-			block.position = { pApp->GetWidth(), 2, 0 };
-			block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
-		}
-		
-		block.velocity = { -400, 0, 0 };
-		block.color = { 0.0,0.4,0.79,0.5 };
-		block.shape = RendererShapes::ShapeTriangleRegular;
+		m_dNextSpawnTime = dCurTime + Random::Rand(m_dTimeBwSpawnMin, m_dTimeBwSpawnMax);
+		CreateBlock();
 	}
 }
+
+void BlockSpawnerLayer::CreateBlock()
+{
+	Block& block = *m_blocks.Push();
+
+	if (Random::Rand() >= 0.5)
+	{
+		//Block Top
+		Application* pApp = Application::GetCurrentApp();
+		block.position = { pApp->GetWidth(), pApp->GetHeight() - 2, 0 };
+		//Negative sign so that the triangle appears upside down
+		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), -Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
+	}
+	else
+	{
+		//block bottom
+		Application* pApp = Application::GetCurrentApp();
+		block.position = { pApp->GetWidth(), 2, 0 };
+		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
+	}
+
+	block.velocity = { -400, 0, 0 };
+	block.color = { 0.0,0.4,0.79,0.5 };
+	block.shape = RendererShapes::ShapeTriangleRegular;
+}
+
+#if 0
 bool BlockSpawnerLayer::OnWindowResize(int width, int height)
 {
 	return false;
@@ -160,3 +164,4 @@ bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 
 	return false;
 }
+#endif

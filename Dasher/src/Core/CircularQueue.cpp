@@ -20,7 +20,13 @@ CircularQueue<T>::~CircularQueue()
 {
 	if (m_Buffer)
 	{
-		delete[] m_Buffer;
+		int index = m_nStartIndex;
+		for (SizeT i = 0; i < m_nCount; i++)
+		{
+			index = (index + 1) % m_nBufferSize;
+			m_Buffer[index].~T();
+		}
+		free(m_Buffer);
 	}
 }
 template <typename T>
@@ -30,19 +36,27 @@ void CircularQueue<T>::Reserve(SizeT size)
 
 	if (m_nBufferSize >= size) { /*ignore the reserve command */ return; }
 
-	T* newBuffer = new T[size];
+	T* newBuffer = (T*)malloc (sizeof(T) * size);
 
 	if (!m_nBufferSize)
 	{
-		memcpy_s(newBuffer, size * sizeof(T), m_Buffer, m_nBufferSize);
+		int index = m_nStartIndex;
+		for (SizeT i = 0; i < m_nCount; i++)
+		{
+			index = (index + 1) % m_nBufferSize;
+			newBuffer[i] = std::move(m_Buffer[index]);
+			m_Buffer[index].~T();
+		}
 	}
 
 	if (m_Buffer)
 	{
-		delete[] m_Buffer;
+		free(m_Buffer);
 	}
 	m_Buffer = newBuffer;
 	m_nBufferSize = size;
+	m_nStartIndex = 0; 
+	m_nEndIndex = m_nCount;
 }
 
 template <typename T>
@@ -51,8 +65,9 @@ void CircularQueue<T>::Push(const T& element)
 	if (m_nCount >= m_nBufferSize) { ASSERT(false, "Not enough space in queue to insert new element"); return; } //No space to allocate;
 
 	ASSERT(m_nEndIndex >= 0 && m_nEndIndex < m_nBufferSize, "Index out of bounds");
-	m_Buffer[m_nEndIndex] = element;
 	
+	new (m_Buffer + m_nEndIndex) T(std::move(element));
+
 	m_nCount++;
 	m_nEndIndex++;
 	if (m_nEndIndex >= m_nBufferSize)
@@ -67,7 +82,7 @@ T* CircularQueue<T>::Push()
 	if (m_nCount >= m_nBufferSize) { ASSERT(false, "Not enough space in queue to insert new element"); return nullptr; } //No space to allocate;
 
 	ASSERT(m_nEndIndex >= 0 && m_nEndIndex < m_nBufferSize, "Index out of bounds");
-	T* newElement = m_Buffer + m_nEndIndex;
+	T* newElement = new (m_Buffer + m_nEndIndex) T();
 
 	m_nCount++;
 	m_nEndIndex++;
@@ -80,10 +95,9 @@ T* CircularQueue<T>::Push()
 
 
 template <typename T>
-T* CircularQueue<T>::Pop()
+void CircularQueue<T>::Pop()
 {
-	if (m_nCount <= 0) { LOG_WARN("Tried to pop from an empty queue"); return nullptr; }
-	ASSERT(m_nStartIndex >= 0 && m_nStartIndex < m_nBufferSize, "Index out of bounds");
+	if (m_nCount <= 0) { LOG_WARN("Tried to pop from an empty queue"); return; }
 	
 	T* poppedElement = (m_Buffer + m_nStartIndex);
 	m_nCount--;
@@ -93,7 +107,7 @@ T* CircularQueue<T>::Pop()
 		m_nStartIndex %= m_nBufferSize;
 	}
 
-	return poppedElement;
+	poppedElement->~T();
 }
 
 template <typename T>
@@ -117,18 +131,6 @@ const T* CircularQueue<T>::GetAtPosition(SizeT queuePosition) const
 	}
 	int nIndex = (m_nStartIndex + queuePosition) % m_nBufferSize;
 	return m_Buffer + nIndex;
-}
-
-template <typename T>
-void CircularQueue<T>::Print() const
-{
-	int index = m_nStartIndex;
-	LOG_CLIENT_WARN("Printing Queue: ");
-	for (int i = 0; i < m_nCount; i++, index += 1, index %= m_nBufferSize)
-	{
-		LOG_CLIENT_INFO("{0}", m_Buffer[index]);
-	}
-	LOG_CLIENT_WARN("Finished...");
 }
 
 template <typename T>
