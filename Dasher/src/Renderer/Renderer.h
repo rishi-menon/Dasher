@@ -4,6 +4,10 @@
 #include "RendererVertex.h"
 #include "RendererShapes.h"
 
+#include <string>
+
+class Font;
+
 class Renderer
 {
 public:
@@ -21,5 +25,9 @@ public:
 
 	static void DrawQuadColor(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, glm::mat4* transformation = nullptr);
 	static void DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVertexCount, const unsigned int* indexBuffer, unsigned int nIndexCount, unsigned int nTextureId, glm::mat4* transformation = nullptr);
+
+
+	//Text rendering
+	static void DrawTextColor(const std::string& text, float PosX, float PosY, float scale, const glm::vec4& col, Font* font = nullptr);
 
 };

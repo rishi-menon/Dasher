@@ -1,7 +1,7 @@
 
 #include "BackgroundLayer.h"
 #include "Application/Application.h"
-#include "Renderer/Texture.h"
+#include "AssetManagement/Texture.h"
 #include "Renderer/Renderer.h"
 
 BackgroundLayerProps::BackgroundLayerProps() :

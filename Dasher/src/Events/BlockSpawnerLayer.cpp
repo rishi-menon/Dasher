@@ -2,7 +2,7 @@
 #include "BlockSpawnerLayer.h"
 #include "Application/Application.h"
 
-#include "Renderer/Texture.h"
+#include "AssetManagement/Texture.h"
 #include "Renderer/Renderer.h"
 
 #include "Collision/Collision.h"
@@ -193,7 +193,7 @@ bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 	Block* buffer = m_blocks.Buffer();
 
 	double curPhase = m_pPlayerLayer->GetPhasePercent();
-	for (int i = 0; i < m_blocks.Count(); i++)
+	for (unsigned int i = 0; i < m_blocks.Count(); i++)
 	{
 		Block& curBlock = buffer[index];
 		if (curBlock.phaseRange.x <= curPhase && curBlock.phaseRange.y >= curPhase)

@@ -4,9 +4,9 @@
 #include <thread>
 #include <chrono>
 
-#include "Renderer/Texture.h"
+#include "AssetManagement/Texture.h"
+#include "AssetManagement/Font.h"
 #include "Renderer/Renderer.h"
-
 #include "Log.h"
 
 #include "EventCallbacks.h"
@@ -19,6 +19,7 @@
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
 int Application::m_nHeight = 0;
+
 
 Application::Application() :
 	m_pWindow(nullptr),
@@ -51,6 +52,8 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	{
 		ASSERT(false, "Could not initialise GLEW");
 	}
+
+	FontInit();
 
 	//Set callbacks
 	glfwSetWindowUserPointer(m_pWindow, this);
@@ -109,10 +112,8 @@ void Application::Run()
 	glClearColor(fCol, fCol, fCol, 1);
 
 	const double dMaxDeltaTime = 1.0/30.0;
-	const double dTargetDeltaTime = 1.0 / 60.0;
 
 	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
-
 
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
@@ -131,6 +132,8 @@ void Application::Run()
 		{
 			pLayer->OnUpdate((float)m_dDeltaTime);
 		}
+
+		Renderer::DrawTextColor("It Works!!", 20, 20, 1.5, { 0.0,0.4,1.0,0.5 });
 
 		//Change the menu mode if applicable
 		if (m_CurMenu != m_NextMenu) { ChangeMenuState(); }
@@ -152,12 +155,13 @@ void Application::Run()
 void Application::Cleanup()
 {
 	Renderer::Cleanup();
+	FontCleanUp();
+	ClearLayers();
 	if (m_pWindow)
 	{
 		glfwDestroyWindow(m_pWindow);
 		m_pWindow = nullptr;
 	}
-	ClearLayers();
 }
 
 
@@ -175,6 +179,7 @@ void Application::ClearLayers()
 		m_listLayersIndex[i].clear();
 	}
 }
+
 void Application::OnStart()
 {
 	//call OnStart for each layer once all the layes have been added
@@ -183,7 +188,7 @@ void Application::OnStart()
 		pLayer->OnStart();
 	}
 }
-
+//Menus
 void Application::ChangeMenuState()
 {
 	m_CurMenu = m_NextMenu;
@@ -216,8 +221,6 @@ void Application::ChangeMenuState()
 		}
 	}
 }
-
-//Menus
 void Application::StartMenuMainMenu()
 {
 	ClearLayers();

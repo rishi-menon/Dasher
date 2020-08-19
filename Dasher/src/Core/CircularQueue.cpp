@@ -128,7 +128,7 @@ template <typename T>
 void CircularQueue<T>::ClearAll(bool bDeallocateBuffer /*= false*/)
 {
 	int index = m_nStartIndex;
-	for (int i = 0; i < m_nCount; i++)
+	for (SizeT i = 0; i < m_nCount; i++)
 	{
 		m_Buffer[i].~T();
 		index = (index + 1) % m_nBufferSize;
