@@ -20,6 +20,8 @@ class BackgroundLayer : public Layer
 {
 public:
 	BackgroundLayer(const BackgroundLayerProps& props);
+	virtual ~BackgroundLayer();
+		
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 
 	virtual void OnStart();

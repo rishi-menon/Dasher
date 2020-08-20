@@ -1,4 +1,3 @@
-
 #include "Application.h"
 
 #include <thread>
@@ -15,6 +14,11 @@
 #include "Events/PlayerLayer.h"
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
+#include "Events/UILayer.h"
+
+//Temp
+#include "UI/Button.h"
+
 
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
@@ -54,6 +58,7 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	}
 
 	FontInit();
+	UI::UIInit();
 
 	//Set callbacks
 	glfwSetWindowUserPointer(m_pWindow, this);
@@ -115,6 +120,19 @@ void Application::Run()
 
 	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
+	//unsigned int w, h;
+	//unsigned int idd = Texture::LoadTexture("Assets/Textures/UI/Button0.png", &w, &h);
+
+	//float width = 450;
+	//float height = 120;
+	//RendererVertex v[4];
+	//v[0].SetPosColTex({ 20, 20, 0 },				{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 0 });
+	//v[1].SetPosColTex({ 20+width, 20, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 0 });
+	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
+	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
+
+	Button button;
+
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
 		double dCurrentTime = glfwGetTime();
@@ -133,7 +151,7 @@ void Application::Run()
 			pLayer->OnUpdate((float)m_dDeltaTime);
 		}
 
-		Renderer::DrawTextColor("It Works!!", 20, 20, 1.5, { 0.0,0.4,1.0,0.5 });
+		//Renderer::DrawQuadTexture(v, RendererShapes::Shape::ShapeQuad, idd);
 
 		//Change the menu mode if applicable
 		if (m_CurMenu != m_NextMenu) { ChangeMenuState(); }
@@ -156,6 +174,7 @@ void Application::Cleanup()
 {
 	Renderer::Cleanup();
 	FontCleanUp();
+	UI::UICleanup();
 	ClearLayers();
 	if (m_pWindow)
 	{
@@ -221,9 +240,11 @@ void Application::ChangeMenuState()
 		}
 	}
 }
+
 void Application::StartMenuMainMenu()
 {
 	ClearLayers();
+	InsertLayer(new UILayer);
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg2.png")));
 	OnStart();
 }

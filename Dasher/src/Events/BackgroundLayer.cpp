@@ -40,6 +40,11 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 	m_vertex[2].SetPosColTex({ width, height, -0.5f }, col, props.initTexCoords[2]);
 	m_vertex[3].SetPosColTex({ 0.0f, height, -0.5f }, col, props.initTexCoords[3]);
 }
+
+BackgroundLayer::~BackgroundLayer()
+{
+	Texture::DeleteTexture(m_nTextureId);
+}
 void BackgroundLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	pApp->RegisterEvents(LayerWindowResize, nIndex);

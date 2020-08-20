@@ -169,6 +169,7 @@
     <ClCompile Include="src\Events\BlockSpawnerLayer.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
     <ClCompile Include="src\Events\PlayerLayer.cpp" />
+    <ClCompile Include="src\Events\UILayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Maths.cpp" />
@@ -176,6 +177,8 @@
     <ClCompile Include="src\Renderer\RendererShapes.cpp" />
     <ClCompile Include="src\Renderer\RendererVertex.cpp" />
     <ClCompile Include="src\AssetManagement\Texture.cpp" />
+    <ClCompile Include="src\UI\Button.cpp" />
+    <ClCompile Include="src\UI\UIObject.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +191,7 @@
     <ClInclude Include="src\Events\BlockSpawnerLayer.h" />
     <ClInclude Include="src\Events\Layer.h" />
     <ClInclude Include="src\Events\PlayerLayer.h" />
+    <ClInclude Include="src\Events\UILayer.h" />
     <ClInclude Include="src\Maths.h" />
     <ClInclude Include="src\Log.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
@@ -195,6 +199,8 @@
     <ClInclude Include="src\Renderer\RendererUtils.h" />
     <ClInclude Include="src\Renderer\RendererVertex.h" />
     <ClInclude Include="src\AssetManagement\Texture.h" />
+    <ClInclude Include="src\UI\Button.h" />
+    <ClInclude Include="src\UI\UIObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\vertex.shader" />
