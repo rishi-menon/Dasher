@@ -29,7 +29,7 @@ namespace RendererShapes
 		outQuad[2].m_textureCoord = { 1.0, 1.0 };
 		outQuad[3].m_textureCoord = { 0.0, 1.0 };
 
-		//set col and tex id
+		//set col
 		for (int i = 0; i < 4; i++)
 		{
 			outQuad[i].m_col = col;
@@ -61,11 +61,14 @@ namespace RendererShapes
 		glm::mat4 matModel = glm::translate<float>(glm::mat4(1.0f), pos - offsetScaled) * matScale;
 
 
-		glm::vec2 tex = { 0.0f, 0.0f };
-		for (unsigned char i = 0; i < 3; i++)
-		{
-			glm::vec3 pos = matModel * baseCoordinates[i];
-			outTriangle[i].SetPosColTex(pos, col, tex);
-		}
+		glm::vec3 vertexPos = matModel * baseCoordinates[0];
+		outTriangle[0].SetPosColTex(vertexPos, col, { 0.0f, 0.0f });
+
+		vertexPos = matModel * baseCoordinates[1];
+		outTriangle[1].SetPosColTex(vertexPos, col, { 1.0f, 0.0f });
+
+
+		vertexPos = matModel * baseCoordinates[2];
+		outTriangle[2].SetPosColTex(vertexPos, col, { 0.5f, 1.0f });
 	}
 }

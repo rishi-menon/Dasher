@@ -46,6 +46,8 @@ public:
 	inline Menu GetCurrentMenu() const { return m_CurMenu; }
 	inline void SetNextMenu(Menu menu) { m_NextMenu = menu; }
 
+	inline void GetMousePos(double& x, double& y) const { glfwGetCursorPos(m_pWindow, &x, &y); y = m_nHeight - y; }
+
 private:
 	void Cleanup();
 	void ClearLayers();

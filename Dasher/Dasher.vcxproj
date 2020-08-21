@@ -168,6 +168,7 @@
     <ClCompile Include="src\Events\BackgroundLayer.cpp" />
     <ClCompile Include="src\Events\BlockSpawnerLayer.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
+    <ClCompile Include="src\Events\MainMenu\MainMenuLayer.cpp" />
     <ClCompile Include="src\Events\PlayerLayer.cpp" />
     <ClCompile Include="src\Events\UILayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="src\Events\BackgroundLayer.h" />
     <ClInclude Include="src\Events\BlockSpawnerLayer.h" />
     <ClInclude Include="src\Events\Layer.h" />
+    <ClInclude Include="src\Events\MainMenu\MainMenuLayer.h" />
     <ClInclude Include="src\Events\PlayerLayer.h" />
     <ClInclude Include="src\Events\UILayer.h" />
     <ClInclude Include="src\Maths.h" />

@@ -78,7 +78,7 @@ bool Font::LoadFont(const char* const path, unsigned int height)
 			}
 		}
 
-		unsigned int texId = Texture::LoadTexture(buffer.data(), face->glyph->bitmap.width, face->glyph->bitmap.rows);
+		unsigned int texId = Texture::LoadTextureBuffer(buffer.data(), face->glyph->bitmap.width, face->glyph->bitmap.rows);
 		glm::ivec2 size = { width, rows };
 		glm::ivec2 bearing = {face->glyph->bitmap_left, face->glyph->bitmap_top};
 		//Advance is stored as 1/64th of a pixel so divide the value by 64 to get pixels

@@ -28,7 +28,7 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 	m_nVelocityX (props.velocityX)
 {
 	ASSERT(props.path, "Image path was null");
-	m_nTextureId = Texture::LoadTexture(props.path, nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	m_nTextureId = Texture::LoadTexture(props.path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
 	const glm::vec4 col = { 1.0,1.0,1.0,1.0 };
 

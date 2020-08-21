@@ -20,32 +20,47 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-	//glDeleteTextures(1, &m_nRendererId);
 }
 
-unsigned int Texture::LoadTexture(const char* const strPath, unsigned int* nOutWidth, unsigned int* nOutHeight, TextureProperties props)
+unsigned int Texture::LoadTexture(const char* const strPath, TextureDimensions* outDimensions, TextureProperties props)
+{
+	TextureDimensions dimension;
+	unsigned int texId = LoadTexturePreserve(strPath, dimension, props);
+	if (dimension.buffer)
+	{
+		stbi_image_free(dimension.buffer);
+		dimension.buffer = nullptr;
+		if (outDimensions) { *outDimensions = dimension; }
+	}
+	return texId;
+}
+
+//This does not deallocate the buffer, The caller has to store and keep track and eventually call Texture::Free
+unsigned int Texture::LoadTexturePreserve(const char* const strPath, TextureDimensions& outDimensions, TextureProperties props)
 {
 	stbi_set_flip_vertically_on_load(1);
-	int x, y, bpp;
-	unsigned char* buffer = stbi_load(strPath, &x, &y, &bpp, 4);
+	int bpp;
+	outDimensions.buffer = stbi_load(strPath, &outDimensions.width, &outDimensions.height, &outDimensions.bpp, 4);
 
-	if (buffer)
+	//Assume that we read a 3x3 image, the index of each pixel location as seen normally would be as follows
+	//	6, 7, 8
+	//  3, 4, 5
+	//	0, 1, 2
+	// ie, the bottom left of the image is the 0th index of the array and then the pixel to its right would be at index 1 (or technically index 4 because index 0 contains rgba)
+
+	if (outDimensions.buffer)
 	{
-		if (nOutWidth) *nOutWidth = x;
-		if (nOutHeight) *nOutHeight = y;
-
-		unsigned int nOutId = Texture::LoadTexture(buffer, x, y, props);
-
-		stbi_image_free(buffer);
+		unsigned int nOutId = Texture::LoadTextureBuffer(outDimensions.buffer, outDimensions.width, outDimensions.height, props);
 		return nOutId;
 	}
 	else
 	{
+		outDimensions = { 0, 0, 0, nullptr };
 		ASSERT(false, "Could not load texture {0}", strPath);
 		return 0xffff;
 	}
 }
-unsigned int Texture::LoadTexture(const unsigned char bufferRgba[], int nSizeX, int nSizeY, TextureProperties props)
+unsigned int Texture::LoadTextureBuffer(const unsigned char bufferRgba[], int nSizeX, int nSizeY, TextureProperties props)
 {
 	unsigned int nOutId;
 	glcall(glGenTextures(1, &nOutId));
@@ -63,6 +78,11 @@ unsigned int Texture::LoadTexture(const unsigned char bufferRgba[], int nSizeX, 
 	return nOutId;
 }
 
+void Texture::FreeImageBuffer(unsigned char* buffer)
+{
+	ASSERT(buffer, "Texture buffer was empty");
+	stbi_image_free(buffer);
+}
 void Texture::DeleteTexture(unsigned int texId)
 {
 	glcall(glDeleteTextures(1, &texId));

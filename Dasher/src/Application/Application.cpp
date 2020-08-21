@@ -15,6 +15,7 @@
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
 #include "Events/UILayer.h"
+#include "Events/MainMenu/MainMenuLayer.h"
 
 //Temp
 #include "UI/Button.h"
@@ -131,8 +132,6 @@ void Application::Run()
 	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
 	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
 
-	Button button;
-
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
 		double dCurrentTime = glfwGetTime();
@@ -146,10 +145,27 @@ void Application::Run()
 		//clear screen
 		glcall(glClear(GL_COLOR_BUFFER_BIT));
 
-		for (Layer* pLayer : m_vLayers)
+		//The UI layer has to be inserted at the beginning of the layer but has to be rendered at the end
+		if (g_nUILayerIndex != -1)
 		{
-			pLayer->OnUpdate((float)m_dDeltaTime);
+			for (int i = 0; i < g_nUILayerIndex; i++)
+			{
+				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
+			}
+			for (unsigned int i = g_nUILayerIndex+1; i < m_vLayers.size(); i++)
+			{
+				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
+			}
+			m_vLayers[g_nUILayerIndex]->OnUpdate((float)m_dDeltaTime);
 		}
+		else
+		{
+			for (Layer* pLayer : m_vLayers)
+			{
+				pLayer->OnUpdate((float)m_dDeltaTime);	
+			}
+		}
+
 
 		//Renderer::DrawQuadTexture(v, RendererShapes::Shape::ShapeQuad, idd);
 
@@ -187,9 +203,9 @@ void Application::Cleanup()
 void Application::ClearLayers()
 {
 	std::vector <Layer*>& vec = m_vLayers;
-	for (Layer* pLayer : vec)
+	for (int i = vec.size() - 1; i >= 0; i--)
 	{
-		delete pLayer;
+		delete vec[i];
 	}
 	m_vLayers.clear();
 
@@ -245,6 +261,7 @@ void Application::StartMenuMainMenu()
 {
 	ClearLayers();
 	InsertLayer(new UILayer);
+	InsertLayer(new MainMenuLayer);
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg2.png")));
 	OnStart();
 }

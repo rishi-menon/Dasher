@@ -1,4 +1,5 @@
 #pragma once
+#include "AssetManagement/Texture.h"
 
 enum class UITypes : unsigned int
 {
@@ -10,12 +11,13 @@ enum class UITypes : unsigned int
 namespace UI
 {
 	extern unsigned int UITexIds[(unsigned int)UITypes::Count];
-	
+	extern TextureDimensions UITexDimension[(unsigned int)UITypes::Count];
+
+
 	void UIInit();
 	void UICleanup();
-
 	inline unsigned int GetTextureId(UITypes type) { return UI::UITexIds[static_cast<unsigned int>(type)]; }
-	
+	inline const TextureDimensions& GetTextureDimension (UITypes type) { return UI::UITexDimension[static_cast<unsigned int>(type)]; }
 }
 
 class UILayer;
@@ -23,8 +25,10 @@ class UIObject
 {
 public:
 	UIObject();
-	virtual ~UIObject() {}
+	virtual ~UIObject();
 	
+	virtual void OnUpdate(float deltaTime) {}
+
 	virtual bool OnMouseMove(int x, int y)		{ return false; }
 	virtual bool OnMouseDown(int nButton)		{ return false; }
 	virtual bool OnMouseUp(int nButton)			{ return false; }
@@ -36,6 +40,8 @@ public:
 	virtual bool OnWindowResize(int x, int y)	{ return false; }
 	
 	inline bool GetIsActive() const { return m_bIsActive; }
+
+	inline void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 
 private:
 	void RegisterUIObject();	//Registers this object to the layer

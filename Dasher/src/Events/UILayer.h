@@ -5,6 +5,7 @@
 
 class UILayer;
 extern UILayer* g_pCurrentUILayer;
+extern int g_nUILayerIndex;
 
 class UILayer : public Layer
 {
@@ -14,6 +15,7 @@ public:
 
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 	virtual void OnStart();
+	virtual void OnUpdate(float deltaTime) override;
 
 	virtual bool OnMouseMove(int x, int y) override;
 	virtual bool OnMouseDown(int nButton)  override;
@@ -26,6 +28,8 @@ public:
 	virtual bool OnWindowResize(int x, int y) override;
 
 	inline void RegisterUIObject(UIObject* pObj) { m_vObjects.emplace_back(pObj); }
+	void DeRegisterUIObject(UIObject* pObj);
+
 private:
 	std::vector<UIObject*> m_vObjects;
 };

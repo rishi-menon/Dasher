@@ -139,7 +139,7 @@ bool Renderer::Initialise()
 
 	//Load the textures
 	unsigned char whiteColor[4] = { 255,255,255,255 };
-	data.nTextureWhiteId = Texture::LoadTexture(whiteColor, 1, 1);
+	data.nTextureWhiteId = Texture::LoadTextureBuffer(whiteColor, 1, 1);
 	//data.nTextureWhiteId = Texture::LoadTexture("Assets\\Textures\\img1.jpg", 0, 0);
 
 	memset(data.boundTextureSlots + 1, -1, 31 * sizeof(int));
@@ -377,6 +377,7 @@ void Renderer::OnWindowResize(int nWidth, int nHeight)
 
 void Renderer::DrawTextColor(const std::string& text, float PosX, float PosY, float scale, const glm::vec4& col, Font* font /*= nullptr*/)
 {
+	if (text.empty()) { return; }
 	if (!font) { font = &data.fontDefault; }
 
 	RendererVertex vertex[4];
