@@ -375,6 +375,10 @@ void Renderer::OnWindowResize(int nWidth, int nHeight)
 	glViewport(0, 0, nWidth, nHeight);
 }
 
+void Renderer::DrawTextColor(const std::string& text, const glm::vec2& pos, float scale, const glm::vec4& col, Font* font /*= nullptr*/)
+{
+	DrawTextColor(text, pos.x, pos.y, scale, col, font);
+}
 void Renderer::DrawTextColor(const std::string& text, float PosX, float PosY, float scale, const glm::vec4& col, Font* font /*= nullptr*/)
 {
 	if (text.empty()) { return; }
@@ -386,8 +390,8 @@ void Renderer::DrawTextColor(const std::string& text, float PosX, float PosY, fl
 	{
 		const FontCharacter& fontChar = font->GetFontChar(text.at(i));
 		//x,y are the coordinates of the bottom left point of the quad that will render the character texture
-		float x = PosX + fontChar.bearing.x;
-		float y = PosY - (fontChar.size.y - fontChar.bearing.y);
+		float x = PosX + fontChar.bearing.x * scale;
+		float y = PosY - (fontChar.size.y - fontChar.bearing.y) * scale;
 		float width = fontChar.size.x * scale;
 		float height = fontChar.size.y * scale;
 
@@ -396,8 +400,11 @@ void Renderer::DrawTextColor(const std::string& text, float PosX, float PosY, fl
 		vertex[2].SetPosColTex({ x + width, y + height, 0 },col, { 1.0f, 1.0f });
 		vertex[3].SetPosColTex({ x, y + height, 0 },		col, { 0.0f, 1.0f });
 		
+		//RendererShapes::Rectangle({}, {}, col);
+
 		Renderer::DrawQuadTexture(vertex, RendererShapes::Shape::ShapeQuad, fontChar.texId);
 
 		PosX += fontChar.advance * scale;
 	}
+
 }

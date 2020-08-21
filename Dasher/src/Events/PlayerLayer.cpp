@@ -44,9 +44,9 @@ void PlayerLayer::OnUpdate(float deltaTime)
 	//divide by 2
 	m_vPos.y = static_cast<float>((m_nHeight >> 1) + m_dAmplitude * glm::sin(m_dPhaseAngle));
 	m_dPhaseAngle += m_dAngVelocity * deltaTime;
-
+	if (m_dPhaseAngle > 2*glm::pi<float>()) { m_dPhaseAngle -= 2 * glm::pi<float>(); }
 	//Draw
-	DrawTrajectory(2.2, 15);
+	DrawTrajectory(2.2, 20);
 	m_dPointPosX -= m_dApparantVelocityX * deltaTime;
 
 	RendererShapes::Rectangle(m_Vertex, m_vPos, mc_vSize, m_vCol);

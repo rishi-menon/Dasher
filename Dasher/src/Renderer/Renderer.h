@@ -30,4 +30,6 @@ public:
 	//Text rendering
 	static void DrawTextColor(const std::string& text, float PosX, float PosY, float scale, const glm::vec4& col, Font* font = nullptr);
 
+	static void DrawTextColor(const std::string& text, const glm::vec2& pos, float scale, const glm::vec4& col, Font* font = nullptr);
+
 };

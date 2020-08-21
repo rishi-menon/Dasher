@@ -4,16 +4,31 @@
 #include "Log.h"
 #include "Renderer/RendererVertex.h"
 #include "UI/UIObject.h"
+#include <string>
 
 struct ButtonProps
 {
+
+	ButtonProps() = default;
+	ButtonProps(const ButtonProps&) = default;
+
+	void SetBasicProps(UITypes uitype, const glm::ivec2& buttonSize, const glm::vec4& col);
+	void SetTextProps(std::string strText, const glm::vec2& textOffset, float textScale, const glm::vec4& textCol);
+
 	UITypes type;
 	glm::ivec2 size;
 	glm::vec4 color;
+
+	std::string text;
+	glm::vec2 textPosOffset;
+	float textScale;
+	glm::vec4 textColor;
 };
 
 class Button : public UIObject
 {
+	typedef void (*ButtonClickFunc) ();
+
 public:
 	enum ButtonState : int
 	{
@@ -43,8 +58,9 @@ public:
 	inline void SetStateProperties(const ButtonProps& prop, int index) { ASSERT(index < StateCount, "Index out of range"); m_buttonProps[index] = prop; }
 
 	inline void SetCurrentState(ButtonState state) { m_curState = state; }
+	inline void SetPosition(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
+	inline void SetButttonClickEvent(ButtonClickFunc func) { m_clickFunc = func; }
 
-	void SetPosition(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
 
 	void RegenerateVertexBuffer();
 
@@ -59,4 +75,5 @@ private:
 	glm::vec2 m_vPos;
 	RendererVertex m_vertex[4];
 
+	ButtonClickFunc m_clickFunc;
 };

@@ -187,6 +187,7 @@
     <ClInclude Include="src\Application\EventCallbacks.h" />
     <ClInclude Include="src\AssetManagement\Font.h" />
     <ClInclude Include="src\Collision\Collision.h" />
+    <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Core\CircularQueue.h" />
     <ClInclude Include="src\Events\BackgroundLayer.h" />
     <ClInclude Include="src\Events\BlockSpawnerLayer.h" />

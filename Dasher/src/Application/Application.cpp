@@ -17,10 +17,6 @@
 #include "Events/UILayer.h"
 #include "Events/MainMenu/MainMenuLayer.h"
 
-//Temp
-#include "UI/Button.h"
-
-
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
 int Application::m_nHeight = 0;

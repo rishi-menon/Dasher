@@ -3,10 +3,28 @@
 #include "Renderer/Renderer.h"
 #include "Application/Application.h"
 
+
+void ButtonProps::SetBasicProps(UITypes uitype, const glm::ivec2& buttonSize, const glm::vec4& col)
+{
+	type = uitype;
+	size = buttonSize;
+	color = col;
+}
+void ButtonProps::SetTextProps(std::string strText, const glm::vec2& textOffset, float textScale, const glm::vec4& textCol)
+{
+	text = std::move (strText);
+	textPosOffset = textOffset;
+	this->textScale = textScale;
+	textColor = textCol;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 Button::Button() :
 	m_curState(StateDefault),
 	m_lastState(StateDefault),
-	m_vPos(0.0f, 0.0f)
+	m_vPos(0.0f, 0.0f),
+	m_clickFunc(nullptr)
 {
 
 }
@@ -21,6 +39,8 @@ void Button::RegenerateVertexBuffer()
 }
 void Button::OnUpdate(float deltaTime)
 {
+
+	
 	//Render here
 	if (m_curState != m_lastState)
 	{
@@ -29,7 +49,14 @@ void Button::OnUpdate(float deltaTime)
 	}
 	//if (m_curState != StateNone)
 	{
-		Renderer::DrawQuadTexture(m_vertex, RendererShapes::Shape::ShapeQuad, UI::GetTextureId(m_buttonProps[m_curState].type));
+		const ButtonProps& prop = m_buttonProps[m_curState];
+		Renderer::DrawQuadTexture(m_vertex, RendererShapes::Shape::ShapeQuad, UI::GetTextureId(prop.type));
+		
+		//middle of the button on y axis and from the leftmost point of the button (this is without any offset)
+		float posX = m_vPos.x - prop.size.x * 0.5f + prop.textPosOffset.x;
+		float posY = m_vPos.y + prop.textPosOffset.y;
+
+		Renderer::DrawTextColor(prop.text, posX, posY, prop.textScale, prop.textColor);		
 	}
 }
 
@@ -52,7 +79,7 @@ bool Button::OnMouseMove(int x, int y)
 }
 bool Button::OnMouseDown(int nButton)
 {
-	if (m_curState == StateSelected)
+	if (!nButton && m_curState == StateSelected)
 	{
 		m_curState = StateClicked;
 		return true;
@@ -62,10 +89,15 @@ bool Button::OnMouseDown(int nButton)
 }
 bool Button::OnMouseUp(int nButton)
 {
+	if (nButton) { return false; }	//it wasnt a left click
+
 	if (m_curState == StateClicked)
 	{
 		m_curState = StateSelected;
-		//To do: call an event function here
+		if (m_clickFunc)
+		{
+			m_clickFunc();
+		}
 		return true;
 	}
 	else
