@@ -1,9 +1,13 @@
 #pragma once
 #include "AssetManagement/Texture.h"
+#include "Renderer/RendererVertex.h"
 
 enum class UITypes : unsigned int
 {
 	Button0 = 0,
+
+	PushButton0,
+	PushButton0_E,	//Enabled state	
 
 	Count
 };
@@ -13,11 +17,13 @@ namespace UI
 	extern unsigned int UITexIds[(unsigned int)UITypes::Count];
 	extern TextureDimensions UITexDimension[(unsigned int)UITypes::Count];
 
+	inline unsigned int GetTextureId(UITypes type) { return UI::UITexIds[static_cast<unsigned int>(type)]; }
+	inline const TextureDimensions& GetTextureDimension (UITypes type) { return UI::UITexDimension[static_cast<unsigned int>(type)]; }
 
 	void UIInit();
 	void UICleanup();
-	inline unsigned int GetTextureId(UITypes type) { return UI::UITexIds[static_cast<unsigned int>(type)]; }
-	inline const TextureDimensions& GetTextureDimension (UITypes type) { return UI::UITexDimension[static_cast<unsigned int>(type)]; }
+	bool CheckCollision(int mousex, int mousey, const TextureDimensions& curDim, const RendererVertex vertexQuad[4]);
+
 }
 
 class UILayer;

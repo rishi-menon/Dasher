@@ -24,7 +24,8 @@ Button::Button() :
 	m_curState(StateDefault),
 	m_lastState(StateDefault),
 	m_vPos(0.0f, 0.0f),
-	m_clickFunc(nullptr)
+	m_clickFunc(nullptr),
+	m_userData (nullptr)
 {
 
 }
@@ -39,8 +40,6 @@ void Button::RegenerateVertexBuffer()
 }
 void Button::OnUpdate(float deltaTime)
 {
-
-	
 	//Render here
 	if (m_curState != m_lastState)
 	{
@@ -62,7 +61,8 @@ void Button::OnUpdate(float deltaTime)
 
 bool Button::OnMouseMove(int x, int y)
 {
-	if (CheckCollision(x, y))
+	const TextureDimensions& curDim = UI::GetTextureDimension(m_buttonProps[m_curState].type);
+	if (UI::CheckCollision(x, y, curDim, m_vertex))
 	{
 		//It could be in button press mode in which case dont do anything
 		if (m_curState == StateDefault)
@@ -96,7 +96,7 @@ bool Button::OnMouseUp(int nButton)
 		m_curState = StateSelected;
 		if (m_clickFunc)
 		{
-			m_clickFunc();
+			m_clickFunc(m_userData);
 		}
 		return true;
 	}
@@ -104,8 +104,10 @@ bool Button::OnMouseUp(int nButton)
 	{
 		double x, y;
 		Application::GetCurrentApp()->GetMousePos(x, y);
+		
+		const TextureDimensions& curDim = UI::GetTextureDimension(m_buttonProps[m_curState].type);
 
-		if (CheckCollision(static_cast<int>(x), static_cast<int>(y)))
+		if (UI::CheckCollision(static_cast<int>(x), static_cast<int>(y), curDim, m_vertex))
 		{
 			m_curState = StateSelected;
 		}
@@ -121,40 +123,4 @@ bool Button::OnWindowResize(int x, int y)
 {
 	//LOG_INFO("window resize: {0}, {1}", x, y);
 	return false;
-}
-
-bool Button::CheckCollision(int mousex, int mousey)
-{
-	const TextureDimensions& curDim = UI::GetTextureDimension(m_buttonProps[m_curState].type);
-
-	double percentX = Math::GetPercent(m_vertex[0].m_pos.x, m_vertex[1].m_pos.x, mousex);
-	double percentY = Math::GetPercent(m_vertex[0].m_pos.y, m_vertex[2].m_pos.y, mousey);
-
-	//LOG_WARN("PX: {0}, PY:{1}", percentX, percentY);
-	if (percentX < 0 || percentX > 1 || percentY < 0 || percentY > 1)
-	{
-		m_curState = StateDefault;
-		return false;
-	}
-
-	int textureCoordX = static_cast<int>(percentX * curDim.width);
-	int textureCoordY = static_cast<int>(percentY * curDim.height);
-
-	int index = textureCoordY * curDim.width + textureCoordX;
-
-	if (curDim.bpp == 4)
-	{
-		//check alpha value 
-		return (curDim.buffer[curDim.bpp * index + 3] > 0);
-	}
-	else
-	{
-		//check the color channel ie check if its black or not
-		int rawIndex = curDim.bpp * index;
-		for (int i = 0; i < curDim.bpp; i++)
-		{
-			if (curDim.buffer[rawIndex + i] > 0) { return true; }
-		}
-		return false;
-	}
 }

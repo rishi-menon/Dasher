@@ -8,6 +8,8 @@
 #include <vector>
 #include <list>
 
+extern bool g_bShowTrajectoryEnabled;
+
 enum class Menu : unsigned int 
 {
 	None = 0,
@@ -44,7 +46,7 @@ public:
 	void RegisterEvents(Layers layerId, LayerIndex index);
 
 	inline Menu GetCurrentMenu() const { return m_CurMenu; }
-	inline void SetNextMenu(Menu menu) { m_NextMenu = menu; }
+	inline void SetNextMenu(Menu menu, void* userData) { m_NextMenu = menu; m_NextMenuUserData = userData; }
 
 	inline void GetMousePos(double& x, double& y) const { glfwGetCursorPos(m_pWindow, &x, &y); y = m_nHeight - y; }
 
@@ -76,4 +78,5 @@ private:
 	std::list<LayerIndex> m_listLayersIndex[LayerCount];
 
 	Menu m_CurMenu, m_NextMenu;
+	void* m_NextMenuUserData;
 };

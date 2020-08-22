@@ -21,13 +21,15 @@ Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
 int Application::m_nHeight = 0;
 
+bool g_bShowTrajectoryEnabled = false;
 
 Application::Application() :
 	m_pWindow(nullptr),
 	m_dCurrentTime (0),
 	m_dDeltaTime (0),
 	m_CurMenu (Menu::MainMenu),
-	m_NextMenu (Menu::MainMenu)
+	m_NextMenu (Menu::MainMenu),
+	m_NextMenuUserData (nullptr)
 
 {
 	ASSERT(!ms_currentApp, "A second Application was created");
@@ -222,7 +224,6 @@ void Application::OnStart()
 //Menus
 void Application::ChangeMenuState()
 {
-	m_CurMenu = m_NextMenu;
 	switch (m_NextMenu)
 	{
 		case Menu::MainMenu:
@@ -251,14 +252,15 @@ void Application::ChangeMenuState()
 			break;
 		}
 	}
+	m_CurMenu = m_NextMenu;
 }
 
 void Application::StartMenuMainMenu()
 {
 	ClearLayers();
 	InsertLayer(new UILayer);
-	InsertLayer(new MainMenuLayer);
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg2.png")));
+	InsertLayer(new MainMenuLayer);
 	OnStart();
 }
 void Application::StartMenuNormalMode()
@@ -271,7 +273,8 @@ void Application::StartMenuNormalMode()
 }
 void  Application::StartMenuPracticeMode()
 {
-
+	//ClearLayers();
+	//OnStart();
 }
 void  Application::StartMenuTutorialMode()
 {

@@ -27,7 +27,7 @@ struct ButtonProps
 
 class Button : public UIObject
 {
-	typedef void (*ButtonClickFunc) ();
+	typedef void (*ButtonClickFunc) (void*);
 
 public:
 	enum ButtonState : int
@@ -36,7 +36,6 @@ public:
 		StateDefault  = 0,
 		StateSelected,
 		StateClicked, 
-
 		StateCount
 	};
 
@@ -60,13 +59,9 @@ public:
 	inline void SetCurrentState(ButtonState state) { m_curState = state; }
 	inline void SetPosition(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
 	inline void SetButttonClickEvent(ButtonClickFunc func) { m_clickFunc = func; }
-
+	inline void SetUserData(void* data) { m_userData = data; }
 
 	void RegenerateVertexBuffer();
-
-private:
-	bool CheckCollision(int mousex, int mousey);
-
 
 private:
 	ButtonProps m_buttonProps[StateCount];
@@ -75,5 +70,6 @@ private:
 	glm::vec2 m_vPos;
 	RendererVertex m_vertex[4];
 
+	void* m_userData;	//Can be any data... It gets passed to the event callbackfunction
 	ButtonClickFunc m_clickFunc;
 };
