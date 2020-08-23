@@ -124,3 +124,25 @@ bool Button::OnWindowResize(int x, int y)
 	//LOG_INFO("window resize: {0}, {1}", x, y);
 	return false;
 }
+
+void Button::ManualClick()
+{
+	double x, y;
+	Application::GetCurrentApp()->GetMousePos(x, y);
+
+	const TextureDimensions& curDim = UI::GetTextureDimension(m_buttonProps[m_curState].type);
+
+	if (UI::CheckCollision(static_cast<int>(x), static_cast<int>(y), curDim, m_vertex))
+	{
+		m_curState = StateSelected;
+	}
+	else
+	{
+		m_curState = StateDefault;
+	}
+
+	if (m_clickFunc)
+	{
+		m_clickFunc(m_userData);
+	}
+}

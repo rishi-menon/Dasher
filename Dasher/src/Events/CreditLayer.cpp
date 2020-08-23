@@ -9,6 +9,7 @@ CreditLayer::CreditLayer()
 void CreditLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	pApp->RegisterEvents(LayerWindowResize, nIndex);
+	pApp->RegisterEvents(LayerKeyUp, nIndex);
 }
 void CreditLayer::OnStart()
 {
@@ -58,5 +59,15 @@ void CreditLayer::OnUpdate(float deltaTime)
 
 bool CreditLayer::OnWindowResize(int x, int y)
 {
+	return false;
+}
+
+bool CreditLayer::OnKeyUp(int key)
+{
+	constexpr int nEscapeKey = 256;
+	if (key == nEscapeKey)
+	{
+		m_BackButton.ManualClick();
+	}
 	return false;
 }

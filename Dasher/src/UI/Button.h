@@ -62,7 +62,8 @@ public:
 	inline void SetUserData(void* data) { m_userData = data; }
 
 	void RegenerateVertexBuffer();
-
+	
+	void ManualClick();
 private:
 	ButtonProps m_buttonProps[StateCount];
 	ButtonState m_curState, m_lastState;
