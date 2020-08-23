@@ -57,6 +57,5 @@ private:
 	const double m_dSizeYMin;
 	const double m_dSizeYMax;
 	
-
 	double m_dNextSpawnTime;
 };

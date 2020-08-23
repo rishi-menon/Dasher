@@ -16,6 +16,7 @@
 #include "Events/BlockSpawnerLayer.h"
 #include "Events/UILayer.h"
 #include "Events/MainMenu/MainMenuLayer.h"
+#include "Events/CreditLayer.h"
 
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
@@ -257,9 +258,25 @@ void Application::ChangeMenuState()
 
 void Application::StartMenuMainMenu()
 {
+	//To do: for future update, have a system to prevent deleting the layer instead of deleting it and then creating it again
+	BackgroundLayerProps props;
+	if (m_CurMenu == Menu::Credits)
+	{
+		for (Layer* pLayer : m_vLayers)
+		{
+			BackgroundLayer* pBgLayer = dynamic_cast<BackgroundLayer*> (pLayer);
+			if (pBgLayer)
+			{
+				props = pBgLayer->GetBackgroundProp();
+			}
+		}
+	}
+	//If it was not found then itll use the default constructor
+	props.path = "Assets\\Textures\\External\\bg2.png";
+
 	ClearLayers();
 	InsertLayer(new UILayer);
-	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg2.png")));
+	InsertLayer(new BackgroundLayer(props));
 	InsertLayer(new MainMenuLayer);
 	OnStart();
 }
@@ -283,4 +300,24 @@ void  Application::StartMenuTutorialMode()
 void  Application::StartMenuCredits()
 {
 
+	//Find the backgroundlayer
+	BackgroundLayerProps props;
+
+	for (Layer* pLayer : m_vLayers)
+	{
+		BackgroundLayer* pBgLayer = dynamic_cast<BackgroundLayer*> (pLayer);
+		if (pBgLayer)
+		{
+			props = pBgLayer->GetBackgroundProp();
+		}
+	}
+	//If it was not found then itll use the default constructor
+	props.path = "Assets\\Textures\\External\\bg2.png";
+
+	ClearLayers();
+	InsertLayer(new UILayer);
+	InsertLayer(new BackgroundLayer(props));
+	InsertLayer(new CreditLayer);
+	
+	OnStart();
 }

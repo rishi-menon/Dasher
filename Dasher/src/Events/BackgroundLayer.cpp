@@ -83,3 +83,10 @@ bool BackgroundLayer::OnWindowResize(int width, int height)
 	m_vertex[3].m_pos = { 0.0f, height, 0.0f };
 	return false;
 }
+
+BackgroundLayerProps BackgroundLayer::GetBackgroundProp() const
+{
+	BackgroundLayerProps props("", m_nVelocityX);
+	props.SetInitTexCoords(m_vertex[0].m_textureCoord, m_vertex[2].m_textureCoord);
+	return props;
+}

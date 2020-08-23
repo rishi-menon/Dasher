@@ -13,7 +13,7 @@ struct BackgroundLayerProps
 
 	float velocityX;
 	glm::vec2 initTexCoords[4];
-	const char* const path;
+	const char* path;
 
 };
 class BackgroundLayer : public Layer
@@ -28,8 +28,9 @@ public:
 	virtual void OnUpdate(float deltaTime);	//in seconds
 	virtual bool OnWindowResize(int width, int height) override;
 
-private:
+	BackgroundLayerProps GetBackgroundProp() const;
 
+private:
 	unsigned int m_nTextureId;
 	RendererVertex m_vertex[4];
 	float m_nVelocityX;

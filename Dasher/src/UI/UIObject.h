@@ -6,6 +6,9 @@ enum class UITypes : unsigned int
 {
 	Button0 = 0,
 
+	ButtonBack,
+	ButtonBack_S,	//Selected state
+
 	PushButton0,
 	PushButton0_E,	//Enabled state	
 
