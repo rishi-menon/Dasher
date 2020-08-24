@@ -42,6 +42,6 @@ namespace CoreLogger
 #define LOG_ERROR(...)
 #define LOG_FATAL(...)
 #define ASSERT(x, ...)
-#define glcall(x)
+#define glcall(x)	x;
 
 #endif

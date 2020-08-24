@@ -11,9 +11,9 @@ MainMenuLayer::MainMenuLayer() :
 	//Constants
 	m_ShowTrajTextPos(50, 90),
 	m_ShowTrajTextScale (0.35f),
-	m_strShowTraj ("Show Trajectory (Practice Mode):"),
+	m_strShowTraj ("Show Trajectory (Zen Mode):"),
 	m_vShowTrajTextCol(1.0f, 1.0f, 1.0f, 1.0f),
-	m_ShowTrajPushButtonOffset (700, 12)
+	m_ShowTrajPushButtonOffset (620, 12)
 {
 
 }
@@ -49,7 +49,7 @@ void MainMenuLayer::OnStart()
 		});
 	}
 
-	//Practice Mode
+	//Zen Mode
 	{
 		const glm::vec2 sizeDefault = { 450, 150 };
 		const glm::vec4 colDefault = { 218.0f / 256, 156.0f / 256, 0.0f, 0.9f };
@@ -60,22 +60,22 @@ void MainMenuLayer::OnStart()
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::Button0, sizeDefault, colDefault);
-		propDefault.SetTextProps("Practice Mode", { 40,-20 }, 0.5, { 1,1,1,1 });
+		propDefault.SetTextProps("Zen Mode", { 80,-20 }, 0.5, { 1,1,1,1 });
 
 		ButtonProps propHighlight;
 		propHighlight.SetBasicProps(UITypes::Button0, sizeSelected, colSelected);
-		propHighlight.SetTextProps("Practice Mode", { 40,-20 }, 0.5, { 1,1,1,1 });
+		propHighlight.SetTextProps("Zen Mode", { 80,-20 }, 0.5, { 1,1,1,1 });
 
 		ButtonProps propClick;
 		propClick.SetBasicProps(UITypes::Button0, sizeSelected, colClick);
-		propClick.SetTextProps("Practice Mode", { 40,-20 }, 0.5, { 1,1,1,1 });
+		propClick.SetTextProps("Zen Mode", { 80,-20 }, 0.5, { 1,1,1,1 });
 
 		m_buttonPracticeMode.SetStateProperties(propDefault, Button::StateDefault);
 		m_buttonPracticeMode.SetStateProperties(propClick, Button::StateClicked);
 		m_buttonPracticeMode.SetStateProperties(propHighlight, Button::StateSelected);
 		m_buttonPracticeMode.SetPosition(buttonPos);
 		m_buttonPracticeMode.SetButttonClickEvent([](void* userData) {
-			Application::GetCurrentApp()->SetNextMenu(Menu::PracticeMode, userData);
+			Application::GetCurrentApp()->SetNextMenu(Menu::ZenMode, userData);
 		});
 	}
 	//Button Tutorial

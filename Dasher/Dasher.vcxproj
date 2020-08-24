@@ -170,7 +170,8 @@
     <ClCompile Include="src\Events\CreditLayer.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
     <ClCompile Include="src\Events\MainMenu\MainMenuLayer.cpp" />
-    <ClCompile Include="src\Events\PlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Player\ZenPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Player\AbstractPlayerLayer.cpp" />
     <ClCompile Include="src\Events\UILayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -196,7 +197,8 @@
     <ClInclude Include="src\Events\CreditLayer.h" />
     <ClInclude Include="src\Events\Layer.h" />
     <ClInclude Include="src\Events\MainMenu\MainMenuLayer.h" />
-    <ClInclude Include="src\Events\PlayerLayer.h" />
+    <ClInclude Include="src\Events\Player\ZenPlayerLayer.h" />
+    <ClInclude Include="src\Events\Player\AbstractPlayerLayer.h" />
     <ClInclude Include="src\Events\UILayer.h" />
     <ClInclude Include="src\Maths.h" />
     <ClInclude Include="src\Log.h" />

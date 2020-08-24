@@ -11,7 +11,8 @@
 #include "EventCallbacks.h"
 
 #include "Events/Layer.h"
-#include "Events/PlayerLayer.h"
+#include "Events/Player/ZenPlayerLayer.h"
+
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
 #include "Events/UILayer.h"
@@ -59,6 +60,7 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 
 	FontInit();
 	UI::UIInit();
+	StandardTextureInit();
 
 	//Set callbacks
 	glfwSetWindowUserPointer(m_pWindow, this);
@@ -116,7 +118,7 @@ void Application::Run()
 	const float fCol = 0.18f;
 	glClearColor(fCol, fCol, fCol, 1);
 
-	const double dMaxDeltaTime = 1.0/30.0;
+	const double dMaxDeltaTime = 1.0/10.0;
 
 	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
@@ -140,7 +142,6 @@ void Application::Run()
 		{
 			m_dDeltaTime = dMaxDeltaTime;
 		}
-
 		//clear screen
 		glcall(glClear(GL_COLOR_BUFFER_BIT));
 
@@ -178,7 +179,7 @@ void Application::Run()
 
 		if (m_dDeltaTime < 1.0 / 70.0)
 		{
-			std::chrono::milliseconds sleepDuration(1);
+			std::chrono::microseconds sleepDuration(100);
 			std::this_thread::sleep_for(sleepDuration);
 		}
 	}
@@ -190,6 +191,8 @@ void Application::Cleanup()
 	Renderer::Cleanup();
 	FontCleanUp();
 	UI::UICleanup();
+	StandardTextureCleanup();
+
 	ClearLayers();
 	if (m_pWindow)
 	{
@@ -237,9 +240,9 @@ void Application::ChangeMenuState()
 			StartMenuNormalMode();
 			break;
 		}
-		case Menu::PracticeMode:
+		case Menu::ZenMode:
 		{
-			StartMenuPracticeMode();
+			StartMenuZenMode();
 			break;
 		}
 		case Menu::TutorialMode:
@@ -272,7 +275,7 @@ void Application::StartMenuMainMenu()
 		}
 	}
 	//If it was not found then itll use the default constructor
-	props.path = "Assets\\Textures\\External\\bg2.png";
+	props.textureType = StandardTexture::Background2;
 
 	ClearLayers();
 	InsertLayer(new UILayer);
@@ -282,16 +285,20 @@ void Application::StartMenuMainMenu()
 }
 void Application::StartMenuNormalMode()
 {
-	ClearLayers();
+	/*ClearLayers();
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg3.png")));
-	InsertLayer(new PlayerLayer);
+	InsertLayer(new ZenPlayerLayer);
+	InsertLayer(new BlockSpawnerLayer);
+	OnStart();*/
+}
+void  Application::StartMenuZenMode()
+{
+	ClearLayers();
+	InsertLayer(new UILayer);
+	InsertLayer(new BackgroundLayer(BackgroundLayerProps(StandardTexture::Background1)));
+	InsertLayer(new ZenPlayerLayer);
 	InsertLayer(new BlockSpawnerLayer);
 	OnStart();
-}
-void  Application::StartMenuPracticeMode()
-{
-	//ClearLayers();
-	//OnStart();
 }
 void  Application::StartMenuTutorialMode()
 {
@@ -312,7 +319,7 @@ void  Application::StartMenuCredits()
 		}
 	}
 	//If it was not found then itll use the default constructor
-	props.path = "Assets\\Textures\\External\\bg2.png";
+	props.textureType = StandardTexture::Background2;
 
 	ClearLayers();
 	InsertLayer(new UILayer);

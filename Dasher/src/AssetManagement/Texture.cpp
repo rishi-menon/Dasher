@@ -2,9 +2,55 @@
 #include "Texture.h"
 #include <GL/glew.h>
 #include <stb_image.h>
-
+#include <unordered_map>
 #include "Log.h"
 
+static std::unordered_map<StandardTexture, unsigned int> mapStandardTexture;
+
+void StandardTextureInit()
+{
+	//To do: This function takes almost a good 4 seconds or so... Try using multiple threads in the future
+
+	mapStandardTexture.reserve(10);
+
+	//Background images have to be loaded with GL_REPEAT so that they loop back
+	unsigned int id = Texture::LoadTexture("Assets\\Textures\\External\\bg1.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	mapStandardTexture.emplace(StandardTexture::Background1, id);
+
+	id = Texture::LoadTexture("Assets\\Textures\\External\\bg2.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	mapStandardTexture.emplace(StandardTexture::Background2, id);
+
+	id = Texture::LoadTexture("Assets\\Textures\\External\\bg3.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	mapStandardTexture.emplace(StandardTexture::Background3, id);
+
+	id = Texture::LoadTexture("Assets\\Textures\\External\\bg4.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	mapStandardTexture.emplace(StandardTexture::Background4, id);
+
+}
+unsigned int GetStandardTextureId(StandardTexture type)
+{
+	std::unordered_map<StandardTexture, unsigned int>::iterator it = mapStandardTexture.find(type);
+
+	if (it == mapStandardTexture.end())
+	{
+		ASSERT(false, "Standard texture was not loaded");
+		return (unsigned int)(-1);
+	}
+	else
+	{
+		return it->second;
+	}
+}
+void StandardTextureCleanup()
+{
+	for (std::pair<StandardTexture, unsigned int> pair : mapStandardTexture)
+	{
+		Texture::DeleteTexture(pair.second);
+	}
+}
+
+
+////////////////////////////////////////////////////////
 
 TextureProperties::TextureProperties(int nMinFilter, int nMaxFilter, int nWrapS, int nWrapT) :
 	m_nMinFilter (nMinFilter),
@@ -39,7 +85,6 @@ unsigned int Texture::LoadTexture(const char* const strPath, TextureDimensions* 
 unsigned int Texture::LoadTexturePreserve(const char* const strPath, TextureDimensions& outDimensions, TextureProperties props)
 {
 	stbi_set_flip_vertically_on_load(1);
-	int bpp;
 	outDimensions.buffer = stbi_load(strPath, &outDimensions.width, &outDimensions.height, &outDimensions.bpp, 4);
 
 	//Assume that we read a 3x3 image, the index of each pixel location as seen normally would be as follows
@@ -57,7 +102,7 @@ unsigned int Texture::LoadTexturePreserve(const char* const strPath, TextureDime
 	{
 		outDimensions = { 0, 0, 0, nullptr };
 		ASSERT(false, "Could not load texture {0}", strPath);
-		return 0xffff;
+		return (unsigned int)(-1);
 	}
 }
 unsigned int Texture::LoadTextureBuffer(const unsigned char bufferRgba[], int nSizeX, int nSizeY, TextureProperties props)

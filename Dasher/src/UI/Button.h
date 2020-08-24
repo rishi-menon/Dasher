@@ -48,9 +48,8 @@ public:
 	virtual bool OnMouseMove(int x, int y) override;
 	virtual bool OnMouseDown(int nButton)  override;
 	virtual bool OnMouseUp(int nButton)    override;
-	//virtual bool OnKey(int key)		override;
-	//virtual bool OnKeyDown(int key) override;
-	//virtual bool OnKeyUp(int key)	override;
+	
+	virtual bool OnKeyUp(int key)	override;
 	virtual bool OnWindowResize(int x, int y) override;
 	
 
@@ -60,6 +59,7 @@ public:
 	inline void SetPosition(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
 	inline void SetButttonClickEvent(ButtonClickFunc func) { m_clickFunc = func; }
 	inline void SetUserData(void* data) { m_userData = data; }
+	inline void SetOptionalKey(int nKey) { m_nOptionalKey = nKey; }
 
 	void RegenerateVertexBuffer();
 	
@@ -73,4 +73,6 @@ private:
 
 	void* m_userData;	//Can be any data... It gets passed to the event callbackfunction
 	ButtonClickFunc m_clickFunc;
+
+	int m_nOptionalKey;	//When this key is pressed then it simulates a button click
 };

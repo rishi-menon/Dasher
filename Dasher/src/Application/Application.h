@@ -17,7 +17,7 @@ enum class Menu : unsigned int
 	
 	//Games
 	NormalMode,
-	PracticeMode,
+	ZenMode,
 	TutorialMode,
 
 	Credits
@@ -59,7 +59,7 @@ private:
 	//States
 	void StartMenuMainMenu();
 	void StartMenuNormalMode();
-	void StartMenuPracticeMode();
+	void StartMenuZenMode();
 	void StartMenuTutorialMode();
 	void StartMenuCredits();
 

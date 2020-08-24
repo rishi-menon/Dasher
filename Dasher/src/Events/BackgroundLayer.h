@@ -3,17 +3,18 @@
 #include "Layer.h"
 #include "Maths.h"
 #include "Renderer/RendererVertex.h"
+#include "AssetManagement/Texture.h"
 
 struct BackgroundLayerProps
 {
 	BackgroundLayerProps();
-	BackgroundLayerProps(const char* const path, float velocity = -0.012f);
+	BackgroundLayerProps(StandardTexture type, float velocity = -0.012f);
 	BackgroundLayerProps(const BackgroundLayerProps&) = default;
 	void SetInitTexCoords(const glm::vec2& bottomLeft, const glm::vec2& topRight);
 
 	float velocityX;
 	glm::vec2 initTexCoords[4];
-	const char* path;
+	StandardTexture textureType;
 
 };
 class BackgroundLayer : public Layer

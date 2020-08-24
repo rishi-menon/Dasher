@@ -6,7 +6,7 @@
 #include "Renderer/Renderer.h"
 
 #include "Collision/Collision.h"
-#include "PlayerLayer.h"
+#include "Events/Player/AbstractPlayerLayer.h"
 
 
 BlockSpawnerLayer::BlockSpawnerLayer() :
@@ -18,21 +18,18 @@ BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_dSizeXMin (80),
 	m_dSizeXMax (100),
 	m_dSizeYMin (300),
-	m_dSizeYMax (500)
+	m_dSizeYMax (500),
+	m_bPreviousCollided (false)
 {
 	
 	m_blocks.Reserve(30);
-	BlockSpawnerLayer::ResetLayer();
+	m_blocks.ClearAll();
+	m_dNextSpawnTime = Application::GetGameTime();
 }
 void BlockSpawnerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	pApp->RegisterEvents(LayerWindowResize, nIndex);
 	pApp->RegisterEvents(LayerMouseMove, nIndex);
-}
-void BlockSpawnerLayer::ResetLayer()
-{
-	m_blocks.ClearAll();
-	m_dNextSpawnTime = Application::GetGameTime();
 }
 
 void BlockSpawnerLayer::OnStart()
@@ -40,9 +37,9 @@ void BlockSpawnerLayer::OnStart()
 	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
 	for (Layer* pLayer : layers)
 	{
-		if (dynamic_cast<PlayerLayer*> (pLayer))
+		if (dynamic_cast<AbstractPlayerLayer*> (pLayer))
 		{
-			m_pPlayerLayer = static_cast<PlayerLayer*>(pLayer);
+			m_pPlayerLayer = static_cast<AbstractPlayerLayer*>(pLayer);
 			break;
 		}
 	}
@@ -92,7 +89,7 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 {
 	const RendererVertex* playerVertex = m_pPlayerLayer->GetVertex();
-	constexpr unsigned int nPlayerVertexCount = (unsigned int)PlayerLayer::GetVertexCount();
+	constexpr unsigned int nPlayerVertexCount = (unsigned int)AbstractPlayerLayer::GetVertexCount();
 
 	//This is for optimization, We dont have to check collision with every single block. Since its a queue, if the blocks position is more than the players x position, then we can skip collision for all the blcoks after that
 	float playerMaxPosX = -1000;
@@ -131,6 +128,7 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 			else if (!curBlock.isPhasable && Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, 3))
 			{
 				playerCollided = true;
+				m_bPreviousCollided = true;
 				m_pPlayerLayer->TakeDamage(10);
 			}
 		}
@@ -140,8 +138,9 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 		index = (index + 1) % m_blocks.Size();
 	}
 
-	if (!playerCollided)
+	if (m_bPreviousCollided && !playerCollided)
 	{
+		m_bPreviousCollided = false;
 		m_pPlayerLayer->TakeNoDamage();
 	}
 }

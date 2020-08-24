@@ -20,7 +20,7 @@ struct RendererData
 	unsigned int nVbo;
 	unsigned int nIbo;
 
-	const int nMaxVertexCount = 52;
+	const int nMaxVertexCount = 1000;
 	const int nMaxIndexCount = (nMaxVertexCount * 6) / 4;
 
 	unsigned int nShader;
@@ -153,6 +153,9 @@ bool Renderer::Initialise()
 
 void Renderer::Cleanup()
 {
+
+	data.fontDefault.Cleanup();
+
 	delete[] data.localVertexBuffer;
 	delete[] data.localIndexBuffer;
 	data.localVertexBuffer = nullptr;

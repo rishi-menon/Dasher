@@ -5,8 +5,7 @@
 #include "Maths.h"
 #include "Renderer/RendererShapes.h"
 
-class RendererVertex;
-class PlayerLayer;
+class AbstractPlayerLayer;
 
 struct Block
 {
@@ -29,7 +28,6 @@ class BlockSpawnerLayer : public Layer
 public:
 	BlockSpawnerLayer();
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
-	virtual void ResetLayer() override;
 
 	virtual void OnStart();
 	virtual void OnUpdate(float deltaTime);	//in seconds
@@ -45,7 +43,7 @@ private:
 	void MoveCollisionRenderBlocks(float deltaTime);
 private:
 	CircularQueue<Block> m_blocks;
-	PlayerLayer* m_pPlayerLayer;
+	AbstractPlayerLayer* m_pPlayerLayer;
 
 	//spawn blocks
 	const double m_dTimeBwSpawnMin;
@@ -58,4 +56,6 @@ private:
 	const double m_dSizeYMax;
 	
 	double m_dNextSpawnTime;
+
+	bool m_bPreviousCollided;
 };

@@ -86,6 +86,10 @@ bool Font::LoadFont(const char* const path, unsigned int height)
 		m_vCharacters.emplace_back(texId, size, bearing, advance);
 	}	
 
+	if (FT_Done_Face(face))
+	{
+		LOG_ERROR("Could not free font face");
+	}
 	return true;
 }
 

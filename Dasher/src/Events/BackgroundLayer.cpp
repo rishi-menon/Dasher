@@ -6,13 +6,13 @@
 
 BackgroundLayerProps::BackgroundLayerProps() :
 	velocityX (-0.012f),
-	path (nullptr)
+	textureType(StandardTexture::None)
 {
 	SetInitTexCoords(glm::vec2(0.0f, 0.0f), glm::vec2(0.75f, 1.0f));
 }
-BackgroundLayerProps::BackgroundLayerProps(const char* const path, float velocity /*= -0.012f*/) :
+BackgroundLayerProps::BackgroundLayerProps(StandardTexture type, float velocity /*= -0.012f*/) :
 	velocityX(velocity),
-	path (path)
+	textureType(type)
 {
 	SetInitTexCoords(glm::vec2(0.0f, 0.0f), glm::vec2(0.75f, 1.0f));
 }
@@ -27,8 +27,9 @@ void BackgroundLayerProps::SetInitTexCoords(const glm::vec2& bottomLeft, const g
 BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 	m_nVelocityX (props.velocityX)
 {
-	ASSERT(props.path, "Image path was null");
-	m_nTextureId = Texture::LoadTexture(props.path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	ASSERT(props.textureType != StandardTexture::None, "Standard texture was null");
+
+	m_nTextureId = GetStandardTextureId(props.textureType);
 
 	const glm::vec4 col = { 1.0,1.0,1.0,1.0 };
 
@@ -43,7 +44,6 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 
 BackgroundLayer::~BackgroundLayer()
 {
-	Texture::DeleteTexture(m_nTextureId);
 }
 void BackgroundLayer::RegisterEvents(Application* pApp, int nIndex)
 {
@@ -86,7 +86,7 @@ bool BackgroundLayer::OnWindowResize(int width, int height)
 
 BackgroundLayerProps BackgroundLayer::GetBackgroundProp() const
 {
-	BackgroundLayerProps props("", m_nVelocityX);
+	BackgroundLayerProps props(StandardTexture::None, m_nVelocityX);
 	props.SetInitTexCoords(m_vertex[0].m_textureCoord, m_vertex[2].m_textureCoord);
 	return props;
 }

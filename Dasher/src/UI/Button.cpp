@@ -25,7 +25,8 @@ Button::Button() :
 	m_lastState(StateDefault),
 	m_vPos(0.0f, 0.0f),
 	m_clickFunc(nullptr),
-	m_userData (nullptr)
+	m_userData (nullptr),
+	m_nOptionalKey(-1)
 {
 
 }
@@ -145,4 +146,13 @@ void Button::ManualClick()
 	{
 		m_clickFunc(m_userData);
 	}
+}
+
+bool Button::OnKeyUp(int key)
+{
+	if (m_nOptionalKey != -1 && m_nOptionalKey == key)
+	{
+		ManualClick();
+	}
+	return false;
 }
