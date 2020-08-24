@@ -14,12 +14,14 @@
 
 #include "Events/Layer.h"
 #include "Events/Player/ZenPlayerLayer.h"
+#include "Events/Player/NormalPlayerLayer.h"
 
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
 #include "Events/UILayer.h"
 #include "Events/MainMenu/MainMenuLayer.h"
 #include "Events/CreditLayer.h"
+#include "Events/FadeoutScreenLayer.h"
 
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
@@ -74,6 +76,9 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	//Enable blending and depth buffer
 	glcall(glEnable(GL_BLEND));
 	glcall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	
+	glcall(glEnable(GL_DEPTH_TEST));
+	glcall(glDepthFunc(GL_LEQUAL));
 
 	bool bSuccess = Renderer::Initialise();
 	ASSERT(bSuccess, "Error: Failed to initialise renderer");
@@ -145,7 +150,7 @@ void Application::Run()
 			m_dDeltaTime = dMaxDeltaTime;
 		}
 		//clear screen
-		glcall(glClear(GL_COLOR_BUFFER_BIT));
+		glcall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 		//The UI layer has to be inserted at the beginning of the layer but has to be rendered at the end
 		if (g_nUILayerIndex != -1)
@@ -257,6 +262,16 @@ void Application::ChangeMenuState()
 			StartMenuCredits();
 			break;
 		}
+		//This is a hack, The menu will change only if the nextMenu is different than the current one. So in order to restart you could invalidate the nextMenu. To do: Add a Menu::Restart option perhaps ?
+		case Menu::None:
+		{
+			//In this case restart the current menu (Eg: Play again button for the main menu
+			LOG_INFO("Restarting Layer");
+			ASSERT(m_CurMenu != Menu::None, "Recursion incoming!");
+			m_NextMenu = m_CurMenu;
+			ChangeMenuState();
+			break;
+		}
 	}
 	m_CurMenu = m_NextMenu;
 }
@@ -287,11 +302,13 @@ void Application::StartMenuMainMenu()
 }
 void Application::StartMenuNormalMode()
 {
-	/*ClearLayers();
-	InsertLayer(new BackgroundLayer(BackgroundLayerProps("Assets\\Textures\\External\\bg3.png")));
-	InsertLayer(new ZenPlayerLayer);
+	ClearLayers();
+	InsertLayer(new UILayer);
+	InsertLayer(new BackgroundLayer(BackgroundLayerProps(StandardTexture::Background3)));
+	InsertLayer(new NormalPlayerLayer);
 	InsertLayer(new BlockSpawnerLayer);
-	OnStart();*/
+	InsertLayer(new FadeoutScreenLayer);
+	OnStart();
 }
 void  Application::StartMenuZenMode()
 {
@@ -308,16 +325,17 @@ void  Application::StartMenuTutorialMode()
 }
 void  Application::StartMenuCredits()
 {
-
 	//Find the backgroundlayer
 	BackgroundLayerProps props;
-
-	for (Layer* pLayer : m_vLayers)
+	if (m_CurMenu == Menu::MainMenu)
 	{
-		BackgroundLayer* pBgLayer = dynamic_cast<BackgroundLayer*> (pLayer);
-		if (pBgLayer)
+		for (Layer* pLayer : m_vLayers)
 		{
-			props = pBgLayer->GetBackgroundProp();
+			BackgroundLayer* pBgLayer = dynamic_cast<BackgroundLayer*> (pLayer);
+			if (pBgLayer)
+			{
+				props = pBgLayer->GetBackgroundProp();
+			}
 		}
 	}
 	//If it was not found then itll use the default constructor

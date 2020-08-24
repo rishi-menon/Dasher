@@ -22,6 +22,12 @@ namespace UI {
 		index = static_cast<unsigned int>(UITypes::ButtonBack_S);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonBack_S.png", UITexDimension[index]);
 
+		index = static_cast<unsigned int>(UITypes::ButtonRestart);
+		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonRestart.png", UITexDimension[index]);
+
+		index = static_cast<unsigned int>(UITypes::ButtonRestart_S);
+		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonRestart_S.png", UITexDimension[index]);
+
 		index = static_cast<unsigned int>(UITypes::PushButton0);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/PushButton0.png", UITexDimension[index]);
 

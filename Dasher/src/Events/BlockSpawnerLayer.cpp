@@ -19,7 +19,8 @@ BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_dSizeXMax (100),
 	m_dSizeYMin (300),
 	m_dSizeYMax (500),
-	m_bPreviousCollided (false)
+	m_bPreviousCollided (false),
+	m_dCurPhasePercent(0)
 {
 	
 	m_blocks.Reserve(30);
@@ -43,6 +44,12 @@ void BlockSpawnerLayer::OnStart()
 			break;
 		}
 	}
+	if (!m_pPlayerLayer)
+	{
+		LOG_WARN("Player layer was not found");
+	}
+
+	//To Do: make this layer independent of the player layer maybe ? So if player layer does not exist then this class should still work ??
 	ASSERT(m_pPlayerLayer, "Player layer was not found");
 }
 
@@ -151,7 +158,7 @@ void BlockSpawnerLayer::CreateBlock()
 	if (Random::Rand() >= 0.5)
 	{
 		//Block Top
-		block.position = { Application::GetWidth(), Application::GetHeight() - 2, 0 };
+		block.position = { Application::GetWidth(), Application::GetHeight() - 2, 0.1 };
 		//Negative sign so that the triangle appears upside down
 		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), -Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
 	}
@@ -159,7 +166,7 @@ void BlockSpawnerLayer::CreateBlock()
 	{
 		//block bottom
 		Application* pApp = Application::GetCurrentApp();
-		block.position = { pApp->GetWidth(), 2, 0 };
+		block.position = { pApp->GetWidth(), 2, 0.1 };
 		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
 	}
 
@@ -168,9 +175,7 @@ void BlockSpawnerLayer::CreateBlock()
 	block.shape = RendererShapes::ShapeTriangleRegular;
 	block.phaseRange = { 0.0, 0.2 };
 
-
-	double curPhase = m_pPlayerLayer->GetPhasePercent();
-	if (block.phaseRange.x <= curPhase && block.phaseRange.y >= curPhase)
+	if (block.phaseRange.x <= m_dCurPhasePercent && block.phaseRange.y >= m_dCurPhasePercent)
 	{
 		block.isPhasable = true;
 		block.color.a = 0.5f;
@@ -191,11 +196,12 @@ bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 	int index = m_blocks.Begin();
 	Block* buffer = m_blocks.Buffer();
 
-	double curPhase = m_pPlayerLayer->GetPhasePercent();
+	m_dCurPhasePercent = Math::GetPercent(0, Application::GetWidth(), x);
+
 	for (unsigned int i = 0; i < m_blocks.Count(); i++)
 	{
 		Block& curBlock = buffer[index];
-		if (curBlock.phaseRange.x <= curPhase && curBlock.phaseRange.y >= curPhase)
+		if (curBlock.phaseRange.x <= m_dCurPhasePercent && curBlock.phaseRange.y >= m_dCurPhasePercent)
 		{
 			curBlock.isPhasable = true;
 			curBlock.color.a = 0.5f;

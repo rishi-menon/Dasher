@@ -169,8 +169,10 @@
     <ClCompile Include="src\Events\BackgroundLayer.cpp" />
     <ClCompile Include="src\Events\BlockSpawnerLayer.cpp" />
     <ClCompile Include="src\Events\CreditLayer.cpp" />
+    <ClCompile Include="src\Events\FadeoutScreenLayer.cpp" />
     <ClCompile Include="src\Events\Layer.cpp" />
     <ClCompile Include="src\Events\MainMenu\MainMenuLayer.cpp" />
+    <ClCompile Include="src\Events\Player\NormalPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Player\ZenPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Player\AbstractPlayerLayer.cpp" />
     <ClCompile Include="src\Events\UILayer.cpp" />
@@ -197,8 +199,10 @@
     <ClInclude Include="src\Events\BackgroundLayer.h" />
     <ClInclude Include="src\Events\BlockSpawnerLayer.h" />
     <ClInclude Include="src\Events\CreditLayer.h" />
+    <ClInclude Include="src\Events\FadeoutScreenLayer.h" />
     <ClInclude Include="src\Events\Layer.h" />
     <ClInclude Include="src\Events\MainMenu\MainMenuLayer.h" />
+    <ClInclude Include="src\Events\Player\NormalPlayerLayer.h" />
     <ClInclude Include="src\Events\Player\ZenPlayerLayer.h" />
     <ClInclude Include="src\Events\Player\AbstractPlayerLayer.h" />
     <ClInclude Include="src\Events\UILayer.h" />

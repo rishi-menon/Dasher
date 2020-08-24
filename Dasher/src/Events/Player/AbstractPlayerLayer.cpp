@@ -11,7 +11,7 @@ AbstractPlayerLayer::AbstractPlayerLayer()
 
 	m_nWidth = Application::GetWidth();
 	m_nHeight = Application::GetHeight();
-	m_vPos = glm::vec2{ 80, 400 };
+	m_vPos = glm::vec3{ 80, 400, 0.0 };
 	m_dAmplitude = (m_nHeight * 0.5 - m_fAmplitudeOffset);
 
 	m_vTrajectoryColor = { 1.0f, 1.0f, 1.0f, 1.0f };

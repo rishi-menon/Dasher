@@ -253,7 +253,7 @@ void Renderer::DrawRectangle(const glm::vec2& pos, const glm::vec2& size, const 
 	}
 
 	RendererVertex quad[4];
-	RendererShapes::Rectangle(quad, pos, size, col);
+	RendererShapes::Rectangle(quad, { pos.x, pos.y, 0.0f }, size, col);
 	for (int i = 0; i < 4; quad[i].SetTexId((float)nTextureSlot), i++);
 
 	//save to local buffer
@@ -372,12 +372,13 @@ void Renderer::DrawQuadTexture(RendererVertex* vertexBuffer, unsigned int nVerte
 
 void Renderer::OnWindowResize(int nWidth, int nHeight)
 {
-	data.matProjection = glm::ortho<float>(0.0f, (float)nWidth, 0.0f, (float)nHeight);
+	data.matProjection = glm::ortho<float>(0.0f, (float)nWidth, 0.0f, (float)nHeight, -1.0f, +1.0f);
 	glcall(glUniformMatrix4fv(data.u_mvpLocation, 1, GL_FALSE, &data.matProjection[0][0]));
 
 	glViewport(0, 0, nWidth, nHeight);
 }
 
+#if 0
 void Renderer::DrawTextColor(const std::string& text, const glm::vec2& pos, float scale, const glm::vec4& col, Font* font /*= nullptr*/)
 {
 	DrawTextColor(text, pos.x, pos.y, scale, col, font);
@@ -409,5 +410,47 @@ void Renderer::DrawTextColor(const std::string& text, float PosX, float PosY, fl
 
 		PosX += fontChar.advance * scale;
 	}
+}
+#endif
 
+void Renderer::DrawTextColor(const char* const strText, int nSize, const glm::vec2& pos, float scale, const glm::vec4& col, Font* font)
+{
+	DrawTextColor(strText, nSize, pos.x, pos.y, scale, col, font);
+}
+void Renderer::DrawTextColor(const char* const strText, int nSize, float PosX, float PosY, float scale, const glm::vec4& col, Font* font)
+{
+	if (!nSize)
+	{
+		return;
+	}
+	else if (nSize == -1)
+	{ 
+		nSize = mystrlen(strText);
+	}
+
+	if (!font) { font = &data.fontDefault; }
+
+	RendererVertex vertex[4];
+
+	for (int i = 0; i < nSize; i++)
+	{
+		if (strText[i] == '\0')	break;
+
+		const FontCharacter& fontChar = font->GetFontChar(strText[i]);
+		//x,y are the coordinates of the bottom left point of the quad that will render the character texture
+		float x = PosX + fontChar.bearing.x * scale;
+		float y = PosY - (fontChar.size.y - fontChar.bearing.y) * scale;
+		float width = fontChar.size.x * scale;
+		float height = fontChar.size.y * scale;
+
+		vertex[0].SetPosColTex({ x, y, 0.8f }, col, { 0.0f, 0.0f });
+		vertex[1].SetPosColTex({ x + width, y, 0.8f }, col, { 1.0f, 0.0f });
+		vertex[2].SetPosColTex({ x + width, y + height,0.8f }, col, { 1.0f, 1.0f });
+		vertex[3].SetPosColTex({ x, y + height, 0.8f }, col, { 0.0f, 1.0f });
+
+		//RendererShapes::Rectangle({}, {}, col);
+
+		Renderer::DrawQuadTexture(vertex, RendererShapes::Shape::ShapeQuad, fontChar.texId);
+		PosX += fontChar.advance * scale;
+	}
 }

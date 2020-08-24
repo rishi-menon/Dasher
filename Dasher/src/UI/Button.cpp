@@ -23,7 +23,7 @@ void ButtonProps::SetTextProps(std::string strText, const glm::vec2& textOffset,
 Button::Button() :
 	m_curState(StateDefault),
 	m_lastState(StateDefault),
-	m_vPos(0.0f, 0.0f),
+	m_vPos(0.0f, 0.0f, 0.8f),
 	m_clickFunc(nullptr),
 	m_userData (nullptr),
 	m_nOptionalKey(-1)
@@ -56,7 +56,7 @@ void Button::OnUpdate(float deltaTime)
 		float posX = m_vPos.x - prop.size.x * 0.5f + prop.textPosOffset.x;
 		float posY = m_vPos.y + prop.textPosOffset.y;
 
-		Renderer::DrawTextColor(prop.text, posX, posY, prop.textScale, prop.textColor);		
+		Renderer::DrawTextColor(prop.text.c_str(), prop.text.size(), posX, posY, prop.textScale, prop.textColor);
 	}
 }
 

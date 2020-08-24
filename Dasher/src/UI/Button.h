@@ -56,7 +56,7 @@ public:
 	inline void SetStateProperties(const ButtonProps& prop, int index) { ASSERT(index < StateCount, "Index out of range"); m_buttonProps[index] = prop; }
 
 	inline void SetCurrentState(ButtonState state) { m_curState = state; }
-	inline void SetPosition(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
+	inline void SetPosition(const glm::vec3& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
 	inline void SetButttonClickEvent(ButtonClickFunc func) { m_clickFunc = func; }
 	inline void SetUserData(void* data) { m_userData = data; }
 	inline void SetOptionalKey(int nKey) { m_nOptionalKey = nKey; }
@@ -68,7 +68,7 @@ private:
 	ButtonProps m_buttonProps[StateCount];
 	ButtonState m_curState, m_lastState;
 
-	glm::vec2 m_vPos;
+	glm::vec3 m_vPos;
 	RendererVertex m_vertex[4];
 
 	void* m_userData;	//Can be any data... It gets passed to the event callbackfunction

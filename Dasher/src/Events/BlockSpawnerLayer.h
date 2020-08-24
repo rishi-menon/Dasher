@@ -58,4 +58,6 @@ private:
 	double m_dNextSpawnTime;
 
 	bool m_bPreviousCollided;
+
+	double m_dCurPhasePercent;	//x percent
 };

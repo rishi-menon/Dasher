@@ -9,6 +9,9 @@ enum class UITypes : unsigned int
 	ButtonBack,
 	ButtonBack_S,	//Selected state
 
+	ButtonRestart,
+	ButtonRestart_S,	//Selected state
+
 	PushButton0,
 	PushButton0_E,	//Enabled state	
 

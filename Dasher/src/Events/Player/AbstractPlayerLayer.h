@@ -61,7 +61,7 @@ protected:
 	//This is the velocity the that the player is moving at. This is never used for actually moving. Its only used to calculate the trajectory
 	double m_dApparantVelocityX;	// To do: Move this variable to child class ??	
 
-	glm::vec2 m_vPos;
+	glm::vec3 m_vPos;
 	double m_dAmplitude;
 
 	int m_nWidth;

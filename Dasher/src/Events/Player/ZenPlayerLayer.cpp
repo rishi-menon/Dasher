@@ -19,7 +19,7 @@ void ZenPlayerLayer::OnStart()
 
 		const glm::vec2 sizeClick = { 105, 105 };
 		const glm::vec4 colClick = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const glm::vec2 buttonPos = { Application::GetWidth() - 120, 110 };
+		const glm::vec3 buttonPos = { Application::GetWidth() - 120, 110, 0.8f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::ButtonBack, sizeDefault, colDefault);

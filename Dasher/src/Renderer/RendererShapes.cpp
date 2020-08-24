@@ -15,14 +15,14 @@ namespace RendererShapes
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//										Rectangle											//
 	//////////////////////////////////////////////////////////////////////////////////////////////
-	void Rectangle(RendererVertex outQuad[4], const glm::vec2& pos, const glm::vec2& size, const glm::vec4& col)
+	void Rectangle(RendererVertex outQuad[4], const glm::vec3& pos, const glm::vec2& size, const glm::vec4& col)
 	{
 		//Set the position
 		float halfx = size.x / 2, halfy = size.y / 2;
-		outQuad[0].m_pos = { pos.x - halfx, pos.y - halfy, 0.0 };
-		outQuad[1].m_pos = { pos.x + halfx, pos.y - halfy, 0.0 };
-		outQuad[2].m_pos = { pos.x + halfx, pos.y + halfy, 0.0 };
-		outQuad[3].m_pos = { pos.x - halfx, pos.y + halfy, 0.0 };
+		outQuad[0].m_pos = { pos.x - halfx, pos.y - halfy, pos.z };
+		outQuad[1].m_pos = { pos.x + halfx, pos.y - halfy, pos.z};
+		outQuad[2].m_pos = { pos.x + halfx, pos.y + halfy, pos.z};
+		outQuad[3].m_pos = { pos.x - halfx, pos.y + halfy, pos.z};
 
 		outQuad[0].m_textureCoord = { 0.0, 0.0 };
 		outQuad[1].m_textureCoord = { 1.0, 0.0 };

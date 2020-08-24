@@ -26,7 +26,7 @@ void MainMenuLayer::OnStart()
 		const glm::vec2 sizeSelected = { 470, 160 };
 		const glm::vec4 colSelected = { 1.0f, 209 / 255.0f, 91 / 255.0f, 0.75f };
 		const glm::vec4 colClick = { 1.0f, 223 / 255.0f, 141 / 255.0f, 0.94f };
-		const glm::vec2 buttonPos = { 740, 1000 };
+		const glm::vec3 buttonPos = { 740, 1000, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::Button0, sizeDefault, colDefault);
@@ -56,7 +56,7 @@ void MainMenuLayer::OnStart()
 		const glm::vec2 sizeSelected = { 470, 160 };
 		const glm::vec4 colSelected = { 1.0f, 209 / 255.0f, 91 / 255.0f, 0.75f };
 		const glm::vec4 colClick = { 1.0f, 223 / 255.0f, 141 / 255.0f, 0.94f };
-		const glm::vec2 buttonPos = { 740, 800 };
+		const glm::vec3 buttonPos = { 740, 800, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::Button0, sizeDefault, colDefault);
@@ -85,7 +85,7 @@ void MainMenuLayer::OnStart()
 		const glm::vec2 sizeSelected = { 470, 160 };
 		const glm::vec4 colSelected = { 1.0f, 209 / 255.0f, 91 / 255.0f, 0.75f };
 		const glm::vec4 colClick = { 1.0f, 223 / 255.0f, 141 / 255.0f, 0.94f };
-		const glm::vec2 buttonPos = { 740, 600 };
+		const glm::vec3 buttonPos = { 740, 600, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::Button0, sizeDefault, colDefault);
@@ -115,7 +115,7 @@ void MainMenuLayer::OnStart()
 		const glm::vec2 sizeSelected = { 470, 160 };
 		const glm::vec4 colSelected = { 1.0f, 209 / 255.0f, 91 / 255.0f, 0.75f };
 		const glm::vec4 colClick = { 1.0f, 223 / 255.0f, 141 / 255.0f, 0.94f };
-		const glm::vec2 buttonPos = { 740, 400 };
+		const glm::vec3 buttonPos = { 740, 400, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::Button0, sizeDefault, colDefault);
@@ -148,7 +148,10 @@ void MainMenuLayer::OnStart()
 
 		m_pbShowTrajectory.SetStateProperties(true, PushButtonProps(UITypes::PushButton0_E, { width, width * ar }, { 1,1,1,1 }));
 
-		m_pbShowTrajectory.SetPos(m_ShowTrajTextPos + m_ShowTrajPushButtonOffset);
+		glm::vec3 pos = { m_ShowTrajTextPos.x + m_ShowTrajPushButtonOffset.x,
+						  m_ShowTrajTextPos.y + m_ShowTrajPushButtonOffset.y,
+						  0.0f};
+		m_pbShowTrajectory.SetPos(pos);
 
 		m_pbShowTrajectory.SetEnabled(g_bShowTrajectoryEnabled);
 		m_pbShowTrajectory.SetButttonClickEvent([](bool value)
@@ -160,7 +163,7 @@ void MainMenuLayer::OnStart()
 }
 void MainMenuLayer::OnUpdate(float deltaTime) 
 {
-	Renderer::DrawTextColor(m_strShowTraj, m_ShowTrajTextPos, m_ShowTrajTextScale, m_vShowTrajTextCol);
+	Renderer::DrawTextColor(m_strShowTraj.c_str(), m_strShowTraj.size(), m_ShowTrajTextPos, m_ShowTrajTextScale, m_vShowTrajTextCol);
 }
 
 bool MainMenuLayer::OnWindowResize(int x, int y)

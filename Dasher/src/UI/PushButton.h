@@ -32,7 +32,7 @@ public:
 	inline bool GetEnabled() const { return m_bIsEnabled; }
 	inline bool& GetEnabledRef() { return m_bIsEnabled; }
 
-	inline void SetPos(const glm::vec2& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
+	inline void SetPos(const glm::vec3& pos) { m_vPos = pos; RegenerateVertexBuffer(); }
 	void RegenerateVertexBuffer();
 
 	inline void SetButttonClickEvent(PushButtonToggleFunc func) { m_toggleFunc = func; }
@@ -42,7 +42,7 @@ private:
 	bool m_bOldEnabled;
 
 	PushButtonProps m_props[2];
-	glm::vec2 m_vPos;
+	glm::vec3 m_vPos;
 
 	RendererVertex m_vertex[4];
 

@@ -36,10 +36,10 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 	int width = Application::GetWidth();
 	int height = Application::GetHeight();
 
-	m_vertex[0].SetPosColTex({ 0.0f, 0.0f, -0.5f }, col, props.initTexCoords[0]);
-	m_vertex[1].SetPosColTex({ width, 0.0f,-0.5f }, col, props.initTexCoords[1]);
-	m_vertex[2].SetPosColTex({ width, height, -0.5f }, col, props.initTexCoords[2]);
-	m_vertex[3].SetPosColTex({ 0.0f, height, -0.5f }, col, props.initTexCoords[3]);
+	m_vertex[0].SetPosColTex({ 0.0f, 0.0f, -0.9 }, col, props.initTexCoords[0]);
+	m_vertex[1].SetPosColTex({ width, 0.0f, -0.9 }, col, props.initTexCoords[1]);
+	m_vertex[2].SetPosColTex({ width, height, -0.9 }, col, props.initTexCoords[2]);
+	m_vertex[3].SetPosColTex({ 0.0f, height, -0.9 }, col, props.initTexCoords[3]);
 }
 
 BackgroundLayer::~BackgroundLayer()

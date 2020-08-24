@@ -20,7 +20,7 @@ void PushButtonProps::SetBasicProps(UITypes uitype, const glm::ivec2& buttonSize
 PushButton::PushButton() :
 	m_bIsEnabled (false),
 	m_bOldEnabled (true),
-	m_vPos (0.0f, 0.0f),
+	m_vPos (0.0f, 0.0f, 0.0f),
 	m_toggleFunc(nullptr)
 {
 }

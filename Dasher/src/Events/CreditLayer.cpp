@@ -23,7 +23,7 @@ void CreditLayer::OnStart()
 
 		const glm::vec2 sizeClick = { 105, 105 };
 		const glm::vec4 colClick = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const glm::vec2 buttonPos = { 120, 110 };
+		const glm::vec3 buttonPos = { 120, 110, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::ButtonBack, sizeDefault, colDefault);
@@ -34,7 +34,7 @@ void CreditLayer::OnStart()
 		propClick.SetTextProps("", { 40,-20 }, 0.5, { 1,1,1,1 });
 
 		m_BackButton.SetStateProperties(propDefault, Button::StateDefault);
-		m_BackButton.SetStateProperties(propDefault, Button::StateSelected);
+		m_BackButton.SetStateProperties(propClick, Button::StateSelected);
 		m_BackButton.SetStateProperties(propClick, Button::StateClicked);
 
 		m_BackButton.SetPosition(buttonPos);
@@ -52,7 +52,7 @@ void CreditLayer::OnUpdate(float deltaTime)
 
 	for (int i = 0; i < TextLineCount; i++)
 	{
-		Renderer::DrawTextColor(m_strCredit[i], posText, textScale[i], { 0.0f, 0.0f, 0.0f, 1.0f });
+		Renderer::DrawTextColor(m_strCredit[i].c_str(), m_strCredit[i].size(), posText, textScale[i], { 0.0f, 0.0f, 0.0f, 1.0f });
 		posText.y -= 120;
 	}
 }
