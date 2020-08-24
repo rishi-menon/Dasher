@@ -160,6 +160,7 @@
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\EventCallbacks.cpp" />
     <ClCompile Include="src\AssetManagement\Font.cpp" />
+    <ClCompile Include="src\AssetManagement\StandardTexture.cpp" />
     <ClCompile Include="src\Collision\Collision.cpp" />
     <ClCompile Include="src\Core\CircularQueue.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -189,6 +190,7 @@
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\EventCallbacks.h" />
     <ClInclude Include="src\AssetManagement\Font.h" />
+    <ClInclude Include="src\AssetManagement\StandardTexture.h" />
     <ClInclude Include="src\Collision\Collision.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Core\CircularQueue.h" />

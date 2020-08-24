@@ -3,7 +3,7 @@
 #include "Layer.h"
 #include "Maths.h"
 #include "Renderer/RendererVertex.h"
-#include "AssetManagement/Texture.h"
+#include "AssetManagement/StandardTexture.h"
 
 struct BackgroundLayerProps
 {

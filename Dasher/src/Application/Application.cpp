@@ -5,6 +5,8 @@
 
 #include "AssetManagement/Texture.h"
 #include "AssetManagement/Font.h"
+#include "AssetManagement/StandardTexture.h"
+
 #include "Renderer/Renderer.h"
 #include "Log.h"
 

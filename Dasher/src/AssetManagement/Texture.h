@@ -1,22 +1,11 @@
 #pragma once
 
-enum class StandardTexture : unsigned int
-{
-	None = 0,
-	Background1 = 1,
-	Background2,
-	Background3,
-	Background4,
-
-};
-
-extern void StandardTextureInit();
-extern unsigned int GetStandardTextureId(StandardTexture type);
-extern void StandardTextureCleanup();
-
 struct TextureProperties
 {
+	TextureProperties();
 	TextureProperties(int nMinFilter, int nMaxFilter, int nWrapS, int nWrapT);
+	TextureProperties(const TextureProperties&) = default;
+	TextureProperties& operator= (const TextureProperties&) = default;
 
 	int m_nMinFilter;
 	int m_nMaxFilter;
