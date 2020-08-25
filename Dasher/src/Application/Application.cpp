@@ -60,11 +60,12 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	if (glewInit() != GLEW_OK)
 	{
 		ASSERT(false, "Could not initialise GLEW");
+		return false;
 	}
 
-	FontInit();
-	UI::UIInit();
-	StandardTextureInit();
+	if (!FontInit()) { return false; }
+	if (!UI::UIInit()) { return false; }
+	if (!StandardTextureInit()) { return false; }
 
 	//Set callbacks
 	glfwSetWindowUserPointer(m_pWindow, this);
@@ -80,13 +81,16 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	glcall(glEnable(GL_DEPTH_TEST));
 	glcall(glDepthFunc(GL_LEQUAL));
 
-	bool bSuccess = Renderer::Initialise();
-	ASSERT(bSuccess, "Error: Failed to initialise renderer");
+	if (!Renderer::Initialise())
+	{
+		LOG_CLIENT_ERROR("Error: Failed to initialise renderer");
+		return false;
+	}
 
 	m_NextMenu = Menu::MainMenu;
 	ChangeMenuState();
 
-	return bSuccess;
+	return true;
 }
 
 
@@ -201,6 +205,7 @@ void Application::Cleanup()
 	StandardTextureCleanup();
 
 	ClearLayers();
+
 	if (m_pWindow)
 	{
 		glfwDestroyWindow(m_pWindow);

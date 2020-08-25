@@ -26,7 +26,7 @@ namespace UI
 	inline unsigned int GetTextureId(UITypes type) { return UI::UITexIds[static_cast<unsigned int>(type)]; }
 	inline const TextureDimensions& GetTextureDimension (UITypes type) { return UI::UITexDimension[static_cast<unsigned int>(type)]; }
 
-	void UIInit();
+	bool UIInit();
 	void UICleanup();
 	bool CheckCollision(int mousex, int mousey, const TextureDimensions& curDim, const RendererVertex vertexQuad[4]);
 

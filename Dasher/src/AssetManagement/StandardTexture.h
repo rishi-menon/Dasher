@@ -8,9 +8,11 @@ enum class StandardTexture : int
 	Background3,
 	Background4,
 
+	SpecialEffect0,
+
 	Count		//Do not use
 };
 
-extern void StandardTextureInit();
+extern bool StandardTextureInit();
 extern unsigned int GetStandardTextureId(StandardTexture type);
 extern void StandardTextureCleanup();

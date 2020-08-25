@@ -3,6 +3,7 @@
 #include "Application/Application.h"
 
 #include "AssetManagement/Texture.h"
+#include "AssetManagement/StandardTexture.h"
 #include "Renderer/Renderer.h"
 
 #include "Collision/Collision.h"
@@ -51,6 +52,8 @@ void BlockSpawnerLayer::OnStart()
 
 	//To Do: make this layer independent of the player layer maybe ? So if player layer does not exist then this class should still work ??
 	ASSERT(m_pPlayerLayer, "Player layer was not found");
+
+	m_nBlockTextureId = GetStandardTextureId(StandardTexture::SpecialEffect0);
 }
 
 void BlockSpawnerLayer::ClearOutOfBoundsBlocks()
@@ -141,7 +144,8 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 		}
 
 		//Render
-		Renderer::DrawQuadColor(blockVertex, curBlock.shape);
+		//Renderer::DrawQuadColor(blockVertex, curBlock.shape);
+		Renderer::DrawQuadTexture(blockVertex, curBlock.shape, m_nBlockTextureId);
 		index = (index + 1) % m_blocks.Size();
 	}
 

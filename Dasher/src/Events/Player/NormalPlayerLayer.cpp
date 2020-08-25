@@ -13,11 +13,22 @@ NormalPlayerLayer::NormalPlayerLayer() :
 	m_bIsColliding(false),
 	m_bIsAlive (true),
 
+	m_nLivesUsed (0),
+
 	m_dNextCollideTime (0.0),
-	m_dImmunityTime (2.0),
+	m_dImmunityTime (4.0),
 	m_dScore (0.0),
 	m_pFadeoutLayer (nullptr)
 {
+	m_vAngularVelocities[0] = { 1, 6 };
+	m_vSizes[0] = { 70, 70 };
+
+	m_vAngularVelocities[1] = { 3, 8 };
+	m_vSizes[1] = { 45, 45 };
+
+	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
+	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
+	AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
 }
 
 void NormalPlayerLayer::OnStart()
@@ -122,12 +133,11 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 	{
 		AbstractPlayerLayer::OnUpdate(deltaTime);
 
-		if (!m_bIsColliding && Application::GetGameTime() > m_dNextCollideTime)
+		if (!m_bCanCollide && !m_bIsColliding && Application::GetGameTime() > m_dNextCollideTime)
 		{
 			m_bCanCollide = true;
 			m_vCol = { 0.5, 0.4, 0.8,1.0 };
 		}
-		
 		//Score
 		m_dScore += deltaTime;
 
@@ -158,10 +168,22 @@ void NormalPlayerLayer::TakeDamage(double damage)
 	{
 		m_bCanCollide = false;
 		m_bIsColliding = true;
-		m_vCol = {1.0f,230.0/255, 0.0f, 0.65f };
+		m_vCol = { 1.0, 81.0/255, 81.0/255, 0.7 };
+		//m_vCol = { 0.5, 0.4, 0.8,0.4 };
+		//m_vCol = { 154.0 / 255, 0.0f, 1.0f,0.37f };
 		//Take damage
-
-		
+		m_nLivesUsed++;
+		if (m_nLivesUsed < PlayerLives)
+		{
+			AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
+			AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
+			AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
+			AbstractPlayerLayer::RecalculateAngularVelocity();
+		}
+		else
+		{
+			NormalPlayerLayer::Die(); // no more lives
+		}
 	}
 }
 void NormalPlayerLayer::TakeNoDamage()

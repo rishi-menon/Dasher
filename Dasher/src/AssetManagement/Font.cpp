@@ -7,12 +7,15 @@
 
 FT_Library freeTypeLib;
 
-void FontInit()
+bool FontInit()
 {
 	if (FT_Init_FreeType(&freeTypeLib))
 	{
-		ASSERT(false, "Could not initialise Freetype library");
+		ASSERT(false, "");
+		LOG_CLIENT_ERROR("Could not initialise Freetype library");
+		return false;
 	}
+	return true;
 }
 void FontCleanUp()
 {
@@ -38,7 +41,7 @@ bool Font::LoadFont(const char* const path, unsigned int height)
 	m_vCharacters.clear();
 
 	FT_Face face;
-	if (FT_New_Face(freeTypeLib, "Assets/Fonts/Quicksand/Quicksand Regular 400.ttf", 0, &face))
+	if (FT_New_Face(freeTypeLib, path, 0, &face))
 	{
 		ASSERT(false, "Could not create a font face");
 		return false;

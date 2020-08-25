@@ -1,3 +1,8 @@
 #pragma once
 
-//#define RM_WINDOW_NO_RESIZE
+#ifdef _DEBUG
+	//#define RM_WINDOW_NO_RESIZE
+
+#else
+	#define RM_WINDOW_NO_RESIZE
+#endif

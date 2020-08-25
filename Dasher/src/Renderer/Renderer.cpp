@@ -146,8 +146,14 @@ bool Renderer::Initialise()
 	data.boundTextureSlots[0] = data.nTextureWhiteId;
 	data.nCurrentTextureSlot = 1;
 
-	data.fontDefault.LoadFont("Assets/Fonts/Quicksand/Quicksand Regular 400.ttf", 120);
+	bool bFontSuccess = data.fontDefault.LoadFont("Assets/Fonts/Quicksand/Quicksand Regular 400.ttf", 120);
 
+	if (!bFontSuccess)
+	{
+		ASSERT(false, "");
+		LOG_CLIENT_ERROR("Could not load font: Assets/Fonts/Quicksand/Quicksand Regular 400.ttf");
+		return false;
+	}
 	return true;
 }
 

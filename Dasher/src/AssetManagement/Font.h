@@ -1,7 +1,7 @@
 #include "Maths.h"
 #include <vector>
 
-extern void FontInit();
+extern bool FontInit();
 extern void FontCleanUp();
 
 struct FontCharacter

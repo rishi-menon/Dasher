@@ -11,35 +11,82 @@ namespace UI {
 	unsigned int UITexIds[static_cast<unsigned int>(UITypes::Count)];
 	TextureDimensions UITexDimension[(unsigned int)UITypes::Count];
 
-	void UIInit()
+	bool UIInit()
 	{
 		unsigned int index = static_cast<unsigned int>(UITypes::Button0);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/Button0.png", UITexDimension[index]);
 
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/Button0.png");
+			return false;
+		}
+
 		index = static_cast<unsigned int>(UITypes::ButtonBack);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonBack.png", UITexDimension[index]);
+
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/ButtonBack.png");
+			return false;
+		}
 
 		index = static_cast<unsigned int>(UITypes::ButtonBack_S);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonBack_S.png", UITexDimension[index]);
 
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/ButtonBack_S.png");
+			return false;
+		}
+
 		index = static_cast<unsigned int>(UITypes::ButtonRestart);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonRestart.png", UITexDimension[index]);
+
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/ButtonRestart.png");
+			return false;
+		}
 
 		index = static_cast<unsigned int>(UITypes::ButtonRestart_S);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/ButtonRestart_S.png", UITexDimension[index]);
 
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/ButtonRestart_S.png");
+			return false;
+		}
+
 		index = static_cast<unsigned int>(UITypes::PushButton0);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/PushButton0.png", UITexDimension[index]);
 
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/PushButton0.png");
+			return false;
+		}
+
 		index = static_cast<unsigned int>(UITypes::PushButton0_E);
 		UITexIds[index] = Texture::LoadTexturePreserve("Assets/Textures/UI/PushButton0_E.png", UITexDimension[index]);
+
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: Assets/Textures/UI/PushButton0_E.png");
+			return false;
+		}
+
+		return true;
 	}
 	void UICleanup()
 	{
 		for (unsigned int i = 0; i < static_cast<unsigned int>(UITypes::Count); i++)
 		{
-			Texture::DeleteTexture(UITexIds[i]);
-			Texture::FreeImageBuffer(UITexDimension[i].buffer);
+			if (UITexIds[i] != (unsigned int)(-1))
+			{
+				Texture::DeleteTexture(UITexIds[i]);
+				Texture::FreeImageBuffer(UITexDimension[i].buffer);
+			}
 		}
 	}
 

@@ -60,4 +60,6 @@ private:
 	bool m_bPreviousCollided;
 
 	double m_dCurPhasePercent;	//x percent
+
+	unsigned int m_nBlockTextureId;
 };

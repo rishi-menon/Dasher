@@ -29,7 +29,7 @@ int main()
 	Application* pApplication = new Application;
 	const int nStartingWidth = 1600, nStartingHeight = 1200;
 
-	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Dasher"))
+	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Phaze"))
 	{
 		pApplication->Run();
 	}

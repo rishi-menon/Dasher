@@ -23,9 +23,14 @@ private:
 	void Die();
 
 private:
+	enum : int {PlayerLives = 2};
+
 	const glm::vec2 m_vScorePos;
 	const float m_fScoreScale;
 	const glm::vec4 m_vScoreCol;
+
+	glm::vec2 m_vAngularVelocities[PlayerLives];
+	glm::vec2 m_vSizes[PlayerLives];
 
 private:
 	Button m_BackButton;
@@ -34,6 +39,8 @@ private:
 	bool m_bCanCollide;
 	bool m_bIsColliding;
 	bool m_bIsAlive;
+
+	int m_nLivesUsed;
 
 	double m_dNextCollideTime;
 	const double m_dImmunityTime;
