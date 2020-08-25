@@ -425,6 +425,7 @@ void Renderer::DrawTextColor(const char* const strText, int nSize, const glm::ve
 }
 void Renderer::DrawTextColor(const char* const strText, int nSize, float PosX, float PosY, float scale, const glm::vec4& col, Font* font)
 {
+#if 0
 	if (!nSize)
 	{
 		return;
@@ -459,4 +460,49 @@ void Renderer::DrawTextColor(const char* const strText, int nSize, float PosX, f
 		Renderer::DrawQuadTexture(vertex, RendererShapes::Shape::ShapeQuad, fontChar.texId);
 		PosX += fontChar.advance * scale;
 	}
+
+#else	// '\n' would now leave a line and start printing from the next line
+	if (!nSize)
+	{
+		return;
+	}
+	else if (nSize == -1)
+	{
+		nSize = mystrlen(strText);
+	}
+
+	if (!font) { font = &data.fontDefault; }
+
+	RendererVertex vertex[4];
+	float positionX = PosX;
+	constexpr float offsetY = 135;
+
+	for (int i = 0; i < nSize; i++)
+	{
+		if (strText[i] == '\0')	break;
+		else if (strText[i] == '\n')
+		{
+			positionX = PosX;
+			PosY -= offsetY * scale;
+			continue;
+		}
+
+		const FontCharacter& fontChar = font->GetFontChar(strText[i]);
+		//x,y are the coordinates of the bottom left point of the quad that will render the character texture
+		float x = positionX + fontChar.bearing.x * scale;
+		float y = PosY - (fontChar.size.y - fontChar.bearing.y) * scale;
+		float width = fontChar.size.x * scale;
+		float height = fontChar.size.y * scale;
+
+		vertex[0].SetPosColTex({ x, y, 0.8f }, col, { 0.0f, 0.0f });
+		vertex[1].SetPosColTex({ x + width, y, 0.8f }, col, { 1.0f, 0.0f });
+		vertex[2].SetPosColTex({ x + width, y + height,0.8f }, col, { 1.0f, 1.0f });
+		vertex[3].SetPosColTex({ x, y + height, 0.8f }, col, { 0.0f, 1.0f });
+
+		//RendererShapes::Rectangle({}, {}, col);
+
+		Renderer::DrawQuadTexture(vertex, RendererShapes::Shape::ShapeQuad, fontChar.texId);
+		positionX += fontChar.advance * scale;
+	}
+#endif
 }

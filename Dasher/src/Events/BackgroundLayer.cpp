@@ -25,8 +25,10 @@ void BackgroundLayerProps::SetInitTexCoords(const glm::vec2& bottomLeft, const g
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
-	m_nVelocityX (props.velocityX)
+	m_fVelocityX(0.0),
+	textureType (StandardTexture::None)
 {
+#if 0
 	ASSERT(props.textureType != StandardTexture::None, "Standard texture was null");
 
 	m_nTextureId = GetStandardTextureId(props.textureType);
@@ -40,6 +42,30 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayerProps& props) :
 	m_vertex[1].SetPosColTex({ width, 0.0f, -0.9 }, col, props.initTexCoords[1]);
 	m_vertex[2].SetPosColTex({ width, height, -0.9 }, col, props.initTexCoords[2]);
 	m_vertex[3].SetPosColTex({ 0.0f, height, -0.9 }, col, props.initTexCoords[3]);
+#else	
+	SetBackgroundState(props);
+#endif
+}
+
+void BackgroundLayer::SetBackgroundState(const BackgroundLayerProps& props)
+{
+	textureType = props.textureType;
+
+	ASSERT(textureType != StandardTexture::None, "Standard texture was null");
+	if (textureType != StandardTexture::None)
+	{
+		m_fVelocityX = props.velocityX;
+		m_nTextureId = GetStandardTextureId(props.textureType);
+
+		const glm::vec4 col = { 1.0,1.0,1.0,1.0 };
+		int width = Application::GetWidth();
+		int height = Application::GetHeight();
+
+		m_vertex[0].SetPosColTex({ 0.0f, 0.0f, -0.9 }, col, props.initTexCoords[0]);
+		m_vertex[1].SetPosColTex({ width, 0.0f, -0.9 }, col, props.initTexCoords[1]);
+		m_vertex[2].SetPosColTex({ width, height, -0.9 }, col, props.initTexCoords[2]);
+		m_vertex[3].SetPosColTex({ 0.0f, height, -0.9 }, col, props.initTexCoords[3]);
+	}
 }
 
 BackgroundLayer::~BackgroundLayer()
@@ -52,14 +78,15 @@ void BackgroundLayer::RegisterEvents(Application* pApp, int nIndex)
 
 void BackgroundLayer::OnStart()
 {
-
 }
 void BackgroundLayer::OnUpdate(float deltaTime)
 {
+	if (textureType == StandardTexture::None) { return; }
+
 	for (int i = 0; i < 4; i++)
 	{
 		//subtract the value because when the speed is positive, the texture coordinates should be decreasing to give the effect of the background moving towards the right
-		m_vertex[i].m_textureCoord.x -= m_nVelocityX * deltaTime;
+		m_vertex[i].m_textureCoord.x -= m_fVelocityX * deltaTime;
 	}
 	
 	float value = m_vertex[0].m_textureCoord.x;
@@ -86,7 +113,7 @@ bool BackgroundLayer::OnWindowResize(int width, int height)
 
 BackgroundLayerProps BackgroundLayer::GetBackgroundProp() const
 {
-	BackgroundLayerProps props(StandardTexture::None, m_nVelocityX);
+	BackgroundLayerProps props(textureType, m_fVelocityX);
 	props.SetInitTexCoords(m_vertex[0].m_textureCoord, m_vertex[2].m_textureCoord);
 	return props;
 }

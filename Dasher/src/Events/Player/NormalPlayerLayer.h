@@ -14,10 +14,13 @@ public:
 	virtual void TakeDamage(double damage) override;
 	virtual void TakeNoDamage() override;
 
-#if 1
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
-	virtual bool OnKeyDown(int key) override;
-#endif
+
+protected:
+	inline void SetScore(double score) { m_dScore = score; }	//This is mainly for the tutorial layer
+	inline Button& GetBackButton() { return m_BackButton; }
+	inline void SetLives(int livesUsed) { m_nLivesUsed = livesUsed; }
+	void SetSpeedOnDamage();
 
 private:
 	void Die();

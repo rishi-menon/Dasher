@@ -9,24 +9,61 @@
 #include "Collision/Collision.h"
 #include "Events/Player/AbstractPlayerLayer.h"
 
+static void CreateBlockDefault(Block& newBlock, double& nextSpawnTime, double curPhase)
+{
+	//spawn blocks
+	const glm::vec2 timeBwSpawn = { 1.4f, 2.2f };
 
+	//size
+	const glm::vec2 sizeX = { 80, 100 };
+	const glm::vec2 sizeY = { 300, 500 };
+
+	if (Random::Rand() >= 0.5)
+	{
+		//newBlock Top
+		newBlock.position = { Application::GetWidth(), Application::GetHeight() - 2, 0.1 };
+		//Negative sign so that the triangle appears upside down
+		newBlock.scale = { Random::Rand(sizeX.x, sizeX.y), -Random::Rand(sizeY.x, sizeY.y), 1 };
+	}
+	else
+	{
+		//newBlock bottom
+		Application* pApp = Application::GetCurrentApp();
+		newBlock.position = { pApp->GetWidth(), 2, 0.1 };
+		newBlock.scale = { Random::Rand(sizeX.x, sizeX.y), Random::Rand(sizeY.x, sizeY.y), 1 };
+	}
+
+	newBlock.velocity = { -400, 0, 0 };
+	newBlock.color = { 0.0,0.4,0.79,1.0 };
+	newBlock.shape = RendererShapes::ShapeTriangleRegular;
+	newBlock.phaseRange = { 0.0, 0.2 };
+
+	if (newBlock.phaseRange.x <= curPhase && newBlock.phaseRange.y >= curPhase)
+	{
+		newBlock.isPhasable = true;
+		newBlock.color.a = 0.5f;
+	}
+	else
+	{
+		newBlock.isPhasable = false;
+		newBlock.color.a = 1.0f;
+	}
+	nextSpawnTime = Application::GetGameTime() + Random::Rand(timeBwSpawn.x, timeBwSpawn.y);
+}
+
+////////////////////////////////////////////
 BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_pPlayerLayer (nullptr),
 	m_dNextSpawnTime (0.0),
 
-	m_dTimeBwSpawnMin(1.4),
-	m_dTimeBwSpawnMax (2.2),
-	m_dSizeXMin (80),
-	m_dSizeXMax (100),
-	m_dSizeYMin (300),
-	m_dSizeYMax (500),
 	m_bPreviousCollided (false),
 	m_dCurPhasePercent(0)
 {
-	
 	m_blocks.Reserve(30);
 	m_blocks.ClearAll();
 	m_dNextSpawnTime = Application::GetGameTime();
+
+	m_CreateBlockFunc = CreateBlockDefault;
 }
 void BlockSpawnerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
@@ -89,10 +126,11 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 
 	//3.Add new blocks 
 	double dCurTime = Application::GetGameTime();	//in seconds
-	if (dCurTime >= m_dNextSpawnTime)
+	//Added the second condition so that we can force it to never spawn by setting it to a negative number. This will be useful in the tutorial layer
+	if (dCurTime >= m_dNextSpawnTime && m_dNextSpawnTime >= 0.0)	
 	{
-		m_dNextSpawnTime = dCurTime + Random::Rand(m_dTimeBwSpawnMin, m_dTimeBwSpawnMax);
-		CreateBlock();
+		Block& block = *m_blocks.Push();
+		m_CreateBlockFunc(block, m_dNextSpawnTime, m_dCurPhasePercent);
 	}
 }
 
@@ -155,42 +193,6 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 		m_pPlayerLayer->TakeNoDamage();
 	}
 }
-void BlockSpawnerLayer::CreateBlock()
-{
-	Block& block = *m_blocks.Push();
-
-	if (Random::Rand() >= 0.5)
-	{
-		//Block Top
-		block.position = { Application::GetWidth(), Application::GetHeight() - 2, 0.1 };
-		//Negative sign so that the triangle appears upside down
-		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), -Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
-	}
-	else
-	{
-		//block bottom
-		Application* pApp = Application::GetCurrentApp();
-		block.position = { pApp->GetWidth(), 2, 0.1 };
-		block.scale = { Random::Rand(m_dSizeXMin,m_dSizeXMax), Random::Rand(m_dSizeYMin,m_dSizeYMax), 1 };
-	}
-
-	block.velocity = { -400, 0, 0 };
-	block.color = { 0.0,0.4,0.79,1.0 };
-	block.shape = RendererShapes::ShapeTriangleRegular;
-	block.phaseRange = { 0.0, 0.2 };
-
-	if (block.phaseRange.x <= m_dCurPhasePercent && block.phaseRange.y >= m_dCurPhasePercent)
-	{
-		block.isPhasable = true;
-		block.color.a = 0.5f;
-	}
-	else
-	{
-		block.isPhasable = false;
-		block.color.a = 1.0f;
-	}	
-}
-
 
 bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 {
@@ -226,3 +228,21 @@ bool BlockSpawnerLayer::OnWindowResize(int width, int height)
 	return false;
 }
 #endif
+
+void BlockSpawnerLayer::RenderBlocks()
+{
+	unsigned int index = m_blocks.Begin();
+	Block* buffer = m_blocks.Buffer();
+
+	for (unsigned int i = 0; i < m_blocks.Count(); i++)
+	{
+		Block& curBlock = buffer[index];
+		RendererVertex blockVertex[3];
+		RendererShapes::TriangleRegular(blockVertex, curBlock.position, curBlock.scale, curBlock.color);
+
+		//Render
+		//Renderer::DrawQuadColor(blockVertex, curBlock.shape);
+		Renderer::DrawQuadTexture(blockVertex, curBlock.shape, m_nBlockTextureId);
+		index = (index + 1) % m_blocks.Size();
+	}
+}

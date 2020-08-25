@@ -23,7 +23,7 @@ void CreditLayer::OnStart()
 
 		const glm::vec2 sizeClick = { 105, 105 };
 		const glm::vec4 colClick = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const glm::vec3 buttonPos = { 120, 110, 0.0f };
+		const glm::vec3 buttonPos = { Application::GetWidth() - 120, 110, 0.0f };
 
 		ButtonProps propDefault;
 		propDefault.SetBasicProps(UITypes::ButtonBack, sizeDefault, colDefault);

@@ -71,59 +71,66 @@ void UILayer::OnUpdate(float deltaTime)
 }
 bool UILayer::OnMouseMove(int x, int y)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnMouseMove(x, y)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnMouseMove(x, y)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 
 bool UILayer::OnMouseDown(int nButton)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnMouseDown(nButton)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnMouseDown(nButton)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 bool UILayer::OnMouseUp(int nButton)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnMouseUp(nButton)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnMouseUp(nButton)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 bool UILayer::OnKey(int key)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnKey(key)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnKey(key)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 bool UILayer::OnKeyDown(int key)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnKeyDown(key)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnKeyDown(key)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 bool UILayer::OnKeyUp(int key)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnKeyUp(key)) { break; }
+		if (pObject && pObject->GetIsActive() && pObject->OnKeyUp(key)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }
 
 bool UILayer::OnWindowResize(int x, int y)
 {
+	bool bRet = false;
 	for (UIObject* pObject : m_vObjects)
 	{
-		if (pObject && pObject->GetIsActive() && pObject->OnWindowResize(x, y)) { break;}
+		if (pObject && pObject->GetIsActive() && pObject->OnWindowResize(x, y)) { bRet = true; break; }
 	}
-	return false;
+	return bRet;
 }

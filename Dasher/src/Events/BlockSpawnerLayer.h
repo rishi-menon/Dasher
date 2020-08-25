@@ -29,36 +29,37 @@ public:
 	BlockSpawnerLayer();
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 
-	virtual void OnStart();
-	virtual void OnUpdate(float deltaTime);	//in seconds
+	virtual void OnStart() override;
+	virtual void OnUpdate(float deltaTime) override;	//in seconds
 	
+	virtual bool OnMouseMove(int x, int y) override;
 #if 0
 	virtual bool OnWindowResize(int width, int height) override;
 #endif
-	virtual bool OnMouseMove(int x, int y) override;
+
+	inline unsigned int GetBlockCount() const { return m_blocks.Count(); }
+
+protected:
+	typedef void (*CreateBlockFunc) (Block& newBlock, double& nextSpawnTime, double curPhase);
+
+	//This is mainly for the tutorial layer only because this layer moves and renders it in the same for loop instead of 2 for loops (WOuldnt make much much of a difference because 
+	void RenderBlocks();	
+	inline CircularQueue<Block>& GetBlocks() { return m_blocks; }
+
+	inline void SetNextSpawnTime(double time) { m_dNextSpawnTime = time; }
+
+	CreateBlockFunc m_CreateBlockFunc;
 
 private:
 	inline void ClearOutOfBoundsBlocks();
-	void CreateBlock();
 	void MoveCollisionRenderBlocks(float deltaTime);
+
 private:
 	CircularQueue<Block> m_blocks;
 	AbstractPlayerLayer* m_pPlayerLayer;
 
-	//spawn blocks
-	const double m_dTimeBwSpawnMin;
-	const double m_dTimeBwSpawnMax;
-
-	//size
-	const double m_dSizeXMin;
-	const double m_dSizeXMax;
-	const double m_dSizeYMin;
-	const double m_dSizeYMax;
-	
 	double m_dNextSpawnTime;
-
 	bool m_bPreviousCollided;
-
 	double m_dCurPhasePercent;	//x percent
 
 	unsigned int m_nBlockTextureId;

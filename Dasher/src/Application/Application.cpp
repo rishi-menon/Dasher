@@ -23,6 +23,9 @@
 #include "Events/CreditLayer.h"
 #include "Events/FadeoutScreenLayer.h"
 
+#include "Events/Tutorial/TutorialPlayerLayer.h"
+#include "Events/Tutorial/TutorialBlockSpawnerLayer.h"
+
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
 int Application::m_nHeight = 0;
@@ -326,7 +329,12 @@ void  Application::StartMenuZenMode()
 }
 void  Application::StartMenuTutorialMode()
 {
-
+	ClearLayers();
+	InsertLayer(new UILayer);
+	InsertLayer(new BackgroundLayer(BackgroundLayerProps(StandardTexture::Background4)));
+	InsertLayer(new TutorialPlayerLayer);
+	InsertLayer(new TutorialBlockSpawnerLayer);
+	OnStart();
 }
 void  Application::StartMenuCredits()
 {

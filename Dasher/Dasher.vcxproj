@@ -175,6 +175,9 @@
     <ClCompile Include="src\Events\Player\NormalPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Player\ZenPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Player\AbstractPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.cpp" />
+    <ClCompile Include="src\Events\Tutorial\TutorialCustomBlockSpawner.cpp" />
+    <ClCompile Include="src\Events\Tutorial\TutorialPlayerLayer.cpp" />
     <ClCompile Include="src\Events\UILayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -205,6 +208,9 @@
     <ClInclude Include="src\Events\Player\NormalPlayerLayer.h" />
     <ClInclude Include="src\Events\Player\ZenPlayerLayer.h" />
     <ClInclude Include="src\Events\Player\AbstractPlayerLayer.h" />
+    <ClInclude Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.h" />
+    <ClInclude Include="src\Events\Tutorial\TutorialCustomBlockSpawner.h" />
+    <ClInclude Include="src\Events\Tutorial\TutorialPlayerLayer.h" />
     <ClInclude Include="src\Events\UILayer.h" />
     <ClInclude Include="src\Maths.h" />
     <ClInclude Include="src\Log.h" />

@@ -30,9 +30,11 @@ public:
 	virtual bool OnWindowResize(int width, int height) override;
 
 	BackgroundLayerProps GetBackgroundProp() const;
+	void SetBackgroundState(const BackgroundLayerProps& props);
 
 private:
 	unsigned int m_nTextureId;
 	RendererVertex m_vertex[4];
-	float m_nVelocityX;
+	float m_fVelocityX;
+	StandardTexture textureType;
 };

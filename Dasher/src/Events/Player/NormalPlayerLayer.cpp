@@ -140,11 +140,12 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 		}
 		//Score
 		m_dScore += deltaTime;
-
-		char buffer[10];
-		std::snprintf(buffer, 10, "%.1f", m_dScore);
-		Renderer::DrawTextColor(buffer, 10, m_vScorePos, m_fScoreScale, m_vScoreCol);
-
+		if (m_dScore >= 0)
+		{
+			char buffer[10];
+			std::snprintf(buffer, 10, "%.1f", m_dScore);
+			Renderer::DrawTextColor(buffer, 10, m_vScorePos, m_fScoreScale, m_vScoreCol);
+		}
 		//Render player
 		RendererShapes::Rectangle(m_Vertex, m_vPos, m_vSize, m_vCol);
 		Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
@@ -173,17 +174,22 @@ void NormalPlayerLayer::TakeDamage(double damage)
 		//m_vCol = { 154.0 / 255, 0.0f, 1.0f,0.37f };
 		//Take damage
 		m_nLivesUsed++;
-		if (m_nLivesUsed < PlayerLives)
-		{
-			AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
-			AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
-			AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
-			AbstractPlayerLayer::RecalculateAngularVelocity();
-		}
-		else
-		{
-			NormalPlayerLayer::Die(); // no more lives
-		}
+		SetSpeedOnDamage();
+	}
+}
+
+void NormalPlayerLayer::SetSpeedOnDamage()
+{
+	if (m_nLivesUsed < PlayerLives)
+	{
+		AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
+		AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
+		AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
+		AbstractPlayerLayer::RecalculateAngularVelocity();
+	}
+	else
+	{
+		NormalPlayerLayer::Die(); // no more lives
 	}
 }
 void NormalPlayerLayer::TakeNoDamage()
@@ -205,19 +211,7 @@ void NormalPlayerLayer::Die()
 	m_restartButton.SetIsActive(true);
 }
 
-#if 1
 void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	AbstractPlayerLayer::RegisterEvents(pApp, nIndex);
-	pApp->RegisterEvents(LayerKeyDown, nIndex);
 }
-bool NormalPlayerLayer::OnKeyDown(int key)
-{
-	if (key == 32)
-	{
-		LOG_INFO("Test");
-		Die();
-	}
-	return false;
-}
-#endif
