@@ -40,7 +40,7 @@ public:
 	inline unsigned int GetBlockCount() const { return m_blocks.Count(); }
 
 protected:
-	typedef void (*CreateBlockFunc) (Block& newBlock, double& nextSpawnTime, double curPhase);
+	typedef void (*CreateBlockFunc) (CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase);
 
 	//This is mainly for the tutorial layer only because this layer moves and renders it in the same for loop instead of 2 for loops (WOuldnt make much much of a difference because 
 	void RenderBlocks();	

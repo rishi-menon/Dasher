@@ -9,6 +9,7 @@ TutorialPlayerLayer::TutorialPlayerLayer() :
 {
 	m_dPointPosX = 80;
 	m_dPointPhase = 0;
+	m_dApparantVelocityX = 400;
 }
 void TutorialPlayerLayer::OnStart()
 {

@@ -1,13 +1,33 @@
 #include "ZenPlayerLayer.h"
 #include "Application/Application.h"
 #include "Renderer/Renderer.h"
+#include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
 
 
-ZenPlayerLayer::ZenPlayerLayer()
+ZenPlayerLayer::ZenPlayerLayer() :
+	m_nCurrentSpeed (0),
+	m_bCanTakeDamage(true),
+	m_bIsColliding(false),
+	m_dNextDamageTime (0.0)
 {
 	m_dPointPosX = 80;
 	m_dPointPhase = 0;
 	m_vTrajectoryColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	g_fBlockSpeed = 500;
+	m_dApparantVelocityX = 500;
+
+	/////////////
+
+	m_vAngularVelocities[0] = { 1, 6 };
+	m_vSizes[0] = { 70, 70 };
+
+	m_vAngularVelocities[1] = { 3, 8 };
+	m_vSizes[1] = { 45, 45 };
+
+	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nCurrentSpeed].x;
+	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nCurrentSpeed].y;
+	AbstractPlayerLayer::m_vSize = m_vSizes[m_nCurrentSpeed];
 
 }
 void ZenPlayerLayer::OnStart()
@@ -47,6 +67,11 @@ void ZenPlayerLayer::OnUpdate(float deltaTime)
 {
 	AbstractPlayerLayer::OnUpdate(deltaTime);
 	
+	if (!m_bIsColliding && !m_bCanTakeDamage && Application::GetGameTime() > m_dNextDamageTime)
+	{
+		m_bCanTakeDamage = true;
+	}
+
 	//Draw
 	if (g_bShowTrajectoryEnabled)
 	{
@@ -61,8 +86,24 @@ void ZenPlayerLayer::OnUpdate(float deltaTime)
 void ZenPlayerLayer::TakeDamage(double damage)
 {
  	m_vCol = { 1.0, 0.2, 0.2, 1.0 };
+	if (m_bCanTakeDamage)
+	{
+		m_bCanTakeDamage = false;
+		m_bIsColliding = true;
+		//switch speeds
+		m_nCurrentSpeed++;
+		m_nCurrentSpeed %= Speeds;
+
+		AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nCurrentSpeed].x;
+		AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nCurrentSpeed].y;
+		AbstractPlayerLayer::m_vSize = m_vSizes[m_nCurrentSpeed];
+		AbstractPlayerLayer::RecalculateAngularVelocity();
+	}
 }
 void ZenPlayerLayer::TakeNoDamage()
 {
 	m_vCol = { 0.5, 0.4, 0.8,1.0 };
+	m_bCanTakeDamage = false;
+	m_bIsColliding = false;
+	m_dNextDamageTime = Application::GetGameTime() + 1.0f;
 }

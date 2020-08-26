@@ -4,4 +4,4 @@
 class TutorialBlockSpawnerLayer;
 
 extern TutorialBlockSpawnerLayer* g_currentInstance;
-extern void TutorialBlockSpawner(Block& newBlock, double& nextSpawnTime, double curPhase);
+extern void TutorialSpawnerFunc (CircularQueue<Block>& blocksQueue, double& nextSpawnTime, double curPhase);

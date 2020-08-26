@@ -2,7 +2,7 @@
 #include "Application/Application.h"
 #include "Events/Tutorial/TutorialPlayerLayer.h"
 #include "Renderer/Renderer.h"
-#include "TutorialCustomBlockSpawner.h"
+#include "BlockSpawnerFunc/TutorialSpawnerFunc.h"
 
 TutorialStageProps::TutorialStageProps(const char* str, const glm::vec2& pos, float scale, const glm::vec4& col) :
 	strText (str),
@@ -35,7 +35,7 @@ TutorialBlockSpawnerLayer::TutorialBlockSpawnerLayer() :
 	m_mapStages.reserve(20);
 	m_mapWaitTime.reserve(10);
 
-	m_CreateBlockFunc = TutorialBlockSpawner;
+	m_CreateBlockFunc = TutorialSpawnerFunc;
 	CreateStages();
 }
 
@@ -250,15 +250,17 @@ void TutorialBlockSpawnerLayer::CreateStages()
 	m_mapWaitTime.emplace(TutorialStage::PlayWarningCollision, 6.0f);
 
 	props = TutorialStageProps(
-		"Alrighty, now onto your most important skill\n"
+		"Alrighty, now onto your most valuable skill... Phasing!!\n"
 		"If you oscillate at the just the right speed, then you can safetly\n"
 		"pass through the nasty spike without taking any damage\n"
-		"Each spike has a different \'speed\' requirement. Give it a try!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"Each spike has a different \'speed\' requirement. Give it a try!\n\n"
+		"Hint: The spike becomes transparent when you can phase\n"
+		"through it", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_mapStages.emplace(TutorialStage::TextPhasing, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayPhasing, 0.9f);
 	
-	props = TutorialStageProps("Whoo hoo, recap over. Your\'e a natural!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_mapStages.emplace(TutorialStage::TextTutorialOver, props);
 
 

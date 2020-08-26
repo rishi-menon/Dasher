@@ -19,8 +19,19 @@ public:
 	virtual void TakeNoDamage() override;
 
 private:
+	enum : int { Speeds = 2 };
+	glm::vec2 m_vAngularVelocities[Speeds];
+	glm::vec2 m_vSizes[Speeds];
+
+private:
 	double m_dPointPosX;	//This is the x coordinate of the first point of the trajectory
 	double m_dPointPhase;	//This is the phase of the first point
 
 	Button m_BackButton;
+
+	int m_nCurrentSpeed;
+	bool m_bCanTakeDamage;
+	bool m_bIsColliding;
+
+	double m_dNextDamageTime;
 };   

@@ -9,6 +9,9 @@
 #include "Collision/Collision.h"
 #include "Events/Player/AbstractPlayerLayer.h"
 
+#include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
+
+#if 0
 static void CreateBlockDefault(Block& newBlock, double& nextSpawnTime, double curPhase)
 {
 	//spawn blocks
@@ -50,8 +53,8 @@ static void CreateBlockDefault(Block& newBlock, double& nextSpawnTime, double cu
 	}
 	nextSpawnTime = Application::GetGameTime() + Random::Rand(timeBwSpawn.x, timeBwSpawn.y);
 }
+#endif
 
-////////////////////////////////////////////
 BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_pPlayerLayer (nullptr),
 	m_dNextSpawnTime (0.0),
@@ -63,7 +66,7 @@ BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_blocks.ClearAll();
 	m_dNextSpawnTime = Application::GetGameTime();
 
-	m_CreateBlockFunc = CreateBlockDefault;
+	m_CreateBlockFunc = DefaultSpawnerFunc;
 }
 void BlockSpawnerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
@@ -129,8 +132,7 @@ void BlockSpawnerLayer::OnUpdate(float deltaTime)
 	//Added the second condition so that we can force it to never spawn by setting it to a negative number. This will be useful in the tutorial layer
 	if (dCurTime >= m_dNextSpawnTime && m_dNextSpawnTime >= 0.0)	
 	{
-		Block& block = *m_blocks.Push();
-		m_CreateBlockFunc(block, m_dNextSpawnTime, m_dCurPhasePercent);
+		m_CreateBlockFunc(m_blocks, m_dNextSpawnTime, m_dCurPhasePercent);
 	}
 }
 

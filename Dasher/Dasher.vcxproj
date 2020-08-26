@@ -161,6 +161,7 @@
     <ClCompile Include="src\Application\EventCallbacks.cpp" />
     <ClCompile Include="src\AssetManagement\Font.cpp" />
     <ClCompile Include="src\AssetManagement\StandardTexture.cpp" />
+    <ClCompile Include="src\BlockSpawnerFunc\DefaultSpawnerFunc.cpp" />
     <ClCompile Include="src\Collision\Collision.cpp" />
     <ClCompile Include="src\Core\CircularQueue.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -176,7 +177,7 @@
     <ClCompile Include="src\Events\Player\ZenPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Player\AbstractPlayerLayer.cpp" />
     <ClCompile Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.cpp" />
-    <ClCompile Include="src\Events\Tutorial\TutorialCustomBlockSpawner.cpp" />
+    <ClCompile Include="src\BlockSpawnerFunc\TutorialSpawnerFunc.cpp" />
     <ClCompile Include="src\Events\Tutorial\TutorialPlayerLayer.cpp" />
     <ClCompile Include="src\Events\UILayer.cpp" />
     <ClCompile Include="src\Log.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\Application\EventCallbacks.h" />
     <ClInclude Include="src\AssetManagement\Font.h" />
     <ClInclude Include="src\AssetManagement\StandardTexture.h" />
+    <ClInclude Include="src\BlockSpawnerFunc\DefaultSpawnerFunc.h" />
     <ClInclude Include="src\Collision\Collision.h" />
     <ClInclude Include="src\Constants.h" />
     <ClInclude Include="src\Core\CircularQueue.h" />
@@ -209,7 +211,7 @@
     <ClInclude Include="src\Events\Player\ZenPlayerLayer.h" />
     <ClInclude Include="src\Events\Player\AbstractPlayerLayer.h" />
     <ClInclude Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.h" />
-    <ClInclude Include="src\Events\Tutorial\TutorialCustomBlockSpawner.h" />
+    <ClInclude Include="src\BlockSpawnerFunc\TutorialSpawnerFunc.h" />
     <ClInclude Include="src\Events\Tutorial\TutorialPlayerLayer.h" />
     <ClInclude Include="src\Events\UILayer.h" />
     <ClInclude Include="src\Maths.h" />

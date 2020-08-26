@@ -1,6 +1,7 @@
 #include "AbstractPlayerLayer.h"
 #include "Application/Application.h"
 #include "Renderer/Renderer.h"
+#include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
 
 
 AbstractPlayerLayer::AbstractPlayerLayer()
@@ -8,6 +9,7 @@ AbstractPlayerLayer::AbstractPlayerLayer()
 	m_dPhaseAngle = 0;
 	m_dAngVelocity = 1;
 	m_dApparantVelocityX = 400;
+	g_fBlockSpeed = 400;
 
 	m_nWidth = Application::GetWidth();
 	m_nHeight = Application::GetHeight();
