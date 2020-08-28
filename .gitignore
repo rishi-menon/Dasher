@@ -1,5 +1,8 @@
 bin/
 bin-int/
 .vs/
+Build/
+build/
+
 **.filters
 **.user
