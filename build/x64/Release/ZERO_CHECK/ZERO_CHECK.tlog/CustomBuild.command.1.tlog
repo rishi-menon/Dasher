@@ -1,0 +1,10 @@
+^C:\DEV\TEMPP\DASHER\BUILD\CMAKEFILES\62BD10877449ECCF65BBB685A14C837D\GENERATE.STAMP.RULE
+setlocal
+C:\AddedBinaries\cmake-3.18.2-win64-x64\bin\cmake.exe -SC:/dev/Tempp/Dasher/CmakeWindows -BC:/dev/Tempp/Dasher/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/dev/Tempp/Dasher/build/MyProject.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
