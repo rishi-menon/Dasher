@@ -30,7 +30,6 @@ void TutorialPlayerLayer::OnStart()
 
 void TutorialPlayerLayer::OnUpdate(float deltaTime)
 {
-
 	if (m_bLayerIsPaused)
 	{
 		//Render player
@@ -40,6 +39,7 @@ void TutorialPlayerLayer::OnUpdate(float deltaTime)
 	else
 	{
 		//Draw Trajectory
+		m_dApparantVelocityX = 400;	//The player layer changes this variable to increase the speed
 		AbstractPlayerLayer::DrawTrajectory(m_dPointPosX, m_dPointPhase, 2.2, 20);
 		m_dPointPosX -= m_dApparantVelocityX * deltaTime;
 		SetScore(-10);	//This prevents the score from being rendered
@@ -53,6 +53,7 @@ void TutorialPlayerLayer::ResetPosition()
 	m_dPointPhase = 0;
 
 	m_vPos = glm::vec3{ 80, 400, 0.0 };
+	m_dApparantVelocityX = 400;
 
 	SetLives(0);
 	SetSpeedOnDamage();	//Hack to get the speed to reset if need be
