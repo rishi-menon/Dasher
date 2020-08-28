@@ -1,3 +1,0 @@
-C:/dev/Tempp/Dasher/build/CMakeFiles/phase.dir
-C:/dev/Tempp/Dasher/build/CMakeFiles/ALL_BUILD.dir
-C:/dev/Tempp/Dasher/build/CMakeFiles/ZERO_CHECK.dir
