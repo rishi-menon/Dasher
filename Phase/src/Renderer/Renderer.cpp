@@ -33,7 +33,7 @@ struct RendererData
 
 	unsigned int nTextureWhiteId;
 
-	const int nMaxTexSlots = 32;
+	const int nMaxTexSlots = 16;
 	int boundTextureSlots[32];
 	int nCurrentTextureSlot = 0;
 
@@ -89,7 +89,48 @@ bool Renderer::Initialise()
 	//create shader
 	{
 		std::string strVertex, strFrag;
+
+	#if 1
+		strVertex = R"(
+#version 330 core
+layout(location = 0) in vec4 a_pos;
+layout(location = 1) in vec4 a_col;
+layout(location = 2) in vec2 a_texCord;
+layout(location = 3) in float a_texIndex;
+
+out vec4 v_col;
+out vec2 v_texCord;
+out float v_texIndex;
+
+uniform mat4 u_mvp;
+void main()
+{
+	gl_Position = u_mvp * a_pos;
+	v_col = a_col;
+	v_texCord = a_texCord;
+	v_texIndex = a_texIndex;
+}
+		)";
+
+		strFrag = R"(
+#version 330 core
+layout(location = 0) out vec4 col;
+
+in vec4 v_col;
+in vec2 v_texCord;
+in float v_texIndex;
+
+uniform sampler2D u_textureSlots[16];
+
+void main()
+{
+	int texId = int(v_texIndex);
+	col = v_col * texture(u_textureSlots[texId], v_texCord);
+}
+		)";
+	#else
 		ParseShader("Assets\\Shaders\\vertex.shader", strVertex, strFrag);
+	#endif
 
 		data.nShader = glCreateProgram();
 		int nVertex = CompileShader(GL_VERTEX_SHADER, strVertex.c_str());
@@ -98,14 +139,19 @@ bool Renderer::Initialise()
 		glcall(glAttachShader(data.nShader, nVertex));
 		glcall(glAttachShader(data.nShader, nFrag));
 		glcall(glLinkProgram(data.nShader));
-		glcall(glValidateProgram(data.nShader));
+		//glcall(glValidateProgram(data.nShader));
 
-		int nLinkStatus = 0, nValidateStatus = 0;
+		int nLinkStatus = 0, nValidateStatus = 1;
 
 		glcall(glGetProgramiv(data.nShader, GL_LINK_STATUS, &nLinkStatus));
-		glcall(glGetProgramiv(data.nShader, GL_VALIDATE_STATUS, &nValidateStatus));
+		//glcall(glGetProgramiv(data.nShader, GL_VALIDATE_STATUS, &nValidateStatus));
 		if (nValidateStatus == GL_FALSE || nLinkStatus == GL_FALSE)
 		{
+			int len;
+			char buff[1000];
+			glcall(glGetProgramInfoLog(data.nShader, 1000, &len, buff));
+			LOG_CLIENT_ERROR ("OpenGL Could not link shader: {0}", buff);
+
 			ASSERT(false, "Could not link/validate shader");
 			return false;
 		}
