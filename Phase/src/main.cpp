@@ -3,11 +3,42 @@
 #include "Maths.h"
 #include "Constants.h"
 
-int main()
+#include "AssetManagement/Texture.h"
+#include "Renderer/RendererUtils.h"
+
+std::string GetMyCurrentDirectory(const char* argv1)
+{
+	std::string path;
+	path.reserve (100);
+
+	int len = mystrlen (argv1);
+	int i = len-1;
+
+	for (; i >= 0; i--)
+	{
+		if (argv1[i] == '/' || argv1[i] == '\\')
+		{
+			break;
+		}
+	}
+	for (int j = 0; j <= i; j++)
+	{
+		path.push_back (argv1[j]);
+	}
+
+	return path;
+}
+
+int main(int argc, const char* argv[])
 {
 	CoreLogger::Init();
 	Random::Init();
 	LOG_CLIENT_TRACE("Started Application");
+
+#ifdef RM_MAC
+	g_strCurrentDirectory = GetMyCurrentDirectory(argv[0]);
+	LOG_CLIENT_INFO ("Current Directory: {0}", g_strCurrentDirectory.c_str());
+#endif
 
 	glfwSetErrorCallback([](int error, const char* const desc)
 	{

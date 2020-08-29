@@ -1,4 +1,5 @@
 #pragma once
+#include <fstream>
 
 static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 {
@@ -21,7 +22,7 @@ static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 		glcall(glGetShaderInfoLog(id, size, &size, buff));
 		LOG_ERROR("Failed to compile {0} shader: {1}", str.c_str(), buff);
 		ASSERT(false, "");
-		delete buff;
+		delete[] buff;
 		return 0;
 	}
 	return id;

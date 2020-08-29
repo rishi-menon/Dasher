@@ -4,6 +4,8 @@
 #include <stb_image.h>
 #include "Log.h"
 
+std::string g_strCurrentDirectory;
+
 TextureProperties::TextureProperties() :
 	m_nMinFilter(GL_LINEAR),
 	m_nMaxFilter(GL_LINEAR),
@@ -41,12 +43,21 @@ unsigned int Texture::LoadTexture(const char* const strPath, TextureDimensions* 
 	return texId;
 }
 
+unsigned int Texture::LoadTexturePreserve(const std::string& strPath, TextureDimensions& outDimensions, TextureProperties props)
+{
+	return LoadTexturePreserve (strPath.c_str(), outDimensions, props);
+}
 //This does not deallocate the buffer, The caller has to store and keep track and eventually call Texture::Free
 unsigned int Texture::LoadTexturePreserve(const char* const strPath, TextureDimensions& outDimensions, TextureProperties props)
 {
 	stbi_set_flip_vertically_on_load(1);
-	outDimensions.buffer = stbi_load(strPath, &outDimensions.width, &outDimensions.height, &outDimensions.bpp, 4);
 
+#ifdef RM_MAC
+	std::string strFullPath = g_strCurrentDirectory + strPath;
+	outDimensions.buffer = stbi_load(strFullPath.c_str(), &outDimensions.width, &outDimensions.height, &outDimensions.bpp, 4);
+#else	
+	outDimensions.buffer = stbi_load(strPath, &outDimensions.width, &outDimensions.height, &outDimensions.bpp, 4);
+#endif
 	//Assume that we read a 3x3 image, the index of each pixel location as seen normally would be as follows
 	//	6, 7, 8
 	//  3, 4, 5

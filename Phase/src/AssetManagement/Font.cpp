@@ -28,14 +28,18 @@ FontCharacter::FontCharacter(unsigned int tex, const glm::ivec2& size, const glm
 {
 
 }
-bool Font::LoadFont(const char* const path, unsigned int height)
+bool Font::LoadFont(const char* path, unsigned int height)
 {
-
 	if (m_vCharacters.size())
 	{
 		LOG_WARN("Font was alraedy loaded");
 		return false;
 	}
+
+#ifdef RM_MAC
+	std::string strFullPath = g_strCurrentDirectory + path;
+	path = strFullPath.c_str();
+#endif
 
 	m_vCharacters.reserve(128);
 	m_vCharacters.clear();

@@ -23,7 +23,7 @@ public:
 	Font(const Font&) = default;
 
 	inline const FontCharacter& GetFontChar(int index) const { return m_vCharacters.at(index); }
-	bool LoadFont(const char* const path, unsigned int height);
+	bool LoadFont(const char* path, unsigned int height);
 
 	void Cleanup();
 private:

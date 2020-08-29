@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+
+extern std::string g_strCurrentDirectory;
 
 struct TextureProperties
 {
@@ -29,6 +32,7 @@ public:
 
 	//This does not deallocate the texture image buffer  once its finished
 	static unsigned int LoadTexturePreserve(const char* const strPath, TextureDimensions& outDimensions, TextureProperties props = TextureProperties(0x2601/*GL LINEAR*/, 0x2601, 0x812F /*GL_CLAMP_TO_EDGE*/, 0x812F));
+	static unsigned int LoadTexturePreserve(const std::string& strPath, TextureDimensions& outDimensions, TextureProperties props = TextureProperties(0x2601/*GL LINEAR*/, 0x2601, 0x812F /*GL_CLAMP_TO_EDGE*/, 0x812F));
 
 	static unsigned int LoadTextureBuffer(const unsigned char bufferRgba[], int nSizeX, int nSizeY, TextureProperties props = TextureProperties(0x2601/*GL LINEAR*/, 0x2601, 0x812F /*GL_CLAMP_TO_EDGE*/, 0x812F));
 
