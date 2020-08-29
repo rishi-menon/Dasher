@@ -4,5 +4,7 @@ bin-int/
 Build/
 build/
 
+**.DS_Store
+
 **.filters
 **.user

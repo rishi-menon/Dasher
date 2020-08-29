@@ -3,12 +3,11 @@ cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(MyProject LANGUAGES CXX)
+project(phase LANGUAGES CXX)
 
 
 INCLUDE_DIRECTORIES(../Phase/src ../Phase/vendor/Freetype ../Phase/vendor/GLEW/include ../Phase/vendor/GLFW/include ../Phase/vendor/glm ../Phase/vendor/spdlog/include ../Phase/vendor/stb_image)
 
-LINK_DIRECTORIES(../Phase/vendor/Freetype/lib-x64 ../Phase/vendor/GLEW/lib/Release/x64 ../Phase/vendor/GLFW/lib-x64)
 
 add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp 
 ../Phase/src/main.cpp ../Phase/src/Maths.cpp ../Phase/src/Log.cpp
@@ -22,5 +21,11 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 
 add_compile_definitions (GLEW_STATIC)
 
-TARGET_LINK_LIBRARIES(phase glew32s glfw3 freetype opengl32)
+TARGET_LINK_LIBRARIES(phase /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLEW/lib/Release/mac/glew.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLFW/lib-mac/glfw3.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/Freetype/lib-mac/freetype.a)
 
+target_link_libraries(phase "-framework Cocoa")
+target_link_libraries(phase "-framework IOKit")
+target_link_libraries(phase "-framework OpenGL")
+
+target_link_libraries(phase /usr/lib/libbz2.1.0.dylib)
+target_link_libraries(phase /usr/lib/libz.1.dylib)
