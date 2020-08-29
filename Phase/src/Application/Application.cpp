@@ -67,7 +67,6 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		return false;
 	}
 
-	LOG_CLIENT_TRACE("Initialised those two correctly");
 	if (!FontInit()) { return false; }
 	if (!UI::UIInit()) { return false; }
 	if (!StandardTextureInit()) { return false; }
@@ -151,8 +150,6 @@ void Application::Run()
 
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
-		LOG_TRACE("Width: {0}, Height: {1}", m_nWidth, m_nHeight);
-		
 		double dCurrentTime = glfwGetTime();
 		m_dDeltaTime = dCurrentTime - m_dCurrentTime;	//in seconds
 		m_dCurrentTime = dCurrentTime;

@@ -21,7 +21,7 @@ public:
 
 	inline T* GetAtRaw(SizeT rawBufferIndex) {
 		
-#if _DEBUG
+#if RM_DEBUG
 		SizeT i = rawBufferIndex;
 		if (m_nStartIndex <= m_nEndIndex)
 		{

@@ -20,7 +20,7 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 ../Phase/src/Events/MainMenu/MainMenuLayer.cpp ../Phase/src/Events/Player/AbstractPlayerLayer.cpp ../Phase/src/Events/Player/NormalPlayerLayer.cpp ../Phase/src/Events/Player/ZenPlayerLayer.cpp ../Phase/src/Events/Tutorial/TutorialBlockSpawnerLayer.cpp ../Phase/src/Events/Tutorial/TutorialPlayerLayer.cpp
 ../Phase/src/Renderer/Renderer.cpp ../Phase/src/Renderer/RendererShapes.cpp ../Phase/src/Renderer/RendererVertex.cpp ../Phase/src/UI/Button.cpp ../Phase/src/UI/PushButton.cpp ../Phase/src/UI/UIObject.cpp)
 
-add_compile_definitions (GLEW_STATIC)
+add_compile_definitions (GLEW_STATIC RM_WIN)
 
 TARGET_LINK_LIBRARIES(phase glew32s glfw3 freetype opengl32)
 

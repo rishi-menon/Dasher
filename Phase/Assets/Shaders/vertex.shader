@@ -28,7 +28,7 @@ in vec4 v_col;
 in vec2 v_texCord;
 in float v_texIndex;
 
-uniform sampler2D u_textureSlots[32];
+uniform sampler2D u_textureSlots[16];
 
 void main()
 {

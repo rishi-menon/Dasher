@@ -22,14 +22,24 @@ namespace CoreLogger
 #define LOG_CLIENT_FATAL(...)	::CoreLogger::g_ClientLogger->fatal (__VA_ARGS__)
 
 
-#ifdef _DEBUG
+#ifdef RM_WIN
+#define DEBUG_BREAK()  __debugbreak()
+
+#elif defined(RM_MAC)
+#define DEBUG_BREAK()
+
+#else
+#define DEBUG_BREAK()
+#endif
+
+#ifdef RM_DEBUG
 #define LOG_TRACE(...)	::CoreLogger::g_CoreLogger->trace (__VA_ARGS__)
 #define LOG_INFO(...)	::CoreLogger::g_CoreLogger->info (__VA_ARGS__)
 #define LOG_WARN(...)	::CoreLogger::g_CoreLogger->warn (__VA_ARGS__)
 #define LOG_ERROR(...)	::CoreLogger::g_CoreLogger->error (__VA_ARGS__)
 #define LOG_FATAL(...)	::CoreLogger::g_CoreLogger->fatal (__VA_ARGS__)
 
-#define ASSERT(x, ...)		if (!(x)) {LOG_WARN(__VA_ARGS__); __debugbreak();}
+#define ASSERT(x, ...)		if (!(x)) {LOG_WARN(__VA_ARGS__); DEBUG_BREAK();}
 
 #define glcall(x)		::CoreLogger::glClearError (); \
 						x; \

@@ -12,6 +12,8 @@
 #include "gtc/matrix_transform.hpp"
 
 #include "RendererUtils.h"
+#include "Constants.h"
+
 
 struct RendererData
 {
@@ -33,6 +35,7 @@ struct RendererData
 
 	unsigned int nTextureWhiteId;
 
+	//Mac supports only 16. Windows could support 32 ?
 	const int nMaxTexSlots = 16;
 	int boundTextureSlots[32];
 	int nCurrentTextureSlot = 0;
@@ -90,7 +93,7 @@ bool Renderer::Initialise()
 	{
 		std::string strVertex, strFrag;
 
-	#if 1
+#ifdef EMBED_SHADER_IN_EXECUTABLE
 		strVertex = R"(
 #version 330 core
 layout(location = 0) in vec4 a_pos;
@@ -128,10 +131,19 @@ void main()
 	col = v_col * texture(u_textureSlots[texId], v_texCord);
 }
 		)";
-	#else
+#else
 		ParseShader("Assets\\Shaders\\vertex.shader", strVertex, strFrag);
-	#endif
-
+#endif
+		if (strVertex.empty())
+		{
+			LOG_CLIENT_WARN("Vertex shader was empty");
+			return false;
+		}
+		else if (strFrag.empty())
+		{
+			LOG_CLIENT_WARN("Fragment shader was empty");
+			return false;
+		}
 		data.nShader = glCreateProgram();
 		int nVertex = CompileShader(GL_VERTEX_SHADER, strVertex.c_str());
 		int nFrag = CompileShader(GL_FRAGMENT_SHADER, strFrag.c_str());
@@ -141,11 +153,11 @@ void main()
 		glcall(glLinkProgram(data.nShader));
 		//glcall(glValidateProgram(data.nShader));
 
-		int nLinkStatus = 0, nValidateStatus = 1;
+		int nLinkStatus = 0;
 
 		glcall(glGetProgramiv(data.nShader, GL_LINK_STATUS, &nLinkStatus));
 		//glcall(glGetProgramiv(data.nShader, GL_VALIDATE_STATUS, &nValidateStatus));
-		if (nValidateStatus == GL_FALSE || nLinkStatus == GL_FALSE)
+		if (nLinkStatus == GL_FALSE)
 		{
 			int len;
 			char buff[1000];
@@ -163,8 +175,8 @@ void main()
 		if (texSlotsLocation != -1)
 		{
 			int u_TexSlots[32];
-			for (int i = 0; i < 32; u_TexSlots[i] = i, i++);
-			glcall(glUniform1iv(texSlotsLocation, 32, u_TexSlots));
+			for (int i = 0; i < data.nMaxTexSlots; u_TexSlots[i] = i, i++);
+			glcall(glUniform1iv(texSlotsLocation, data.nMaxTexSlots, u_TexSlots));
 		}
 		else
 		{
