@@ -1,5 +1,12 @@
 bin/
 bin-int/
 .vs/
+Build/
+build/
+builds/
+Builds/
+
+**.DS_Store
+
 **.filters
 **.user
