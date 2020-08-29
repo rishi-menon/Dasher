@@ -37,7 +37,7 @@ int main(int argc, const char* argv[])
 
 #ifdef RM_MAC
 	g_strCurrentDirectory = GetMyCurrentDirectory(argv[0]);
-	LOG_CLIENT_INFO ("Current Directory: {0}", g_strCurrentDirectory.c_str());
+	LOG_INFO ("Current Directory: {0}", g_strCurrentDirectory.c_str());
 #endif
 
 	glfwSetErrorCallback([](int error, const char* const desc)
