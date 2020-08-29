@@ -24,6 +24,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			int width = Application::GetWidth();
 			int posY;
 
+			float scaleY = Application::GetHeight() * 400.0f/1200.0f;
 			for (int i = 0; i < nMaxBlocks; i++)
 			{
 				Block& newBlock = *blocksQueue.Push();
@@ -31,12 +32,12 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 				{
 					//Down
 					posY = 2;
-					newBlock.scale = { 90, 400, 1 };
+					newBlock.scale = { 90, scaleY, 1 };
 				}
 				else
 				{
 					posY = Application::GetHeight() - 2;
-					newBlock.scale = { 90, -400, 1 };
+					newBlock.scale = { 90, -scaleY, 1 };
 				}
 				newBlock.position = { width + i * 700, posY, 0.1f };
 				newBlock.velocity = { -400, 0, 0 };
@@ -53,6 +54,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			constexpr int nMaxBlocks = 2;
 			int width = Application::GetWidth();
 			int posY;
+			float scaleY = Application::GetHeight() * 350.0f/1200.0f;
 
 			for (int i = 0; i < nMaxBlocks; i++)
 			{
@@ -61,12 +63,12 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 				{
 					//Down
 					posY = 2;
-					newBlock.scale = { 90, 350, 1 };
+					newBlock.scale = { 90, scaleY, 1 };
 				}
 				else
 				{
 					posY = Application::GetHeight() - 2;
-					newBlock.scale = { 90, -350, 1 };
+					newBlock.scale = { 90, -scaleY, 1 };
 				}
 				newBlock.position = { width, posY, 0.1f };
 				newBlock.velocity = { -400, 0, 0 };
@@ -85,6 +87,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			constexpr int nGroups = 3;
 			int width = Application::GetWidth();
 			int posY;
+			float scaleY = Application::GetHeight() * 350.0f/1200.0f;
 
 			for (int j = 0; j < nGroups; j++)
 			{
@@ -95,12 +98,12 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 					{
 						//Down
 						posY = 2;
-						newBlock.scale = { 90, 350, 1 };
+						newBlock.scale = { 90, scaleY, 1 };
 					}
 					else
 					{
 						posY = Application::GetHeight() - 2;
-						newBlock.scale = { 90, -350, 1 };
+						newBlock.scale = { 90, -scaleY, 1 };
 					}
 					newBlock.position = { width + 850*j, posY, 0.1f };
 					newBlock.velocity = { -400, 0, 0 };

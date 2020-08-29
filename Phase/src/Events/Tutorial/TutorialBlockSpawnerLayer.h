@@ -50,6 +50,8 @@ public:
 	virtual bool OnMouseUp(int nButton) override;
 	virtual bool OnKeyUp(int key) override;
 
+	virtual bool OnWindowResize (int x, int y) override;
+
 	inline TutorialStage GetCurrentStage() const { return m_CurStage; }
 
 	void RestartCurrentStage();	//Eg when player dies

@@ -33,9 +33,6 @@ public:
 	virtual void OnUpdate(float deltaTime) override;	//in seconds
 	
 	virtual bool OnMouseMove(int x, int y) override;
-#if 0
-	virtual bool OnWindowResize(int width, int height) override;
-#endif
 
 	inline unsigned int GetBlockCount() const { return m_blocks.Count(); }
 

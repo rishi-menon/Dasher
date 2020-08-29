@@ -96,7 +96,9 @@ void SetGenericProperties(Block& block, double curPhase)
 static void CreateBlocksGeneric(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase, bool* bDirections, int nBlockCount)
 {
 	const glm::vec2 sizeX = { 80, 100 };
-	const glm::vec2 sizeY = { 300, 500 };
+
+	
+	const glm::vec2 sizeY = { Application::GetHeight()*300.0f/1200.0f, Application::GetHeight()*475.0f/1200.0f };
 	constexpr float fDistanceBwSpawns = 550.0f;
 	constexpr float fDistToNextSpawn = 800.0f;
 

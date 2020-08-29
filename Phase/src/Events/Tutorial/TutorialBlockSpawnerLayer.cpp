@@ -48,8 +48,10 @@ TutorialBlockSpawnerLayer::~TutorialBlockSpawnerLayer()
 void TutorialBlockSpawnerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	BlockSpawnerLayer::RegisterEvents(pApp, nIndex);
+	pApp->RegisterEvents(LayerWindowResize, nIndex);
 	pApp->RegisterEvents(LayerMouseUp, nIndex);
 	pApp->RegisterEvents(LayerKeyUp, nIndex);
+	
 }
 
 void TutorialBlockSpawnerLayer::OnStart()
@@ -263,5 +265,20 @@ void TutorialBlockSpawnerLayer::CreateStages()
 	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	m_mapStages.emplace(TutorialStage::TextTutorialOver, props);
 
+	OnWindowResize(Application::GetWidth(), Application::GetHeight());	//Set the position of the tutorial text fields
+}
 
+bool TutorialBlockSpawnerLayer::OnWindowResize (int x, int y) 
+{
+	BlockSpawnerLayer::OnWindowResize(x, y);
+	int nHeight = Application::GetHeight();
+	//glm::vec2(100, 1000)
+	m_mapStages.at(TutorialStage::TextIntro).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	m_mapStages.at(TutorialStage::TextBasicMove).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	m_mapStages.at(TutorialStage::TextFriendlySpikes).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	m_mapStages.at(TutorialStage::TextWarningCollision).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	m_mapStages.at(TutorialStage::TextPhasing).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	m_mapStages.at(TutorialStage::TextTutorialOver).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+
+	return false;
 }

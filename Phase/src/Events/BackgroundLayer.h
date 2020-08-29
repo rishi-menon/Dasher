@@ -25,8 +25,8 @@ public:
 		
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 
-	virtual void OnStart();
-	virtual void OnUpdate(float deltaTime);	//in seconds
+	virtual void OnStart() override;
+	virtual void OnUpdate(float deltaTime) override;	//in seconds
 	virtual bool OnWindowResize(int width, int height) override;
 
 	BackgroundLayerProps GetBackgroundProp() const;

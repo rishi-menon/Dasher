@@ -70,7 +70,6 @@ BlockSpawnerLayer::BlockSpawnerLayer() :
 }
 void BlockSpawnerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
-	pApp->RegisterEvents(LayerWindowResize, nIndex);
 	pApp->RegisterEvents(LayerMouseMove, nIndex);
 }
 
@@ -223,13 +222,6 @@ bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 	}
 	return false;
 }
-
-#if 0
-bool BlockSpawnerLayer::OnWindowResize(int width, int height)
-{
-	return false;
-}
-#endif
 
 void BlockSpawnerLayer::RenderBlocks()
 {

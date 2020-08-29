@@ -14,7 +14,7 @@ public:
 	virtual ~UILayer();
 
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
-	virtual void OnStart();
+	virtual void OnStart() override;
 	virtual void OnUpdate(float deltaTime) override;
 
 	virtual bool OnMouseMove(int x, int y) override;
