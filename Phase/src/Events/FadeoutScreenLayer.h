@@ -10,6 +10,8 @@ class FadeoutScreenLayer : public Layer
 public:
 	FadeoutScreenLayer();
 	virtual void OnUpdate(float deltaTime) override;
+	virtual void RegisterEvents(Application* pApp, int nIndex) override;
+	virtual bool OnWindowResize(int x, int y) override;
 
 	inline void BeginFading() { m_fAnimationPercent = 0.0f; m_bIsRunning = true; m_bIsActive = true; m_bCallbackFunctionActivated = false; GenerateVertexBuffer(); }
 
@@ -57,6 +59,7 @@ public:
 
 private:
 	void GenerateVertexBuffer();
+
 private:
 	bool m_bIsActive;	//Layer is active or not
 	bool m_bIsRunning;	//animation is currently running or not, once it gets over, the callback function will soon get called

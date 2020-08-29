@@ -43,13 +43,14 @@ void CreditLayer::OnStart()
 			});
 	}
 
+	CreditLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 }
 
 void CreditLayer::OnUpdate(float deltaTime)
 {
-	glm::vec2 posText = {550, 700};
 	const float textScale[TextLineCount] = {0.8f, 0.6f};
 
+	glm::vec2 posText = m_vPosText;
 	for (int i = 0; i < TextLineCount; i++)
 	{
 		Renderer::DrawTextColor(m_strCredit[i].c_str(), m_strCredit[i].size(), posText, textScale[i], { 0.0f, 0.0f, 0.0f, 1.0f });
@@ -59,6 +60,22 @@ void CreditLayer::OnUpdate(float deltaTime)
 
 bool CreditLayer::OnWindowResize(int x, int y)
 {
+	{
+		float posX = x - 120.0f;
+		if (posX < 20) { posX = 20; }
+
+		const glm::vec3 buttonPos = { posX, 110, 0.0f };
+		m_BackButton.SetPosition(buttonPos);
+	}
+	
+	{
+		float percentX = 550.0f / 1600.0f;
+		float percentY = 700.0f / 1200.0f;
+
+		m_vPosText.x = Math::Lerp(0, x, percentX);
+		m_vPosText.y = Math::Lerp(0, y, percentY);
+	}
+
 	return false;
 }
 

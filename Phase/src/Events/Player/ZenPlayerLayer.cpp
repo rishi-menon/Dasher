@@ -62,6 +62,8 @@ void ZenPlayerLayer::OnStart()
 		constexpr int nEscapeKey = 256;
 		m_BackButton.SetOptionalKey(nEscapeKey);
 	}
+
+	ZenPlayerLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 }
 void ZenPlayerLayer::OnUpdate(float deltaTime)
 {
@@ -106,4 +108,14 @@ void ZenPlayerLayer::TakeNoDamage()
 	m_bCanTakeDamage = false;
 	m_bIsColliding = false;
 	m_dNextDamageTime = Application::GetGameTime() + 1.0f;
+}
+
+bool ZenPlayerLayer::OnWindowResize(int x, int y)
+{
+	float posX = x - 120.0f;
+	if (posX < 20) { posX = 20; }
+
+	const glm::vec3 buttonPos = { posX, 110, 0.0f };
+	m_BackButton.SetPosition(buttonPos);
+	return false;
 }

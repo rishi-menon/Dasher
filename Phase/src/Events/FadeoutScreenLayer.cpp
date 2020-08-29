@@ -57,3 +57,13 @@ void FadeoutScreenLayer::OnUpdate(float deltaTime)
 		Renderer::DrawQuadColor(m_vertex, RendererShapes::Shape::ShapeQuad);
 	}
 }
+
+void FadeoutScreenLayer::RegisterEvents(Application* pApp, int nIndex)
+{
+	pApp->RegisterEvents(LayerWindowResize, nIndex);
+}
+bool FadeoutScreenLayer::OnWindowResize(int x, int y)
+{
+	GenerateVertexBuffer();
+	return false;
+}

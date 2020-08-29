@@ -17,7 +17,9 @@ public:
 
 	virtual void TakeDamage(double damage) override;
 	virtual void TakeNoDamage() override;
-
+	
+	virtual bool OnWindowResize(int x, int y) override;
+	
 private:
 	enum : int { Speeds = 2 };
 	glm::vec2 m_vAngularVelocities[Speeds];

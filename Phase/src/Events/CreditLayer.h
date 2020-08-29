@@ -22,4 +22,6 @@ private:
 
 	enum { TextLineCount = 2};
 	std::string m_strCredit[TextLineCount];
+
+	glm::vec2 m_vPosText;
 };

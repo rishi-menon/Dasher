@@ -15,6 +15,7 @@ public:
 	virtual void TakeNoDamage() override;
 
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
+	virtual bool OnWindowResize(int x, int y) override;
 
 protected:
 	inline void SetScore(double score) { m_dScore = score; }	//This is mainly for the tutorial layer
@@ -28,7 +29,7 @@ private:
 private:
 	enum : int {PlayerLives = 2};
 
-	const glm::vec2 m_vScorePos;
+	glm::vec2 m_vScorePos;
 	const float m_fScoreScale;
 	const glm::vec4 m_vScoreCol;
 

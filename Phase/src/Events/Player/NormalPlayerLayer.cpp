@@ -6,7 +6,7 @@
 
 NormalPlayerLayer::NormalPlayerLayer() :
 	// constants
-	m_vScorePos (Application::GetWidth() - 280.0f, Application::GetHeight() - 140.0f),
+	m_vScorePos (0.0f, 0.0),
 	m_fScoreScale (0.7f),
 	m_vScoreCol (1.0f, 1.0f, 1.0f, 1.0f),
 
@@ -126,6 +126,8 @@ void NormalPlayerLayer::OnStart()
 	{
 		LOG_WARN("Fade out layer was not found");
 	}
+
+	NormalPlayerLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 }
 
 void NormalPlayerLayer::OnUpdate(float deltaTime)
@@ -157,14 +159,13 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 	}
 	else
 	{
-		const glm::vec2 textPos = glm::vec2(500, 670);
 		constexpr float textScale = 0.8f;
 		const glm::vec4 textCol = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		//Player has died, Only show the score
 		char buffer[20];
 		std::snprintf(buffer, 20, "Score: %.1f", m_dScore);
-		Renderer::DrawTextColor(buffer, 20, textPos, textScale, textCol);
+		Renderer::DrawTextColor(buffer, 20, m_vScorePos, textScale, textCol);
 	}
 }
 
@@ -214,9 +215,45 @@ void NormalPlayerLayer::Die()
 		m_pFadeoutLayer->BeginFading();
 	}
 	m_restartButton.SetIsActive(true);
+
+
+	constexpr float percentX = 500.0f / 1600.0f;
+	constexpr float percentY = 670.0f / 1200.0f;
+	m_vScorePos.x = Math::Lerp(0, Application::GetWidth(), percentX);
+	m_vScorePos.y = Math::Lerp(0, Application::GetHeight(), percentY);
 }
 
 void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 {
 	AbstractPlayerLayer::RegisterEvents(pApp, nIndex);
+}
+
+bool NormalPlayerLayer::OnWindowResize(int x, int y)
+{
+	{
+		float posX = x - 120.0f;
+		if (posX < 20) { posX = 20; }
+
+		const glm::vec3 buttonPos = { posX, 110, 0.8f };
+		m_BackButton.SetPosition(buttonPos);
+	}
+	{
+		float posX = x - 270.0f;
+		if (posX < 20) { posX = 20; }
+		const glm::vec3 buttonPos = { posX, 110, 0.8f };
+		m_restartButton.SetPosition(buttonPos);
+	}
+	if (m_bIsAlive)
+	{
+		m_vScorePos.x = x - 280.0f;
+		m_vScorePos.y = y - 140.0f;
+	}
+	else
+	{
+		constexpr float percentX = 500.0f / 1600.0f;
+		constexpr float percentY = 670.0f / 1200.0f;
+		m_vScorePos.x = Math::Lerp (0, x, percentX);
+		m_vScorePos.y = Math::Lerp(0, y, percentY);
+	}
+	return false;
 }

@@ -160,6 +160,7 @@ void MainMenuLayer::OnStart()
 		});
 	}
 
+	MainMenuLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());	//position buttons in the correct place
 }
 void MainMenuLayer::OnUpdate(float deltaTime) 
 {
@@ -168,5 +169,47 @@ void MainMenuLayer::OnUpdate(float deltaTime)
 
 bool MainMenuLayer::OnWindowResize(int x, int y)
 {
+	//Normal Mode
+	{
+		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
+		float percentX = (740.0f) / (1600.0f);	//original position vs original width
+		float percentY = (1000.0f) / (1200.0f);
+		buttonPos.x = Math::Lerp(0, x, percentX);
+		buttonPos.y = Math::Lerp(0, y, percentY);
+		m_buttonMainMenu.SetPosition(buttonPos);
+	}
+
+	//Zen Mode
+	{
+		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
+		float percentX = (740.0f) / (1600.0f);	//original position vs original width
+		float percentY = (800.0f) / (1200.0f);
+		buttonPos.x = Math::Lerp(0, x, percentX);
+		buttonPos.y = Math::Lerp(0, y, percentY);
+		m_buttonPracticeMode.SetPosition(buttonPos);
+
+	}
+	//Button Tutorial
+	{
+		
+		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
+		float percentX = (740.0f) / (1600.0f);	//original position vs original width
+		float percentY = (600.0f) / (1200.0f);
+		buttonPos.x = Math::Lerp(0, x, percentX);
+		buttonPos.y = Math::Lerp(0, y, percentY);
+		m_buttonTutorial.SetPosition(buttonPos);
+
+	}
+
+	//Credits
+	{
+		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
+		float percentX = (740.0f) / (1600.0f);	//original position vs original width
+		float percentY = (400.0f) / (1200.0f);
+		buttonPos.x = Math::Lerp(0, x, percentX);
+		buttonPos.y = Math::Lerp(0, y, percentY);
+		m_buttonCredits.SetPosition(buttonPos);
+	}
+
 	return false;
 }
