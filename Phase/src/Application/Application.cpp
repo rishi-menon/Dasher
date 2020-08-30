@@ -223,7 +223,8 @@ void Application::Cleanup()
 void Application::ClearLayers()
 {
 	std::vector <Layer*>& vec = m_vLayers;
-	for (std::size_t i = vec.size() - 1; i >= 0; i--)
+	//Do not change to std::size_t as it is unsigned and the for loop breaks when the value becomes negative
+	for (int i = vec.size() - 1; i >= 0; i--)
 	{
 		delete vec[i];
 	}
