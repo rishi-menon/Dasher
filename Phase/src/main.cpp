@@ -51,8 +51,8 @@ int main(int argc, const char* argv[])
 #if 1
 	const GLFWvidmode* modes = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	
-	const int nStartingWidth = modes->width / 1.2;
-	const int nStartingHeight = modes->height / 1.2;
+	const int nStartingWidth = static_cast<int>(modes->width / 1.2);
+	const int nStartingHeight = static_cast<int>(modes->height / 1.2);
 #else
 	const int nStartingWidth = 1600, nStartingHeight = 1200;
 #endif

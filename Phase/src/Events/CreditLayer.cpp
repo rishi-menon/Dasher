@@ -53,7 +53,7 @@ void CreditLayer::OnUpdate(float deltaTime)
 	glm::vec2 posText = m_vPosText;
 	for (int i = 0; i < TextLineCount; i++)
 	{
-		Renderer::DrawTextColor(m_strCredit[i].c_str(), m_strCredit[i].size(), posText, textScale[i], { 0.0f, 0.0f, 0.0f, 1.0f });
+		Renderer::DrawTextColor(m_strCredit[i].c_str(), (int)m_strCredit[i].size(), posText, textScale[i], { 0.0f, 0.0f, 0.0f, 1.0f });
 		posText.y -= 120;
 	}
 }
@@ -72,8 +72,8 @@ bool CreditLayer::OnWindowResize(int x, int y)
 		float percentX = 550.0f / 1600.0f;
 		float percentY = 700.0f / 1200.0f;
 
-		m_vPosText.x = Math::Lerp(0, x, percentX);
-		m_vPosText.y = Math::Lerp(0, y, percentY);
+		m_vPosText.x = static_cast<float>(Math::Lerp(0, x, percentX));
+		m_vPosText.y = static_cast<float>(Math::Lerp(0, y, percentY));
 	}
 
 	return false;

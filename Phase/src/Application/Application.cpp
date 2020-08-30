@@ -103,12 +103,12 @@ void Application::InsertLayer(Layer* pLayer)
 	std::vector<Layer*>::iterator it = std::find(m_vLayers.begin(), m_vLayers.end(), pLayer);
 	if (it != m_vLayers.end())
 	{
-		int index = it - m_vLayers.begin();
+		int index = static_cast<int>(it - m_vLayers.begin());
 		ASSERT(false, "Layer is already inserted");
 	}
 	else
 	{
-		int index = m_vLayers.size();
+		int index = static_cast<int>(m_vLayers.size());
 		m_vLayers.push_back (pLayer);
 		pLayer->RegisterEvents(this, index);
 	}
@@ -223,7 +223,7 @@ void Application::Cleanup()
 void Application::ClearLayers()
 {
 	std::vector <Layer*>& vec = m_vLayers;
-	for (int i = vec.size() - 1; i >= 0; i--)
+	for (std::size_t i = vec.size() - 1; i >= 0; i--)
 	{
 		delete vec[i];
 	}

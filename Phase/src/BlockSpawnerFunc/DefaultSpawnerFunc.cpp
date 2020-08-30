@@ -36,7 +36,7 @@ void DefaultSpawnerFunc(CircularQueue<Block>& blocks, double& nextSpawnTime, dou
 	
 	//for percentage, the sum of all the variables should be 100, but this formula would work for non 100 sum numbers as well. (It would be 65 parts of the total chance of happening instead of 65%)
 
-	float fPart = Random::Rand() * fPercGroup4;
+	float fPart = static_cast<float>(Random::Rand() * fPercGroup4);
 
 	if (fPart <= fPercPhaseOnly)
 	{
@@ -152,7 +152,7 @@ static void CreatePhasableOnly(CircularQueue<Block>& blocks, double& nextSpawnTi
 	 
 	float peak = Application::GetHeight() * 700.0f/1200.0f;
 
-	float sizeY1 = peak*Random::Rand(0.5 - 0.1, 0.5 + 0.1);
+	float sizeY1 = static_cast<float>(peak*Random::Rand(0.5 - 0.1, 0.5 + 0.1));
 	float sizeY2 = peak - sizeY1;	//700 fills the entire screen 
 
 	const glm::vec2 sizeY = { Application::GetHeight()*300.0f/1200.0f, Application::GetHeight()*475.0f/1200.0f };
