@@ -22,8 +22,8 @@ ZenPlayerLayer::ZenPlayerLayer() :
 	m_vAngularVelocities[0] = { 1, 6 };
 	m_vSizes[0] = { 70, 70 };
 
-	m_vAngularVelocities[1] = { 3, 8 };
-	m_vSizes[1] = { 45, 45 };
+	//m_vAngularVelocities[1] = { 3, 8 };
+	//ßm_vSizes[1] = { 45, 45 };
 
 	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nCurrentSpeed].x;
 	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nCurrentSpeed].y;

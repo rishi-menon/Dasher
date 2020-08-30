@@ -49,6 +49,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			nextSpawnTime = -10;	//forces an object to never spawn
 			break;
 		}
+#if 0
 		case TutorialStage::PlayWarningCollision:
 		{
 			constexpr int nMaxBlocks = 2;
@@ -81,6 +82,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			nextSpawnTime = -10;	//forces an object to never spawn
 			break;
 		}
+#endif
 		case TutorialStage::PlayPhasing:
 		{
 
@@ -105,9 +107,9 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 						posY = Application::GetHeight() - 2;
 						newBlock.scale = { 90, -scaleY, 1 };
 					}
-					newBlock.position = { width + 850*j, posY, 0.1f };
+					newBlock.position = { width + 1800*j, posY, 0.1f };
 					newBlock.velocity = { -400, 0, 0 };
-					newBlock.color = { 0.0,0.4,0.79,1.0 };
+					newBlock.color = { 0.0 + 0.3*j,0.4 - 0.1*j,0.79,1.0 };
 					newBlock.shape = RendererShapes::ShapeTriangleRegular;
 					
 					switch (j)

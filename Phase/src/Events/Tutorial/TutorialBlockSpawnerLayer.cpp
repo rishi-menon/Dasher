@@ -217,26 +217,28 @@ void TutorialBlockSpawnerLayer::RestartCurrentStage()
 }
 void TutorialBlockSpawnerLayer::CreateStages()
 {
+	const glm::vec4 textCol = {0.9f, 0.9f, 0.9f, 1.0f};
 	TutorialStageProps props = TutorialStageProps(
 		"Hi fellow electron, your adventure awaits you!\n"
 		"Now if you\'re already a professional (which you obviously are)\n"
 		"then you can press ESC or the back button to skip the tutorial\n"
 		"Or if you want a quick recap of your awesomeness then press the\n"
-		"enter key or the left mouse button to proceed", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"enter key or the left mouse button to proceed", glm::vec2(100, 1000), 0.4f, textCol);
 
 	m_mapStages.emplace (TutorialStage::TextIntro, props);
 
 	props = TutorialStageProps(
 		"As an electron, you are forced to constantly oscillate to stay stable\n"
-	    "Use the mouse to control the speed at which you oscillate\n"
-		"Give it a try! (Hint: X position of the mouse)", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	    "Use the mouse cursor to control the speed\n"
+		"at which you oscillate. Give it a try!\n\n"
+		"(Hint: Move the cursor left and right)", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace (TutorialStage::TextBasicMove, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayMove, 8.0f);
 
 	props = TutorialStageProps(
 		"Awesome! Now try dodging these very friendly spikes\n"
-		"that are thrown at you", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"that are thrown at you", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextFriendlySpikes, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayFriendlySpikes, 0.9f);
@@ -244,25 +246,23 @@ void TutorialBlockSpawnerLayer::CreateStages()
 	props = TutorialStageProps(
 		"Great! Keep in mind that while actually playing, the spikes\n"
 		"won\'t be this friendly. If you hit it, you lose half your mass\n"
-		"You\'ll end up becoming smaller and faster\n\n\n"
-		"When this happens though, you do get a small window\n"
-		"of immunity time", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"You\'ll end up becoming smaller and faster\n", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextWarningCollision, props);
 
-	m_mapWaitTime.emplace(TutorialStage::PlayWarningCollision, 6.0f);
+	//m_mapWaitTime.emplace(TutorialStage::PlayWarningCollision, 6.0f);
 
 	props = TutorialStageProps(
 		"Alrighty, now onto your most valuable skill... Phasing!!\n"
-		"If you oscillate at the just the right speed, then you can safetly\n"
+		"If you oscillate at the just the right speed, then you can safely\n"
 		"pass through the nasty spike without taking any damage\n"
 		"Each spike has a different \'speed\' requirement. Give it a try!\n\n"
 		"Hint: The spike becomes transparent when you can phase\n"
-		"through it", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"through it", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextPhasing, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayPhasing, 0.9f);
 	
-	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextTutorialOver, props);
 
 	OnWindowResize(Application::GetWidth(), Application::GetHeight());	//Set the position of the tutorial text fields

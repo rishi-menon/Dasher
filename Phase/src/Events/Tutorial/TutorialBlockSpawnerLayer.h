@@ -27,7 +27,7 @@ enum class TutorialStage : int
 	PlayFriendlySpikes,
 
 	TextWarningCollision,
-	PlayWarningCollision,
+	//PlayWarningCollision,
 
 	TextPhasing,
 	PlayPhasing,

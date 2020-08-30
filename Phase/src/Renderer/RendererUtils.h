@@ -1,5 +1,6 @@
 #pragma once
 #include <fstream>
+#include "CommandLineFeatures.h"
 
 static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 {
@@ -28,37 +29,6 @@ static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 	return id;
 }
 
-static int mystrlen(const char* str)
-{
-	int i = 0;
-	for (; str[i] != '\0'; i++);
-	return i;
-}
-
-static bool mystrcmp(const char* strA, const char* strB, int len = -1)
-{
-	//return true if they are different strings
-	int lenA = mystrlen(strA);
-	int lenB = mystrlen(strB);
-
-	if (len == -1)
-	{
-		if (lenA != lenB)	return true;
-	}
-	else
-	{
-		if (lenA < len || lenB < len) return true;
-	}
-
-	if (len == -1 || len > lenA)	len = lenA;
-
-	for (int i = 0; i < len; i++)
-	{
-		if (strA[i] != strB[i])
-			return true;
-	}
-	return false;
-}
 static void ParseShader(const char* const filePath, std::string& outVertex, std::string& outFrag)
 {
 	std::ifstream file;
@@ -74,7 +44,7 @@ static void ParseShader(const char* const filePath, std::string& outVertex, std:
 			char buff[300];
 			file.getline(buff, 300);
 
-			if (!mystrcmp(buff, "#shader", 7))
+			if (!StringHelper::mystrcmp(buff, "#shader", 7))
 			{
 				//change type
 				char c = buff[8];

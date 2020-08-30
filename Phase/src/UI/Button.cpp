@@ -70,13 +70,12 @@ bool Button::OnMouseMove(int x, int y)
 		{
 			m_curState = StateSelected;
 		}
-		return true;
 	}
 	else
 	{
 		m_curState = StateDefault;
-		return false;
 	}
+	return false;
 }
 bool Button::OnMouseDown(int nButton)
 {

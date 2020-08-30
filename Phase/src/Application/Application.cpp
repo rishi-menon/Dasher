@@ -148,6 +148,9 @@ void Application::Run()
 	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
 	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
 
+	constexpr int nSleepMicroSeconds = 500;
+	std::chrono::microseconds sleepDuration(nSleepMicroSeconds);
+
 	while (!glfwWindowShouldClose (m_pWindow))
 	{
 		double dCurrentTime = glfwGetTime();
@@ -191,10 +194,9 @@ void Application::Run()
 
 		glfwSwapBuffers(m_pWindow);
 		glfwPollEvents(); 
-
-		if (m_dDeltaTime < 1.0 / 70.0)
+		
+		// if (m_dDeltaTime < 1.0 / 70.0)
 		{
-			std::chrono::microseconds sleepDuration(100);
 			std::this_thread::sleep_for(sleepDuration);
 		}
 	}

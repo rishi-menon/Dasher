@@ -11,7 +11,7 @@ INCLUDE_DIRECTORIES(../Phase/src ../Phase/vendor/Freetype ../Phase/vendor/GLEW/i
 LINK_DIRECTORIES(../Phase/vendor/Freetype/lib-x64 ../Phase/vendor/GLEW/lib/Release/x64 ../Phase/vendor/GLFW/lib-x64)
 
 add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp 
-../Phase/src/main.cpp ../Phase/src/Maths.cpp ../Phase/src/Log.cpp
+../Phase/src/main.cpp ../Phase/src/Maths.cpp ../Phase/src/Log.cpp ../Phase/src/CommandLineFeatures
 ../Phase/src/Application/Application.cpp ../Phase/src/Application/EventCallbacks.cpp
 ../Phase/src/AssetManagement/Font.cpp ../Phase/src/AssetManagement/StandardTexture.cpp ../Phase/src/AssetManagement/Texture.cpp
 ../Phase/src/BlockSpawnerFunc/DefaultSpawnerFunc.cpp ../Phase/src/BlockSpawnerFunc/TutorialSpawnerFunc.cpp

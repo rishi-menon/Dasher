@@ -153,7 +153,7 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 		RendererShapes::Rectangle(m_Vertex, m_vPos, m_vSize, m_vCol);
 		Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
 
-		constexpr float blockSpeedIncreaseTime = 1.25f;	//Time taken to increase the block speed by 1
+		constexpr float blockSpeedIncreaseTime = 0.8f;	//Time taken to increase the block speed by 1
 		g_fBlockSpeed += deltaTime / blockSpeedIncreaseTime;
 		m_dApparantVelocityX = g_fBlockSpeed;
 	}

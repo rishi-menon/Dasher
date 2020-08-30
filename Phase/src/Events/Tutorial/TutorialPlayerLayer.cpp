@@ -62,20 +62,27 @@ void TutorialPlayerLayer::ResetPosition()
 void TutorialPlayerLayer::TakeDamage(double damage)
 {
 	TutorialStage stage = m_pTutorialSpawner->GetCurrentStage();
+#if 0
 	if (stage != TutorialStage::PlayWarningCollision)
 	{
 		m_pTutorialSpawner->RestartCurrentStage();
 	}
 	else
+
 	{
 		NormalPlayerLayer::TakeDamage(damage);
 	}
+#else
+	m_pTutorialSpawner->RestartCurrentStage();
+#endif
 }
 void TutorialPlayerLayer::TakeNoDamage()
 {
+#if 0
 	TutorialStage stage = m_pTutorialSpawner->GetCurrentStage();
 	if (stage == TutorialStage::PlayWarningCollision)
 	{
 		NormalPlayerLayer::TakeNoDamage();
 	}
+#endif
 }

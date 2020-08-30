@@ -50,6 +50,8 @@ public:
 
 	inline void GetMousePos(double& x, double& y) const { glfwGetCursorPos(m_pWindow, &x, &y); y = m_nHeight - y; }
 
+	inline GLFWwindow* GetWindowGLFW () { return m_pWindow; }
+
 private:
 	void Cleanup();
 	void ClearLayers();

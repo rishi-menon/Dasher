@@ -4,39 +4,24 @@
 #include "Constants.h"
 
 #include "AssetManagement/Texture.h"
-#include "Renderer/RendererUtils.h"
-
-std::string GetMyCurrentDirectory(const char* argv1)
-{
-	std::string path;
-	path.reserve (100);
-
-	int len = mystrlen (argv1);
-	int i = len-1;
-
-	for (; i >= 0; i--)
-	{
-		if (argv1[i] == '/' || argv1[i] == '\\')
-		{
-			break;
-		}
-	}
-	for (int j = 0; j <= i; j++)
-	{
-		path.push_back (argv1[j]);
-	}
-
-	return path;
-}
+#include "CommandLineFeatures.h"
 
 int main(int argc, const char* argv[])
 {
 	CoreLogger::Init();
 	Random::Init();
+
+	if (CommandLineFeatures::ParseCommandLine(argc, argv))
+	{
+		return 0;
+	}
+	
 	LOG_CLIENT_TRACE("Started Application");
 
+	
+
 #ifdef RM_MAC
-	g_strCurrentDirectory = GetMyCurrentDirectory(argv[0]);
+	g_strCurrentDirectory = CommandLineFeatures::GetMyCurrentDirectory(argv[0]);
 	LOG_INFO ("Current Directory: {0}", g_strCurrentDirectory.c_str());
 #endif
 
@@ -63,9 +48,16 @@ int main(int argc, const char* argv[])
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 #endif
 
-	Application* pApplication = new Application;
+#if 1
+	const GLFWvidmode* modes = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	
+	const int nStartingWidth = modes->width / 1.2;
+	const int nStartingHeight = modes->height / 1.2;
+#else
 	const int nStartingWidth = 1600, nStartingHeight = 1200;
+#endif
 
+	Application* pApplication = new Application;
 	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Phaze"))
 	{
 		pApplication->Run();
