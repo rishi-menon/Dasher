@@ -3,6 +3,7 @@
 #include "AbstractPlayerLayer.h"
 #include "UI/Button.h"
 #include "Events/FadeoutScreenLayer.h"
+#include "UI/UIImage.h"
 
 class NormalPlayerLayer : public AbstractPlayerLayer
 {
@@ -21,13 +22,19 @@ protected:
 	inline void SetScore(double score) { m_dScore = score; }	//This is mainly for the tutorial layer
 	inline Button& GetBackButton() { return m_BackButton; }
 	inline void SetLives(int livesUsed) { m_nLivesUsed = livesUsed; }
-	void SetSpeedOnDamage();
+
 
 private:
 	void Die();
+	void SetLifeUI();
+
 
 private:
-	enum : int {PlayerLives = 2};
+	const glm::vec2 m_vHealthUISize;
+	const float m_fHealthUIOffsetX;
+
+private:
+	enum : int {PlayerLives = 4};
 
 	glm::vec2 m_vScorePos;
 	const float m_fScoreScale;
@@ -52,4 +59,6 @@ private:
 	double m_dScore;
 
 	FadeoutScreenLayer* m_pFadeoutLayer;
+
+	UIImage m_HealthUI[PlayerLives];
 };

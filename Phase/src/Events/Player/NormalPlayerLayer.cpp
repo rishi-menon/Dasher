@@ -3,9 +3,13 @@
 #include "Application/Application.h"
 #include <string>
 #include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
+#include "AssetManagement/StandardTexture.h"
 
 NormalPlayerLayer::NormalPlayerLayer() :
 	// constants
+	m_vHealthUISize(80, 80),
+	m_fHealthUIOffsetX(90.0f),
+
 	m_vScorePos (0.0f, 0.0),
 	m_fScoreScale (0.7f),
 	m_vScoreCol (1.0f, 1.0f, 1.0f, 1.0f),
@@ -17,15 +21,21 @@ NormalPlayerLayer::NormalPlayerLayer() :
 	m_nLivesUsed (0),
 
 	m_dNextCollideTime (0.0),
-	m_dImmunityTime (4.0),
+	m_dImmunityTime (0.8),
 	m_dScore (0.0),
 	m_pFadeoutLayer (nullptr)
 {
 	m_vAngularVelocities[0] = { 1, 6 };
 	m_vSizes[0] = { 70, 70 };
 
-	m_vAngularVelocities[1] = { 3, 8 };
-	m_vSizes[1] = { 45, 45 };
+	m_vAngularVelocities[1] = { 1.5, 6.5 };
+	m_vSizes[1] = { 60, 60 };
+
+	m_vAngularVelocities[2] = { 2, 7 };
+	m_vSizes[2] = { 55, 55 };
+
+	m_vAngularVelocities[3] = { 2.5, 7.5 };
+	m_vSizes[3] = { 45, 45 };
 
 	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
 	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
@@ -127,6 +137,19 @@ void NormalPlayerLayer::OnStart()
 		LOG_WARN("Fade out layer was not found");
 	}
 
+	//Health UI
+	{
+		const glm::vec4 col = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec3 pos = { Application::GetWidth() - m_vHealthUISize.x/2 - (PlayerLives-1)*m_fHealthUIOffsetX - 40, Application::GetHeight() - 200, 0.5 };	//The health ui disappears when the player dies because the z value is less than 0.7 (which is the z value of the fade out layer)
+
+		for (int i = 0; i < PlayerLives; i++)
+		{
+			m_HealthUI[i].SetTextureId(StandardTexture::LifeFull);
+			m_HealthUI[i].SetProperties(pos, m_vHealthUISize, col);
+			pos.x += m_fHealthUIOffsetX;
+		}
+	}
+
 	NormalPlayerLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 }
 
@@ -180,24 +203,22 @@ void NormalPlayerLayer::TakeDamage(double damage)
 		//m_vCol = { 154.0 / 255, 0.0f, 1.0f,0.37f };
 		//Take damage
 		m_nLivesUsed++;
-		SetSpeedOnDamage();
+
+		SetLifeUI();
+		if (m_nLivesUsed < PlayerLives)
+		{
+			AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
+			AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
+			AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
+			AbstractPlayerLayer::RecalculateAngularVelocity();
+		}
+		else
+		{
+			NormalPlayerLayer::Die(); // no more lives
+		}
 	}
 }
 
-void NormalPlayerLayer::SetSpeedOnDamage()
-{
-	if (m_nLivesUsed < PlayerLives)
-	{
-		AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
-		AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
-		AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
-		AbstractPlayerLayer::RecalculateAngularVelocity();
-	}
-	else
-	{
-		NormalPlayerLayer::Die(); // no more lives
-	}
-}
 void NormalPlayerLayer::TakeNoDamage()
 {
 	if (m_bIsColliding)
@@ -221,6 +242,8 @@ void NormalPlayerLayer::Die()
 	constexpr float percentY = 670.0f / 1200.0f;
 	m_vScorePos.x = Math::Lerp(0, Application::GetWidth(), percentX);
 	m_vScorePos.y = Math::Lerp(0, Application::GetHeight(), percentY);
+
+	SetLifeUI();
 }
 
 void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
@@ -230,6 +253,7 @@ void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 
 bool NormalPlayerLayer::OnWindowResize(int x, int y)
 {
+	AbstractPlayerLayer::OnWindowResize(x, y);
 	{
 		float posX = x - 120.0f;
 		if (posX < 20) { posX = 20; }
@@ -256,4 +280,17 @@ bool NormalPlayerLayer::OnWindowResize(int x, int y)
 		m_vScorePos.y = Math::Lerp(0, y, percentY);
 	}
 	return false;
+}
+
+void NormalPlayerLayer::SetLifeUI()
+{
+	int i = 0, m_nCurLives = PlayerLives - m_nLivesUsed;
+	for (; i < m_nCurLives; i++)
+	{
+		m_HealthUI[i].SetTextureId(StandardTexture::LifeFull);
+	}
+	for (; i < PlayerLives; i++)
+	{
+		m_HealthUI[i].SetTextureId(StandardTexture::LifeEmpty);
+	}
 }

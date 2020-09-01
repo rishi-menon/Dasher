@@ -219,19 +219,18 @@ void TutorialBlockSpawnerLayer::CreateStages()
 {
 	const glm::vec4 textCol = {0.9f, 0.9f, 0.9f, 1.0f};
 	TutorialStageProps props = TutorialStageProps(
-		"Hi fellow electron, your adventure awaits you!\n"
-		"Now if you\'re already a professional (which you obviously are)\n"
-		"then you can press ESC or the back button to skip the tutorial\n"
-		"Or if you want a quick recap of your awesomeness then press the\n"
-		"enter key or the left mouse button to proceed", glm::vec2(100, 1000), 0.4f, textCol);
+		"Hi there!\n"
+		"You can press ESC or the back button to skip\n"
+		"this tutorial or you can press the enter key\n"
+		"or the left mouse button to proceed", glm::vec2(100, 1000), 0.4f, textCol);
 
 	m_mapStages.emplace (TutorialStage::TextIntro, props);
 
 	props = TutorialStageProps(
-		"As an electron, you are forced to constantly oscillate to stay stable\n"
-	    "Use the mouse cursor to control the speed\n"
-		"at which you oscillate. Give it a try!\n\n"
-		"(Hint: Move the cursor left and right)", glm::vec2(100, 1000), 0.4f, textCol);
+		"You will constantly oscillate up and down\n"
+	    "Use the mouse cursor to control the speed at which you move\n"
+		"Give it a try!\n\n"
+		"Hint: Move the cursor left and right", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace (TutorialStage::TextBasicMove, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayMove, 8.0f);
@@ -243,26 +242,24 @@ void TutorialBlockSpawnerLayer::CreateStages()
 
 	m_mapWaitTime.emplace(TutorialStage::PlayFriendlySpikes, 0.9f);
 
-	props = TutorialStageProps(
-		"Great! Keep in mind that while actually playing, the spikes\n"
-		"won\'t be this friendly. If you hit it, you lose half your mass\n"
-		"You\'ll end up becoming smaller and faster\n", glm::vec2(100, 1000), 0.4f, textCol);
-	m_mapStages.emplace(TutorialStage::TextWarningCollision, props);
+	/*props = TutorialStageProps(
+		"Great! Keep in mind that while actually playing,\n"
+		"the spikes won\'t be this friendly", glm::vec2(100, 1000), 0.4f, textCol);
+	m_mapStages.emplace(TutorialStage::TextWarningCollision, props);*/
 
 	//m_mapWaitTime.emplace(TutorialStage::PlayWarningCollision, 6.0f);
 
 	props = TutorialStageProps(
-		"Alrighty, now onto your most valuable skill... Phasing!!\n"
-		"If you oscillate at the just the right speed, then you can safely\n"
-		"pass through the nasty spike without taking any damage\n"
-		"Each spike has a different \'speed\' requirement. Give it a try!\n\n"
-		"Hint: The spike becomes transparent when you can phase\n"
-		"through it", glm::vec2(100, 1000), 0.4f, textCol);
+		"Alrighty, now onto Phasing!\n"
+		"If you move at the just the right speed, then the spike\n"
+		"becomes transparent and you can safely pass through\n"
+		"it without taking any damage. Each spike has a\n"
+		"different \'speed\' requirement. Give it a try!", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextPhasing, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayPhasing, 0.9f);
 	
-	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, textCol);
+	props = TutorialStageProps("Awesome! You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextTutorialOver, props);
 
 	OnWindowResize(Application::GetWidth(), Application::GetHeight());	//Set the position of the tutorial text fields
@@ -273,12 +270,19 @@ bool TutorialBlockSpawnerLayer::OnWindowResize (int x, int y)
 	BlockSpawnerLayer::OnWindowResize(x, y);
 	int nHeight = Application::GetHeight();
 	//glm::vec2(100, 1000)
-	m_mapStages.at(TutorialStage::TextIntro).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+
+	for (auto& pair : m_mapStages)
+	{
+		TutorialStageProps& props = pair.second;
+		props.strPos = { 100.0f, nHeight * 1000.0f / 1200.0f };
+	}
+#if 0
+	m_mapStages.at(TutorialStage::TextIntro).strPos = 
 	m_mapStages.at(TutorialStage::TextBasicMove).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextFriendlySpikes).strPos = {100.0f, nHeight*1000.0f/1200.0f};
-	m_mapStages.at(TutorialStage::TextWarningCollision).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	//m_mapStages.at(TutorialStage::TextWarningCollision).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextPhasing).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextTutorialOver).strPos = {100.0f, nHeight*1000.0f/1200.0f};
-
+#endif
 	return false;
 }

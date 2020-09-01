@@ -10,14 +10,56 @@ INCLUDE_DIRECTORIES(../Phase/src ../Phase/vendor/Freetype ../Phase/vendor/GLEW/i
 
 
 add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp 
-../Phase/src/main.cpp ../Phase/src/Maths.cpp ../Phase/src/Log.cpp ../Phase/src/CommandLineFeatures
-../Phase/src/Application/Application.cpp ../Phase/src/Application/EventCallbacks.cpp
-../Phase/src/AssetManagement/Font.cpp ../Phase/src/AssetManagement/StandardTexture.cpp ../Phase/src/AssetManagement/Texture.cpp
-../Phase/src/BlockSpawnerFunc/DefaultSpawnerFunc.cpp ../Phase/src/BlockSpawnerFunc/TutorialSpawnerFunc.cpp
+
+../Phase/src/main.cpp 
+../Phase/src/Maths.cpp 
+../Phase/src/Log.cpp 
+../Phase/src/CommandLineFeatures.cpp 
+../Phase/src/Constants.cpp
+
+
+../Phase/src/Application/Application.cpp 
+../Phase/src/Application/EventCallbacks.cpp
+
+
+../Phase/src/AssetManagement/Font.cpp 
+../Phase/src/AssetManagement/StandardTexture.cpp 
+../Phase/src/AssetManagement/Texture.cpp
+
+
+../Phase/src/BlockSpawnerFunc/DefaultSpawnerFunc.cpp 
+../Phase/src/BlockSpawnerFunc/TutorialSpawnerFunc.cpp
+
+
 ../Phase/src/Collision/Collision.cpp
-../Phase/src/Events/BackgroundLayer.cpp ../Phase/src/Events/BlockSpawnerLayer.cpp ../Phase/src/Events/CreditLayer.cpp ../Phase/src/Events/FadeoutScreenLayer.cpp ../Phase/src/Events/Layer.cpp ../Phase/src/Events/UILayer.cpp 
-../Phase/src/Events/MainMenu/MainMenuLayer.cpp ../Phase/src/Events/Player/AbstractPlayerLayer.cpp ../Phase/src/Events/Player/NormalPlayerLayer.cpp ../Phase/src/Events/Player/ZenPlayerLayer.cpp ../Phase/src/Events/Tutorial/TutorialBlockSpawnerLayer.cpp ../Phase/src/Events/Tutorial/TutorialPlayerLayer.cpp
-../Phase/src/Renderer/Renderer.cpp ../Phase/src/Renderer/RendererShapes.cpp ../Phase/src/Renderer/RendererVertex.cpp ../Phase/src/UI/Button.cpp ../Phase/src/UI/PushButton.cpp ../Phase/src/UI/UIObject.cpp)
+
+../Phase/src/Core/StringHelper.cpp
+
+../Phase/src/Events/BackgroundLayer.cpp 
+../Phase/src/Events/BlockSpawnerLayer.cpp 
+../Phase/src/Events/CreditLayer.cpp 
+../Phase/src/Events/FadeoutScreenLayer.cpp 
+../Phase/src/Events/Layer.cpp 
+../Phase/src/Events/UILayer.cpp 
+../Phase/src/Events/MainMenu/MainMenuLayer.cpp 
+../Phase/src/Events/Player/AbstractPlayerLayer.cpp 
+../Phase/src/Events/Player/NormalPlayerLayer.cpp 
+../Phase/src/Events/Player/ZenPlayerLayer.cpp 
+../Phase/src/Events/Tutorial/TutorialBlockSpawnerLayer.cpp 
+
+
+../Phase/src/Events/Tutorial/TutorialPlayerLayer.cpp
+
+
+../Phase/src/Renderer/Renderer.cpp 
+../Phase/src/Renderer/RendererShapes.cpp 
+../Phase/src/Renderer/RendererVertex.cpp 
+
+../Phase/src/UI/Button.cpp 
+../Phase/src/UI/PushButton.cpp 
+../Phase/src/UI/UIObject.cpp
+../Phase/src/UI/UIImage.cpp
+)
 
 add_compile_definitions (GLEW_STATIC RM_MAC)
 

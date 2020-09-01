@@ -37,6 +37,8 @@ Application::Application() :
 	m_pWindow(nullptr),
 	m_dCurrentTime (0),
 	m_dDeltaTime (0),
+	m_dGameLastSleepTime (0),
+
 	m_CurMenu (Menu::MainMenu),
 	m_NextMenu (Menu::MainMenu),
 	m_NextMenuUserData (nullptr)
@@ -91,7 +93,7 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		return false;
 	}
 
-	m_NextMenu = Menu::MainMenu;
+	m_NextMenu = Menu::TutorialMode;
 	ChangeMenuState();
 
 	return true;
@@ -133,7 +135,7 @@ void Application::Run()
 	const float fCol = 0.18f;
 	glClearColor(fCol, fCol, fCol, 1);
 
-	const double dMaxDeltaTime = 1.0/10.0;
+	const double dMaxDeltaTime = 1.0/30.0;
 
 	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
@@ -148,10 +150,15 @@ void Application::Run()
 	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
 	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
 
-	constexpr int nSleepMicroSeconds = 500;
-	std::chrono::microseconds sleepDuration(nSleepMicroSeconds);
+	constexpr int nSleep = 1;
+	std::chrono::milliseconds sleepDuration(nSleep);
+	
+	constexpr int nGameTimeBetweenSleep = 2;	//in seconds
 
-	while (!glfwWindowShouldClose (m_pWindow))
+	constexpr int nSleepTimeGameMode = 2;
+	std::chrono::milliseconds sleepDurationGame(nSleepTimeGameMode);
+
+	while (!glfwWindowShouldClose(m_pWindow))
 	{
 		double dCurrentTime = glfwGetTime();
 		m_dDeltaTime = dCurrentTime - m_dCurrentTime;	//in seconds
@@ -160,6 +167,7 @@ void Application::Run()
 		{
 			m_dDeltaTime = dMaxDeltaTime;
 		}
+
 		//clear screen
 		glcall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
@@ -170,7 +178,7 @@ void Application::Run()
 			{
 				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
 			}
-			for (unsigned int i = g_nUILayerIndex+1; i < m_vLayers.size(); i++)
+			for (unsigned int i = g_nUILayerIndex + 1; i < m_vLayers.size(); i++)
 			{
 				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
 			}
@@ -180,7 +188,7 @@ void Application::Run()
 		{
 			for (Layer* pLayer : m_vLayers)
 			{
-				pLayer->OnUpdate((float)m_dDeltaTime);	
+				pLayer->OnUpdate((float)m_dDeltaTime);
 			}
 		}
 
@@ -193,9 +201,19 @@ void Application::Run()
 		Renderer::Flush();
 
 		glfwSwapBuffers(m_pWindow);
-		glfwPollEvents(); 
-		
+		glfwPollEvents();
+
 		// if (m_dDeltaTime < 1.0 / 70.0)
+		if (m_CurMenu == Menu::NormalMode || m_CurMenu == Menu::ZenMode || m_CurMenu == Menu::TutorialMode)
+		{
+			if (dCurrentTime > m_dGameLastSleepTime)
+			{
+				//while running the game sleep
+				std::this_thread::sleep_for(sleepDurationGame);
+				m_dGameLastSleepTime = dCurrentTime + nGameTimeBetweenSleep;
+			}
+		}
+		else
 		{
 			std::this_thread::sleep_for(sleepDuration);
 		}

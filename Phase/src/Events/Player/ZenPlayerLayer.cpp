@@ -112,6 +112,7 @@ void ZenPlayerLayer::TakeNoDamage()
 
 bool ZenPlayerLayer::OnWindowResize(int x, int y)
 {
+	AbstractPlayerLayer::OnWindowResize(x, y);
 	float posX = x - 120.0f;
 	if (posX < 20) { posX = 20; }
 

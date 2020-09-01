@@ -15,6 +15,9 @@ enum class UITypes : unsigned int
 	PushButton0,
 	PushButton0_E,	//Enabled state	
 
+	PushButton1,
+	PushButton1_E,	//Enabled state	
+
 	Count
 };
 

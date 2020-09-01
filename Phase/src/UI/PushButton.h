@@ -21,6 +21,7 @@ class PushButton : public UIObject
 	typedef void (*PushButtonToggleFunc) (bool);
 public:
 	PushButton();
+	virtual ~PushButton() {}
 
 	virtual void OnUpdate(float deltaTime) override;
 	virtual bool OnMouseUp(int nButton)    override;

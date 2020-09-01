@@ -1,6 +1,6 @@
 #pragma once
 #include <fstream>
-#include "CommandLineFeatures.h"
+#include "Core/StringHelper.h"
 
 static unsigned int CompileShader(unsigned int nShaderType, const char* strCode)
 {

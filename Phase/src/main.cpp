@@ -58,7 +58,7 @@ int main(int argc, const char* argv[])
 #endif
 
 	Application* pApplication = new Application;
-	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Phaze"))
+	if (pApplication->Initialise(nStartingWidth, nStartingHeight, "Phase"))
 	{
 		pApplication->Run();
 	}
