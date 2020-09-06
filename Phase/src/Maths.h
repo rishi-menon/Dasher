@@ -7,6 +7,19 @@ namespace Math {
 	{
 		return a + (b - a) * percent;
 	}
+
+	inline double ClampLeft(double min, double value)
+	{
+		if (value < min)		return min;
+		else					return value;
+	}
+
+	inline double ClampRight(double max, double value)
+	{
+		if (value > max)		return max;
+		else					return value;
+	}
+
 	inline double Clamp(double min, double max, double value)
 	{
 		if (value < min)		return min;

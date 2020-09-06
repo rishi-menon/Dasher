@@ -21,7 +21,7 @@ public:
 	virtual bool OnWindowResize(int x, int y) override;
 	
 private:
-	enum : int { Speeds = 2 };
+	enum : int { Speeds = 1 };
 	glm::vec2 m_vAngularVelocities[Speeds];
 	glm::vec2 m_vSizes[Speeds];
 

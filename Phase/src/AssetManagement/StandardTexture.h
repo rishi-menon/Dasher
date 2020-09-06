@@ -10,6 +10,10 @@ enum class StandardTexture : int
 
 	SpecialEffect0,
 
+	LifeFull,
+	LifeEmpty,
+
+
 	Count		//Do not use
 };
 

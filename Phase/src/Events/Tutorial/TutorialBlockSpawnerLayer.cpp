@@ -85,6 +85,8 @@ void TutorialBlockSpawnerLayer::OnStart()
 
 void TutorialBlockSpawnerLayer::OnUpdate(float deltaTime)
 {
+	if (!m_pTutorialPlayer) { return; }
+
 	if (m_CurStage >= TutorialStage::Count)
 	{
 		m_pTutorialPlayer->TutorialOver();
@@ -99,8 +101,15 @@ void TutorialBlockSpawnerLayer::OnUpdate(float deltaTime)
 		if (!m_bStageOver)
 		{
 			//stage is not yet over
+			if (m_CurStage == TutorialStage::PlayPhasing)
+			{
+				//Draw gray rectangles to indicate the phase region
+				ShowPhaseRange();
+			}
+
 			if (!GetBlockCount())
 			{
+				//Player has passed through all the blocks, Stage is over (Start the wait time).
 				m_bStageOver = true;
 				float waitTime;
 				std::unordered_map<TutorialStage, float>::iterator it = m_mapWaitTime.find(m_CurStage);
@@ -134,6 +143,7 @@ void TutorialBlockSpawnerLayer::OnUpdate(float deltaTime)
 		Renderer::DrawTextColor(props.strText, 30000, props.strPos, props.strScale, props.strTextCol);
 	}
 }
+
 bool TutorialBlockSpawnerLayer::OnMouseMove(int x, int y)
 {
 	return BlockSpawnerLayer::OnMouseMove(x, y);
@@ -174,14 +184,13 @@ bool TutorialBlockSpawnerLayer::OnKeyUp(int key)
 void TutorialBlockSpawnerLayer::StartCurrentStage()
 {
 	m_bStageOver = false;
-
 	GetBlocks().ClearAll();
-	m_pTutorialPlayer->ResetPosition();
-
 	if (m_CurStage >= TutorialStage::Count)
 	{
 		return;
 	}
+
+	m_pTutorialPlayer->StartStage(m_CurStage);
 
 	m_CurIterator = m_mapStages.find(m_CurStage);
 	if (m_CurIterator == m_mapStages.end())
@@ -200,6 +209,41 @@ void TutorialBlockSpawnerLayer::StartCurrentStage()
 		SetNextSpawnTime(-10.0);	//never spawn
 	}
 }
+
+void TutorialBlockSpawnerLayer::ShowPhaseRange()
+{
+#ifdef RM_DEBUG
+	if (!m_pTutorialPlayer) { ASSERT(false, "Tutorial player layer does not exist in ShowPhaseRange"); return; }
+#endif
+
+	glm::vec3 playerPos = m_pTutorialPlayer->GetPlayerPos();
+	CircularQueue<Block>& blocks = GetBlocks();
+	int nIndex = blocks.Begin();
+	bool bFound = false;
+	for (int i = 0; i < blocks.Count(); i++)
+	{
+		if (blocks.Buffer()[nIndex].position.x > playerPos.x)
+		{
+			bFound = true;
+			break;
+		}
+		nIndex = (nIndex + 1) % blocks.Size();
+	}
+	if (bFound)
+	{
+		glm::vec4 col = { 0.2, 1.0, 0.2, 0.4f };
+		glm::vec2 range = blocks.Buffer()[nIndex].phaseRange;
+
+		float posX = range.x * Application::GetWidth();
+		float width = (range.y - range.x) * Application::GetWidth();
+
+		RendererVertex vertex[4];
+		RendererShapes::RectangleBottomLeft(vertex, { posX, 0.0, 0.0 }, { width, Application::GetHeight() }, col);
+		Renderer::DrawQuadColor(vertex, RendererShapes::Shape::ShapeQuad);
+	}
+	
+}
+
 void TutorialBlockSpawnerLayer::RestartCurrentStage()
 {
 	MapStages::iterator it = m_CurIterator;
@@ -217,52 +261,44 @@ void TutorialBlockSpawnerLayer::RestartCurrentStage()
 }
 void TutorialBlockSpawnerLayer::CreateStages()
 {
+	const glm::vec4 textCol = {0.9f, 0.9f, 0.9f, 1.0f};
 	TutorialStageProps props = TutorialStageProps(
-		"Hi fellow electron, your adventure awaits you!\n"
-		"Now if you\'re already a professional (which you obviously are)\n"
-		"then you can press ESC or the back button to skip the tutorial\n"
-		"Or if you want a quick recap of your awesomeness then press the\n"
-		"enter key or the left mouse button to proceed", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"Hi there!\n"
+		"You can press ESC or the back button to skip\n"
+		"this tutorial or you can press the left mouse\n"
+		"button or the enter key to proceed", glm::vec2(100, 1000), 0.4f, textCol);
 
 	m_mapStages.emplace (TutorialStage::TextIntro, props);
 
 	props = TutorialStageProps(
-		"As an electron, you are forced to constantly oscillate to stay stable\n"
-	    "Use the mouse to control the speed at which you oscillate\n"
-		"Give it a try! (Hint: X position of the mouse)", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"You will constantly oscillate up and down\n"
+	    "Move the mouse cursor left and right to control\n" 
+		"the speed at which you move\n"
+		"Give it a try!", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace (TutorialStage::TextBasicMove, props);
 
-	m_mapWaitTime.emplace(TutorialStage::PlayMove, 8.0f);
+	m_mapWaitTime.emplace(TutorialStage::PlayMove, 7.0f);
 
 	props = TutorialStageProps(
 		"Awesome! Now try dodging these very friendly spikes\n"
-		"that are thrown at you", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"that are thrown at you\n", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextFriendlySpikes, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayFriendlySpikes, 0.9f);
 
 	props = TutorialStageProps(
-		"Great! Keep in mind that while actually playing, the spikes\n"
-		"won\'t be this friendly. If you hit it, you lose half your mass\n"
-		"You\'ll end up becoming smaller and faster\n\n\n"
-		"When this happens though, you do get a small window\n"
-		"of immunity time", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_mapStages.emplace(TutorialStage::TextWarningCollision, props);
-
-	m_mapWaitTime.emplace(TutorialStage::PlayWarningCollision, 6.0f);
-
-	props = TutorialStageProps(
-		"Alrighty, now onto your most valuable skill... Phasing!!\n"
-		"If you oscillate at the just the right speed, then you can safetly\n"
-		"pass through the nasty spike without taking any damage\n"
-		"Each spike has a different \'speed\' requirement. Give it a try!\n\n"
-		"Hint: The spike becomes transparent when you can phase\n"
-		"through it", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		"Alrighty, now onto Phasing!\n"
+		"If you move at the just the right speed, then the spike\n"
+		"becomes transparent and you can safely pass through\n"
+		"it without taking any damage. Each spike has a\n"
+		"different \'speed\' requirement.\n\n"
+		"Phasing consumes energy which replenishes\n"
+		"over time", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextPhasing, props);
 
 	m_mapWaitTime.emplace(TutorialStage::PlayPhasing, 0.9f);
 	
-	props = TutorialStageProps("Awesome!, recap over. You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	props = TutorialStageProps("Awesome! You\'re a natural at phasing!", glm::vec2(100, 1000), 0.4f, textCol);
 	m_mapStages.emplace(TutorialStage::TextTutorialOver, props);
 
 	OnWindowResize(Application::GetWidth(), Application::GetHeight());	//Set the position of the tutorial text fields
@@ -273,12 +309,19 @@ bool TutorialBlockSpawnerLayer::OnWindowResize (int x, int y)
 	BlockSpawnerLayer::OnWindowResize(x, y);
 	int nHeight = Application::GetHeight();
 	//glm::vec2(100, 1000)
-	m_mapStages.at(TutorialStage::TextIntro).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+
+	for (auto& pair : m_mapStages)
+	{
+		TutorialStageProps& props = pair.second;
+		props.strPos = { 100.0f, nHeight * 1000.0f / 1200.0f };
+	}
+#if 0
+	m_mapStages.at(TutorialStage::TextIntro).strPos = 
 	m_mapStages.at(TutorialStage::TextBasicMove).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextFriendlySpikes).strPos = {100.0f, nHeight*1000.0f/1200.0f};
-	m_mapStages.at(TutorialStage::TextWarningCollision).strPos = {100.0f, nHeight*1000.0f/1200.0f};
+	//m_mapStages.at(TutorialStage::TextWarningCollision).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextPhasing).strPos = {100.0f, nHeight*1000.0f/1200.0f};
 	m_mapStages.at(TutorialStage::TextTutorialOver).strPos = {100.0f, nHeight*1000.0f/1200.0f};
-
+#endif
 	return false;
 }

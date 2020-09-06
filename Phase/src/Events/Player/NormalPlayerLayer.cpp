@@ -1,31 +1,46 @@
 #include "NormalPlayerLayer.h"
 #include "Renderer/Renderer.h"
 #include "Application/Application.h"
-#include <string>
+
 #include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
+#include "AssetManagement/StandardTexture.h"
+#include "Events/BlockSpawnerLayer.h"
+#include "NormalPlayerLayerUI.h"
+
 
 NormalPlayerLayer::NormalPlayerLayer() :
-	// constants
-	m_vScorePos (0.0f, 0.0),
-	m_fScoreScale (0.7f),
-	m_vScoreCol (1.0f, 1.0f, 1.0f, 1.0f),
-
 	m_bCanCollide (true),
 	m_bIsColliding(false),
 	m_bIsAlive (true),
+	m_bStartedPhasing(false),
 
 	m_nLivesUsed (0),
 
 	m_dNextCollideTime (0.0),
-	m_dImmunityTime (4.0),
+	m_dImmunityTime (0.8),
 	m_dScore (0.0),
-	m_pFadeoutLayer (nullptr)
+	m_pFadeoutLayer (nullptr),
+	m_pBlockSpawnerLayer (nullptr),
+	m_pPlayerLayerUI (nullptr),
+
+	m_dTotalPhaseTime (2.0f),
+	m_dTimeTakenToRegen (8.0f),
+	m_dNextPhaseRegenTime (0.0)
+
 {
 	m_vAngularVelocities[0] = { 1, 6 };
 	m_vSizes[0] = { 70, 70 };
 
-	m_vAngularVelocities[1] = { 3, 8 };
-	m_vSizes[1] = { 45, 45 };
+	m_vAngularVelocities[1] = { 1.5, 6.5 };
+	m_vSizes[1] = { 60, 60 };
+
+	m_vAngularVelocities[2] = { 2, 7 };
+	m_vSizes[2] = { 55, 55 };
+
+	m_vAngularVelocities[3] = { 2.5, 7.5 };
+	m_vSizes[3] = { 45, 45 };
+
+	m_dPhaseTimeRemaining = m_dTotalPhaseTime;
 
 	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
 	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
@@ -34,79 +49,33 @@ NormalPlayerLayer::NormalPlayerLayer() :
 
 void NormalPlayerLayer::OnStart()
 {
-	//Back button
-	{
-		const glm::vec2 sizeDefault = { 105,105 };
-		const glm::vec4 colDefault = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		const glm::vec2 sizeClick = { 105, 105 };
-		const glm::vec4 colClick = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const glm::vec3 buttonPos = { Application::GetWidth() - 120, 110, 0.8f };
-
-		ButtonProps propDefault;
-		propDefault.SetBasicProps(UITypes::ButtonBack, sizeDefault, colDefault);
-		propDefault.SetTextProps("", { 40,-20 }, 0.5, { 1,1,1,1 });
-
-		ButtonProps propClick;
-		propClick.SetBasicProps(UITypes::ButtonBack_S, sizeClick, colClick);
-		propClick.SetTextProps("", { 40,-20 }, 0.5, { 1,1,1,1 });
-
-
-		m_BackButton.SetStateProperties(propDefault, Button::StateDefault);
-		m_BackButton.SetStateProperties(propClick, Button::StateSelected);
-		m_BackButton.SetStateProperties(propClick, Button::StateClicked);
-
-		m_BackButton.SetPosition(buttonPos);
-		m_BackButton.SetButttonClickEvent([](void* userData) {
-			Application::GetCurrentApp()->SetNextMenu(Menu::MainMenu, userData);
-			});
-
-		constexpr int nEscapeKey = 256;
-		m_BackButton.SetOptionalKey(nEscapeKey);
-	}
-
-#if 1
-	//Restart button
-	{
-		const glm::vec2 sizeDefault = { 105,105 };
-		const glm::vec4 colDefault = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		const glm::vec2 sizeClick = { 105, 105 };
-		const glm::vec4 colClick = { 1.0f, 1.0f, 1.0f, 1.0f };
-		const glm::vec3 buttonPos = { Application::GetWidth() - 270, 110, 0.8f };
-
-		ButtonProps propDefault;
-		propDefault.SetBasicProps(UITypes::ButtonRestart, sizeDefault, colDefault);
-		propDefault.SetTextProps("", { 40,-20 }, 0.5, { 1,1,1,1 });
-
-		ButtonProps propClick;
-		propClick.SetBasicProps(UITypes::ButtonRestart_S, sizeClick, colClick);
-		propClick.SetTextProps("", { 40,-20 }, 0.5, { 1,1,1,1 });
-
-		m_restartButton.SetStateProperties(propDefault, Button::StateDefault);
-		m_restartButton.SetStateProperties(propClick, Button::StateSelected);
-		m_restartButton.SetStateProperties(propClick, Button::StateClicked);
-
-		m_restartButton.SetPosition(buttonPos);
-		m_restartButton.SetButttonClickEvent([](void* userData) {
-			Application::GetCurrentApp()->SetNextMenu(Menu::None, userData);
-			});
-
-		constexpr int nRestart = 'R';	//glfw returns ascii value of the capital letter even if caps lock is turned off
-		m_restartButton.SetOptionalKey(nRestart);
-		m_restartButton.SetIsActive(false);
-	}
-#endif
-
 	//Get the fade out layer to play an animation when the player dies
 	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
 	for (Layer* pLayer : layers)
 	{
-		FadeoutScreenLayer* pFadeLayer = dynamic_cast <FadeoutScreenLayer*> (pLayer);
-		if (pFadeLayer)
+		if (!m_pFadeoutLayer)
 		{
-			m_pFadeoutLayer = pFadeLayer;
-			break;
+			FadeoutScreenLayer* pFadeLayer = dynamic_cast <FadeoutScreenLayer*> (pLayer);
+			if (pFadeLayer)
+			{
+				m_pFadeoutLayer = pFadeLayer;
+			}
+		}
+		if (!m_pBlockSpawnerLayer)
+		{
+			BlockSpawnerLayer* pBlockLayer = dynamic_cast <BlockSpawnerLayer*> (pLayer);
+			if (pBlockLayer)
+			{
+				m_pBlockSpawnerLayer = pBlockLayer;
+			}
+		}
+		if (!m_pPlayerLayerUI)
+		{
+			NormalPlayerLayerUI* pPlayerLayerUI = dynamic_cast<NormalPlayerLayerUI*> (pLayer);
+			if (pPlayerLayerUI)
+			{
+				m_pPlayerLayerUI = pPlayerLayerUI;
+			}
 		}
 	}
 
@@ -115,20 +84,30 @@ void NormalPlayerLayer::OnStart()
 		m_pFadeoutLayer->SetAlphaRange({ 0.0f, 0.7f });
 		m_pFadeoutLayer->SetAnimationTime(0.9f);
 		m_pFadeoutLayer->SetColor({0.0f, 0.0f, 0.0f});
-
-		//m_pFadeoutLayer->SetOptionalWaitTimeBeforeCallback(0.8f);
-		//m_pFadeoutLayer->SetOptionalCallback([](void * userData)
-		//	{
-		//		LOG_INFO("Testing Calback");
-		//	});
 	}
 	else
 	{
 		LOG_WARN("Fade out layer was not found");
 	}
 
+
+	if (!m_pBlockSpawnerLayer)
+	{
+		LOG_WARN("Block spawner layer was not found in normal player layer");
+	}
+
+	if (!m_pPlayerLayerUI)
+	{
+		LOG_WARN("normal player layer UI was not found in normal player layer");
+
+	}
+	
 	NormalPlayerLayer::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//																			//
+//////////////////////////////////////////////////////////////////////////////
 
 void NormalPlayerLayer::OnUpdate(float deltaTime)
 {
@@ -136,74 +115,120 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 	{
 		AbstractPlayerLayer::OnUpdate(deltaTime);
 
-		if (!m_bCanCollide && !m_bIsColliding && Application::GetGameTime() > m_dNextCollideTime)
+		double dCurrentTime = Application::GetGameTime();
+		if (!m_bCanCollide && !m_bIsColliding && dCurrentTime > m_dNextCollideTime)
 		{
 			m_bCanCollide = true;
 			m_vCol = { 0.5, 0.4, 0.8,1.0 };
 		}
+
+		//Phase time
+		if (m_dPhaseTimeRemaining < m_dTotalPhaseTime && m_dNextPhaseRegenTime > 0 && dCurrentTime > m_dNextPhaseRegenTime)
+		{
+			bool bCantPhase = (m_dPhaseTimeRemaining < 0.0);
+			m_dPhaseTimeRemaining += deltaTime / m_dTimeTakenToRegen;
+			if (m_dPhaseTimeRemaining > m_dTotalPhaseTime)
+			{
+				m_dPhaseTimeRemaining = m_dTotalPhaseTime;
+			}
+
+			if (bCantPhase && m_dPhaseTimeRemaining > 0.0)
+			{
+				//it just went from -ve to +ve... Recalculate the phase
+				double x, y;
+				Application::GetCurrentApp()->GetMousePos(x, y);
+				m_pBlockSpawnerLayer->RecalculateBlockPhase((float)x);
+			}
+		}
+
 		//Score
 		m_dScore += deltaTime;
-		if (m_dScore >= 0)
-		{
-			char buffer[10];
-			std::snprintf(buffer, 10, "%.1f", m_dScore);
-			Renderer::DrawTextColor(buffer, 10, m_vScorePos, m_fScoreScale, m_vScoreCol);
-		}
+		
 		//Render player
 		RendererShapes::Rectangle(m_Vertex, m_vPos, m_vSize, m_vCol);
 		Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
 
-		constexpr float blockSpeedIncreaseTime = 1.25f;	//Time taken to increase the block speed by 1
-		g_fBlockSpeed += deltaTime / blockSpeedIncreaseTime;
+		constexpr float blockSpeedMultiplier = 1.0f / 0.75f;	//denominator is the Time taken to increase the block speed by 1 unit
+		g_fBlockSpeed += deltaTime * blockSpeedMultiplier;
 		m_dApparantVelocityX = g_fBlockSpeed;
 	}
 	else
 	{
-		constexpr float textScale = 0.8f;
-		const glm::vec4 textCol = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		//Player has died, Only show the score
-		char buffer[20];
-		std::snprintf(buffer, 20, "Score: %.1f", m_dScore);
-		Renderer::DrawTextColor(buffer, 20, m_vScorePos, textScale, textCol);
+		
 	}
 }
 
 void NormalPlayerLayer::TakeDamage(double damage)
 {
-	if (m_bCanCollide)
+	if (m_bCanCollide && !m_bStartedPhasing)
 	{
 		m_bCanCollide = false;
 		m_bIsColliding = true;
 		m_vCol = { 1.0, 81.0/255, 81.0/255, 0.7 };
-		//m_vCol = { 0.5, 0.4, 0.8,0.4 };
-		//m_vCol = { 154.0 / 255, 0.0f, 1.0f,0.37f };
+
 		//Take damage
 		m_nLivesUsed++;
-		SetSpeedOnDamage();
+
+		if (m_pPlayerLayerUI)
+		{
+			m_pPlayerLayerUI->SetLifeUI();
+		}
+		if (m_nLivesUsed < PlayerLives)
+		{
+			AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
+			AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
+			AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
+			AbstractPlayerLayer::RecalculateAngularVelocity();
+		}
+		else
+		{
+			NormalPlayerLayer::Die(); // no more lives
+		}
 	}
 }
 
-void NormalPlayerLayer::SetSpeedOnDamage()
-{
-	if (m_nLivesUsed < PlayerLives)
-	{
-		AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nLivesUsed].x;
-		AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nLivesUsed].y;
-		AbstractPlayerLayer::m_vSize = m_vSizes[m_nLivesUsed];
-		AbstractPlayerLayer::RecalculateAngularVelocity();
-	}
-	else
-	{
-		NormalPlayerLayer::Die(); // no more lives
-	}
-}
 void NormalPlayerLayer::TakeNoDamage()
 {
 	if (m_bIsColliding)
 	{
 		m_bIsColliding = false;
 		m_dNextCollideTime = Application::GetGameTime() + m_dImmunityTime;
+	}
+	
+	if (m_dNextPhaseRegenTime < 0)
+	{
+		//Player just finished a phase (time mightve ran out so we cant use m_bIsCollididng as he mightve phased and then midway collided)
+		m_bStartedPhasing = false;
+		constexpr double dWaitTimeBeforeRegen = 5;
+		m_dNextPhaseRegenTime = Application::GetGameTime() + dWaitTimeBeforeRegen;
+	}
+}
+
+void NormalPlayerLayer::TakePhaseDamage()
+{
+	m_bStartedPhasing = true;
+
+	if (!m_bCanCollide) { return; }
+
+	float deltaTime = Application::GetCurrentApp()->GetDeltaTime();
+
+	m_dNextPhaseRegenTime = -1;	//prevents regen
+
+	//small negative value instead of exactly 0.0 so that the CanPhase check ( x > 0) consistantly works
+
+	bool bCanPhase = (m_dPhaseTimeRemaining > 0);
+	m_dPhaseTimeRemaining -= deltaTime;
+	if (m_dPhaseTimeRemaining <= -0.05)
+	{
+		m_dPhaseTimeRemaining = -0.05;
+	}
+
+	if (m_pBlockSpawnerLayer && bCanPhase && m_dPhaseTimeRemaining <= 0.0)
+	{
+		//it just went from +ve to -ve... Recalculate the phase
+		double x, y;
+		Application::GetCurrentApp()->GetMousePos(x, y);
+		m_pBlockSpawnerLayer->RecalculateBlockPhase((float)x);
 	}
 }
 
@@ -214,13 +239,19 @@ void NormalPlayerLayer::Die()
 	{
 		m_pFadeoutLayer->BeginFading();
 	}
-	m_restartButton.SetIsActive(true);
-
-
-	constexpr float percentX = 500.0f / 1600.0f;
-	constexpr float percentY = 670.0f / 1200.0f;
-	m_vScorePos.x = Math::Lerp(0, Application::GetWidth(), percentX);
-	m_vScorePos.y = Math::Lerp(0, Application::GetHeight(), percentY);
+	
+	if (m_pPlayerLayerUI)
+	{
+		m_pPlayerLayerUI->PlayerHasDied();
+	}
+	//Invalidate position
+	m_vPos = { -1000.0f, -1000.0f, 0.0f };
+	RendererShapes::Rectangle(m_Vertex, m_vPos, m_vSize, m_vCol);
+	
+	if (m_pPlayerLayerUI)
+	{
+		m_pPlayerLayerUI->SetLifeUI();
+	}
 }
 
 void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
@@ -230,30 +261,7 @@ void NormalPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 
 bool NormalPlayerLayer::OnWindowResize(int x, int y)
 {
-	{
-		float posX = x - 120.0f;
-		if (posX < 20) { posX = 20; }
+	AbstractPlayerLayer::OnWindowResize(x, y);
 
-		const glm::vec3 buttonPos = { posX, 110, 0.8f };
-		m_BackButton.SetPosition(buttonPos);
-	}
-	{
-		float posX = x - 270.0f;
-		if (posX < 20) { posX = 20; }
-		const glm::vec3 buttonPos = { posX, 110, 0.8f };
-		m_restartButton.SetPosition(buttonPos);
-	}
-	if (m_bIsAlive)
-	{
-		m_vScorePos.x = x - 280.0f;
-		m_vScorePos.y = y - 140.0f;
-	}
-	else
-	{
-		constexpr float percentX = 500.0f / 1600.0f;
-		constexpr float percentY = 670.0f / 1200.0f;
-		m_vScorePos.x = Math::Lerp (0, x, percentX);
-		m_vScorePos.y = Math::Lerp(0, y, percentY);
-	}
 	return false;
 }

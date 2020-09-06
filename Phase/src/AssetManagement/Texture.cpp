@@ -3,8 +3,7 @@
 #include <GL/glew.h>
 #include <stb_image.h>
 #include "Log.h"
-
-std::string g_strCurrentDirectory;
+#include "Constants.h"
 
 TextureProperties::TextureProperties() :
 	m_nMinFilter(GL_LINEAR),

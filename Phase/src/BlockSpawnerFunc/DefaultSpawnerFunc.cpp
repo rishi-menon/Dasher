@@ -18,10 +18,10 @@ static const glm::vec4 s_standardCol[s_nBlockColCount] =
 };
 static const glm::vec2 s_standardPhase[s_nBlockColCount] =
 {
-	{0.05,0.3},
-	{0.05,0.3},
-	{0.7, 0.95 },
-	{0.7, 0.95 }
+	{0.0,0.25},
+	{0.0,0.25},
+	{0.75, 1.0 },
+	{0.75, 1.0 }
 };
 
 static void CreateBlocksGeneric(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase, bool* bDirections, int nBlockCount);
@@ -30,13 +30,13 @@ static void CreatePhasableOnly(CircularQueue<Block>& blocks, double& nextSpawnTi
 
 void DefaultSpawnerFunc(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase)
 {
-	constexpr float fPercPhaseOnly = 10.0f;
-	constexpr float fPercGroup3 = 60.0f + fPercPhaseOnly;	//65% chance of creating a 3 group block
-	constexpr float fPercGroup4 = 30.0f + fPercGroup3;	
+	constexpr float fPercPhaseOnly = 25.0f;
+	constexpr float fPercGroup3 = 55.0f + fPercPhaseOnly;	//% chance of creating a 3 group block
+	constexpr float fPercGroup4 = 20.0f + fPercGroup3;	
 	
 	//for percentage, the sum of all the variables should be 100, but this formula would work for non 100 sum numbers as well. (It would be 65 parts of the total chance of happening instead of 65%)
 
-	float fPart = Random::Rand() * fPercGroup4;
+	float fPart = static_cast<float>(Random::Rand() * fPercGroup4);
 
 	if (fPart <= fPercPhaseOnly)
 	{
@@ -141,8 +141,8 @@ static void CreateBlocksGeneric(CircularQueue<Block>& blocks, double& nextSpawnT
 static void CreatePhasableOnly(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase)
 {
 	const glm::vec2 sizeX = { 80, 100 };
-	constexpr float fDistanceBeforeSpawn = 400.0f;
-	constexpr float fDistToNextSpawn = 900.0f;
+	constexpr float fDistanceBeforeSpawn = 100.0f;
+	constexpr float fDistToNextSpawn = 800.0f;
 	
 	const int width = Application::GetWidth();
 
@@ -150,8 +150,12 @@ static void CreatePhasableOnly(CircularQueue<Block>& blocks, double& nextSpawnTi
 	if (index == s_nBlockColCount) { index--; }
 
 	 
-	float sizeY1 = Random::Rand(350 - 150, 350 + 150);
-	float sizeY2 = 700.0f - sizeY1;	//700 fills the entire screen 
+	float peak = Application::GetHeight() * 700.0f/1200.0f;
+
+	float sizeY1 = static_cast<float>(peak*Random::Rand(0.5 - 0.1, 0.5 + 0.1));
+	float sizeY2 = peak - sizeY1;	//700 fills the entire screen 
+
+	const glm::vec2 sizeY = { Application::GetHeight()*300.0f/1200.0f, Application::GetHeight()*475.0f/1200.0f };
 
 	for (char i = 0; i < 2; i++)
 	{

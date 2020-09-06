@@ -14,47 +14,72 @@ bool StandardTextureInit()
 	
 
 	//Background images have to be loaded with GL_REPEAT so that they loop back
-	unsigned int id = Texture::LoadTexture("Assets/Textures/External/bg1.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	const char* path = "Assets/Textures/External/bg1.png";
+	unsigned int id = Texture::LoadTexture(path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 	mapStandardTexture.emplace(StandardTexture::Background1, id);
 
 	if (id == (unsigned int)(-1)) 
 	{ 
-		LOG_CLIENT_ERROR("Could not find image: Assets/Textures/External/bg1.png");
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
 		return false; 
 	}
 	
-	id = Texture::LoadTexture("Assets/Textures/External/bg2.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	path = "Assets/Textures/External/bg2.png";
+	id = Texture::LoadTexture(path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 	mapStandardTexture.emplace(StandardTexture::Background2, id);
 
 	if (id == (unsigned int)(-1))
 	{
-		LOG_CLIENT_ERROR("Could not find image: Assets/Textures/External/bg2.png");
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
 		return false;
 	}
 
-	id = Texture::LoadTexture("Assets/Textures/External/bg3.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	path = "Assets/Textures/External/bg3.png";
+	id = Texture::LoadTexture(path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 	mapStandardTexture.emplace(StandardTexture::Background3, id);
 	if (id == (unsigned int)(-1))
 	{
-		LOG_CLIENT_ERROR("Could not find image: Assets/Textures/External/bg3.png");
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
 		return false;
 	}
 
-	id = Texture::LoadTexture("Assets/Textures/External/bg4.png", nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	path = "Assets/Textures/External/bg4.png";
+	id = Texture::LoadTexture(path, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 	mapStandardTexture.emplace(StandardTexture::Background4, id);
 	if (id == (unsigned int)(-1))
 	{
-		LOG_CLIENT_ERROR("Could not find image: Assets/Textures/External/bg4.png");
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
 		return false;
 	}
 
 	/////////////////////////////////////////////////////////////////////////
 
-	id = Texture::LoadTexture("Assets/Textures/SpecialEffect0.png");
+	path = "Assets/Textures/UI/LifeFull.png";
+	id = Texture::LoadTexture(path);
+	mapStandardTexture.emplace(StandardTexture::LifeFull, id);
+	if (id == (unsigned int)(-1))
+	{
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
+		return false;
+	}
+
+	path = "Assets/Textures/UI/LifeEmpty.png";
+	id = Texture::LoadTexture(path);
+	mapStandardTexture.emplace(StandardTexture::LifeEmpty, id);
+	if (id == (unsigned int)(-1))
+	{
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
+		return false;
+	}
+
+	/////////////////////////////////////////////////////////////////////////
+
+	path = "Assets/Textures/SpecialEffect0.png";
+	id = Texture::LoadTexture(path);
 	mapStandardTexture.emplace(StandardTexture::SpecialEffect0, id);
 	if (id == (unsigned int)(-1))
 	{
-		LOG_CLIENT_ERROR("Could not find image: Assets/Textures/SpecialEffect0.png");
+		LOG_CLIENT_ERROR("Could not find image: {0}", path);
 		return false;
 	}
 

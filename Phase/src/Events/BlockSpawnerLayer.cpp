@@ -11,50 +11,6 @@
 
 #include "BlockSpawnerFunc/DefaultSpawnerFunc.h"
 
-#if 0
-static void CreateBlockDefault(Block& newBlock, double& nextSpawnTime, double curPhase)
-{
-	//spawn blocks
-	const glm::vec2 timeBwSpawn = { 1.4f, 2.2f };
-
-	//size
-	const glm::vec2 sizeX = { 80, 100 };
-	const glm::vec2 sizeY = { 300, 500 };
-
-	if (Random::Rand() >= 0.5)
-	{
-		//newBlock Top
-		newBlock.position = { Application::GetWidth(), Application::GetHeight() - 2, 0.1 };
-		//Negative sign so that the triangle appears upside down
-		newBlock.scale = { Random::Rand(sizeX.x, sizeX.y), -Random::Rand(sizeY.x, sizeY.y), 1 };
-	}
-	else
-	{
-		//newBlock bottom
-		Application* pApp = Application::GetCurrentApp();
-		newBlock.position = { pApp->GetWidth(), 2, 0.1 };
-		newBlock.scale = { Random::Rand(sizeX.x, sizeX.y), Random::Rand(sizeY.x, sizeY.y), 1 };
-	}
-
-	newBlock.velocity = { -400, 0, 0 };
-	newBlock.color = { 0.0,0.4,0.79,1.0 };
-	newBlock.shape = RendererShapes::ShapeTriangleRegular;
-	newBlock.phaseRange = { 0.0, 0.2 };
-
-	if (newBlock.phaseRange.x <= curPhase && newBlock.phaseRange.y >= curPhase)
-	{
-		newBlock.isPhasable = true;
-		newBlock.color.a = 0.5f;
-	}
-	else
-	{
-		newBlock.isPhasable = false;
-		newBlock.color.a = 1.0f;
-	}
-	nextSpawnTime = Application::GetGameTime() + Random::Rand(timeBwSpawn.x, timeBwSpawn.y);
-}
-#endif
-
 BlockSpawnerLayer::BlockSpawnerLayer() :
 	m_pPlayerLayer (nullptr),
 	m_dNextSpawnTime (0.0),
@@ -152,6 +108,7 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 
 	bool playerCollided = false;
 	bool checkCollision = true;
+
 	for (unsigned int i = 0; i < m_blocks.Count(); i++)
 	{
 		//Update the block's position
@@ -174,16 +131,23 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 			{
 				checkCollision = false;
 			} 
-			else if (!curBlock.isPhasable && Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, 3))
+			else if (Collision::CheckCollision(playerVertex, nPlayerVertexCount, blockVertex, 3))
 			{
 				playerCollided = true;
 				m_bPreviousCollided = true;
-				m_pPlayerLayer->TakeDamage(10);
+				if (!curBlock.isPhasable)
+				{
+					
+					m_pPlayerLayer->TakeDamage(10);
+				}
+				else
+				{
+					m_pPlayerLayer->TakePhaseDamage();
+				}
 			}
 		}
 
 		//Render
-		//Renderer::DrawQuadColor(blockVertex, curBlock.shape);
 		Renderer::DrawQuadTexture(blockVertex, curBlock.shape, m_nBlockTextureId);
 		index = (index + 1) % m_blocks.Size();
 	}
@@ -195,20 +159,27 @@ void BlockSpawnerLayer::MoveCollisionRenderBlocks(float deltaTime)
 	}
 }
 
-bool BlockSpawnerLayer::OnMouseMove(int x, int y)
+void BlockSpawnerLayer::RecalculateBlockPhase(float mousePosX)
 {
-	if (!m_pPlayerLayer) { ASSERT(false, "PlayerLayer was null"); return false; }
-
-	//Recalculate phasable blocks
 	int index = m_blocks.Begin();
 	Block* buffer = m_blocks.Buffer();
 
-	m_dCurPhasePercent = Math::GetPercent(0, Application::GetWidth(), x);
+	if (!m_pPlayerLayer) { ASSERT(false, "PlayerLayer was null"); return; }
 
+	bool bPlayerCanPhase = m_pPlayerLayer->CanPhase();
+
+	if (bPlayerCanPhase)
+	{
+		m_dCurPhasePercent = Math::GetPercent(0, Application::GetWidth(), mousePosX);
+	}
+	else
+	{
+		m_dCurPhasePercent = -1;	//invalid so that new blocks that are created will never be phasable
+	}
 	for (unsigned int i = 0; i < m_blocks.Count(); i++)
 	{
 		Block& curBlock = buffer[index];
-		if (curBlock.phaseRange.x <= m_dCurPhasePercent && curBlock.phaseRange.y >= m_dCurPhasePercent)
+		if (bPlayerCanPhase && curBlock.phaseRange.x <= m_dCurPhasePercent && curBlock.phaseRange.y >= m_dCurPhasePercent)
 		{
 			curBlock.isPhasable = true;
 			curBlock.color.a = 0.5f;
@@ -220,6 +191,11 @@ bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 		}
 		index = (index + 1) % m_blocks.Size();
 	}
+}
+bool BlockSpawnerLayer::OnMouseMove(int x, int y)
+{
+	//Recalculate phasable blocks
+	RecalculateBlockPhase(x);
 	return false;
 }
 

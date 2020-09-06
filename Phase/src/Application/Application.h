@@ -39,6 +39,8 @@ public:
 	inline static void SetWidth(int nWidth)   { m_nWidth = nWidth; }
 	inline static void SetHeight(int nHeight) { m_nHeight = nHeight; }
 
+	inline float GetDeltaTime() const { return static_cast<float>(m_dDeltaTime); }
+
 	bool Initialise(int nWidth, int nHeight, const char* const strTitle);
 	void Run();
 
@@ -49,6 +51,8 @@ public:
 	inline void SetNextMenu(Menu menu, void* userData) { m_NextMenu = menu; m_NextMenuUserData = userData; }
 
 	inline void GetMousePos(double& x, double& y) const { glfwGetCursorPos(m_pWindow, &x, &y); y = m_nHeight - y; }
+
+	inline GLFWwindow* GetWindowGLFW () { return m_pWindow; }
 
 private:
 	void Cleanup();
@@ -72,6 +76,7 @@ private:
 
 	double m_dCurrentTime;
 	double m_dDeltaTime;
+	double m_dGameLastSleepTime;
 
 	std::vector<Layer*> m_vLayers;
 	//create a vector for each event callback. The vector stores the index position in the actual m_vLayers array. When the event occurs, the corresponding OnEvent function will be called for all the layers stored in the corresponding index array.

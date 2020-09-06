@@ -490,7 +490,7 @@ void Renderer::DrawTextColor(const char* const strText, int nSize, float PosX, f
 	}
 	else if (nSize == -1)
 	{ 
-		nSize = mystrlen(strText);
+		nSize = StringHelper::mystrlen(strText);
 	}
 
 	if (!font) { font = &data.fontDefault; }
@@ -526,7 +526,7 @@ void Renderer::DrawTextColor(const char* const strText, int nSize, float PosX, f
 	}
 	else if (nSize == -1)
 	{
-		nSize = mystrlen(strText);
+		nSize = StringHelper::mystrlen(strText);
 	}
 
 	if (!font) { font = &data.fontDefault; }

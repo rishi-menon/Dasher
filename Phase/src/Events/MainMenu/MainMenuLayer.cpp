@@ -141,12 +141,12 @@ void MainMenuLayer::OnStart()
 	//Show Trajectory Push Button
 	{
 		//Aspect ratio of the image 
-		const TextureDimensions& dim = UI::GetTextureDimension(UITypes::PushButton0);
+		const TextureDimensions& dim = UI::GetTextureDimension(UITypes::PushButton1);
 		float ar = static_cast<float>(dim.height) / static_cast<float>(dim.width);
-		float width = 100;
-		m_pbShowTrajectory.SetStateProperties(false, PushButtonProps(UITypes::PushButton0, { width, width * ar }, { 1,1,1,1 }));
+		float width = 65;
+		m_pbShowTrajectory.SetStateProperties(false, PushButtonProps(UITypes::PushButton1, { width, width * ar }, { 1,1,1,1 }));
 
-		m_pbShowTrajectory.SetStateProperties(true, PushButtonProps(UITypes::PushButton0_E, { width, width * ar }, { 1,1,1,1 }));
+		m_pbShowTrajectory.SetStateProperties(true, PushButtonProps(UITypes::PushButton1_E, { width, width * ar }, { 1,1,1,1 }));
 
 		glm::vec3 pos = { m_ShowTrajTextPos.x + m_ShowTrajPushButtonOffset.x,
 						  m_ShowTrajTextPos.y + m_ShowTrajPushButtonOffset.y,

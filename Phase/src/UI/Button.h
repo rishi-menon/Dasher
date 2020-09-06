@@ -42,6 +42,7 @@ public:
 public:
 	Button();
 	Button(const Button&) = default;
+	virtual ~Button() {}
 
 	//Events
 	virtual void OnUpdate(float deltaTime) override;

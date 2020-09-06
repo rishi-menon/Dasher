@@ -49,6 +49,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			nextSpawnTime = -10;	//forces an object to never spawn
 			break;
 		}
+#if 0
 		case TutorialStage::PlayWarningCollision:
 		{
 			constexpr int nMaxBlocks = 2;
@@ -81,6 +82,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 			nextSpawnTime = -10;	//forces an object to never spawn
 			break;
 		}
+#endif
 		case TutorialStage::PlayPhasing:
 		{
 
@@ -105,11 +107,24 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 						posY = Application::GetHeight() - 2;
 						newBlock.scale = { 90, -scaleY, 1 };
 					}
-					newBlock.position = { width + 850*j, posY, 0.1f };
-					newBlock.velocity = { -400, 0, 0 };
-					newBlock.color = { 0.0,0.4,0.79,1.0 };
+					newBlock.position = { width + 1800*j, posY, 0.1f };
+					newBlock.velocity = { -400, 0, 0 }; 
+
+					if (!(j % 2))
+					{
+						//0 and 2: Blue
+						newBlock.color = { 0.0f, 0.4f, 0.79f, 1.0f };
+						newBlock.phaseRange = { 0.0,0.25 };
+					}
+					else
+					{
+						//Red
+						newBlock.color = { 1.0f, 65.0f / 255.0f, 65.0f / 255.0f, 1.0f };
+						newBlock.phaseRange = { 0.75, 1.0 };
+					}
 					newBlock.shape = RendererShapes::ShapeTriangleRegular;
 					
+#if 0
 					switch (j)
 					{
 						case 0:
@@ -133,7 +148,7 @@ void TutorialSpawnerFunc(CircularQueue<Block>& blocksQueue, double& nextSpawnTim
 							break;
 						}
 					}
-					
+#endif
 					newBlock.isPhasable = (newBlock.phaseRange.x <= curPhase && newBlock.phaseRange.y >= curPhase);
 
 				}

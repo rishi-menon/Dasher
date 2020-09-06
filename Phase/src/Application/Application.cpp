@@ -15,6 +15,7 @@
 #include "Events/Layer.h"
 #include "Events/Player/ZenPlayerLayer.h"
 #include "Events/Player/NormalPlayerLayer.h"
+#include "Events/Player/NormalPlayerLayerUI.h"
 
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
@@ -26,6 +27,8 @@
 #include "Events/Tutorial/TutorialPlayerLayer.h"
 #include "Events/Tutorial/TutorialBlockSpawnerLayer.h"
 
+#include "CommandLineFeatures.h"
+#include "Constants.h"
 
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
@@ -37,6 +40,8 @@ Application::Application() :
 	m_pWindow(nullptr),
 	m_dCurrentTime (0),
 	m_dDeltaTime (0),
+	m_dGameLastSleepTime (0),
+
 	m_CurMenu (Menu::MainMenu),
 	m_NextMenu (Menu::MainMenu),
 	m_NextMenuUserData (nullptr)
@@ -51,6 +56,19 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	m_vLayers.reserve(10);
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+#ifdef RM_OPENGL_CORE_PROFILE
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+
+#ifdef RM_WINDOW_NO_RESIZE
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+#endif
+
 	m_pWindow = glfwCreateWindow(nWidth, nHeight, strTitle, nullptr, nullptr);
 	if (!m_pWindow)
 	{
@@ -64,6 +82,11 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	if (glewInit() != GLEW_OK)
 	{
 		ASSERT(false, "Could not initialise GLEW");
+		return false;
+	}
+
+	if (CommandLineFeatures::ParseCommandLineAfterGlew(g_argc, g_argv))
+	{
 		return false;
 	}
 
@@ -91,7 +114,7 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		return false;
 	}
 
-	m_NextMenu = Menu::MainMenu;
+	m_NextMenu = Menu::TutorialMode;
 	ChangeMenuState();
 
 	return true;
@@ -103,12 +126,12 @@ void Application::InsertLayer(Layer* pLayer)
 	std::vector<Layer*>::iterator it = std::find(m_vLayers.begin(), m_vLayers.end(), pLayer);
 	if (it != m_vLayers.end())
 	{
-		int index = it - m_vLayers.begin();
+		int index = static_cast<int>(it - m_vLayers.begin());
 		ASSERT(false, "Layer is already inserted");
 	}
 	else
 	{
-		int index = m_vLayers.size();
+		int index = static_cast<int>(m_vLayers.size());
 		m_vLayers.push_back (pLayer);
 		pLayer->RegisterEvents(this, index);
 	}
@@ -130,33 +153,30 @@ void Application::RegisterEvents(Layers layerId, LayerIndex index)
 
 void Application::Run()
 {
-	const float fCol = 0.18f;
+	const float fCol = 0.0f;
 	glClearColor(fCol, fCol, fCol, 1);
 
-	const double dMaxDeltaTime = 1.0/10.0;
+	const double dMaxDeltaTime = 1.0/30.0;
 
-	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	constexpr int nRegularSleepMils = 1;	//mils = milliseconds
+	constexpr int nGameSecondsBeforeSleep = 2;
+	constexpr int nGameSleepMils = 2;
+	
+	std::chrono::milliseconds chronoRegularSleep(nRegularSleepMils);
+	std::chrono::milliseconds chronoGameSleep(nGameSleepMils);
 
-	//unsigned int w, h;
-	//unsigned int idd = Texture::LoadTexture("Assets/Textures/UI/Button0.png", &w, &h);
+	double dCurrentTime;
 
-	//float width = 450;
-	//float height = 120;
-	//RendererVertex v[4];
-	//v[0].SetPosColTex({ 20, 20, 0 },				{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 0 });
-	//v[1].SetPosColTex({ 20+width, 20, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 0 });
-	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
-	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
-
-	while (!glfwWindowShouldClose (m_pWindow))
+	while (!glfwWindowShouldClose(m_pWindow))
 	{
-		double dCurrentTime = glfwGetTime();
+		dCurrentTime = glfwGetTime();
 		m_dDeltaTime = dCurrentTime - m_dCurrentTime;	//in seconds
 		m_dCurrentTime = dCurrentTime;
 		if (m_dDeltaTime > dMaxDeltaTime)
 		{
 			m_dDeltaTime = dMaxDeltaTime;
 		}
+
 		//clear screen
 		glcall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
@@ -167,7 +187,7 @@ void Application::Run()
 			{
 				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
 			}
-			for (unsigned int i = g_nUILayerIndex+1; i < m_vLayers.size(); i++)
+			for (unsigned int i = g_nUILayerIndex + 1; i < m_vLayers.size(); i++)
 			{
 				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
 			}
@@ -177,12 +197,9 @@ void Application::Run()
 		{
 			for (Layer* pLayer : m_vLayers)
 			{
-				pLayer->OnUpdate((float)m_dDeltaTime);	
+				pLayer->OnUpdate((float)m_dDeltaTime);
 			}
 		}
-
-
-		//Renderer::DrawQuadTexture(v, RendererShapes::Shape::ShapeQuad, idd);
 
 		//Change the menu mode if applicable
 		if (m_CurMenu != m_NextMenu) { ChangeMenuState(); }
@@ -190,12 +207,21 @@ void Application::Run()
 		Renderer::Flush();
 
 		glfwSwapBuffers(m_pWindow);
-		glfwPollEvents(); 
+		glfwPollEvents();
 
-		if (m_dDeltaTime < 1.0 / 70.0)
+		//Sleep
+		if (m_CurMenu == Menu::NormalMode || m_CurMenu == Menu::ZenMode || m_CurMenu == Menu::TutorialMode)
 		{
-			std::chrono::microseconds sleepDuration(100);
-			std::this_thread::sleep_for(sleepDuration);
+			if (dCurrentTime > m_dGameLastSleepTime)
+			{
+				//while running the game sleep
+				std::this_thread::sleep_for(chronoGameSleep);
+				m_dGameLastSleepTime = dCurrentTime + nGameSecondsBeforeSleep;
+			}
+		}
+		else
+		{
+			std::this_thread::sleep_for(chronoRegularSleep);
 		}
 	}
 
@@ -221,9 +247,11 @@ void Application::Cleanup()
 void Application::ClearLayers()
 {
 	std::vector <Layer*>& vec = m_vLayers;
-	for (int i = vec.size() - 1; i >= 0; i--)
+	//Do not change to std::size_t as it is unsigned and the for loop breaks when the value becomes negative
+	for (int i = (int)(vec.size() - 1); i >= 0; i--)
 	{
-		delete vec[i];
+		if (vec[i])
+			delete vec[i];
 	}
 	m_vLayers.clear();
 
@@ -317,6 +345,8 @@ void Application::StartMenuNormalMode()
 	InsertLayer(new NormalPlayerLayer);
 	InsertLayer(new BlockSpawnerLayer);
 	InsertLayer(new FadeoutScreenLayer);
+	InsertLayer(new NormalPlayerLayerUI);
+
 	OnStart();
 }
 void  Application::StartMenuZenMode()
@@ -335,6 +365,7 @@ void  Application::StartMenuTutorialMode()
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps(StandardTexture::Background4)));
 	InsertLayer(new TutorialPlayerLayer);
 	InsertLayer(new TutorialBlockSpawnerLayer);
+	InsertLayer(new NormalPlayerLayerUI);
 	OnStart();
 }
 void  Application::StartMenuCredits()

@@ -22,8 +22,8 @@ ZenPlayerLayer::ZenPlayerLayer() :
 	m_vAngularVelocities[0] = { 1, 6 };
 	m_vSizes[0] = { 70, 70 };
 
-	m_vAngularVelocities[1] = { 3, 8 };
-	m_vSizes[1] = { 45, 45 };
+	//m_vAngularVelocities[1] = { 3, 8 };
+	//ßm_vSizes[1] = { 45, 45 };
 
 	AbstractPlayerLayer::m_dAngVelocityMin = m_vAngularVelocities[m_nCurrentSpeed].x;
 	AbstractPlayerLayer::m_dAngVelocityMax = m_vAngularVelocities[m_nCurrentSpeed].y;
@@ -112,6 +112,7 @@ void ZenPlayerLayer::TakeNoDamage()
 
 bool ZenPlayerLayer::OnWindowResize(int x, int y)
 {
+	AbstractPlayerLayer::OnWindowResize(x, y);
 	float posX = x - 120.0f;
 	if (posX < 20) { posX = 20; }
 

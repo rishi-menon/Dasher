@@ -22,6 +22,14 @@ void WindowResizeCallback(GLFWwindow* pWindow, int nWidth, int nHeight)
 		}
 
 	}
+
+	#ifdef RM_MAC
+		//mac has this weird issue where the renderer draws only on part of the screen when resizing
+		int x, y;
+		glfwGetWindowPos (pWindow, &x, &y);
+		glfwSetWindowPos(pWindow, x+1, y);
+		glfwSetWindowPos(pWindow, x, y);
+	#endif
 }
 
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)

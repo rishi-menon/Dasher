@@ -26,9 +26,6 @@ enum class TutorialStage : int
 	TextFriendlySpikes,
 	PlayFriendlySpikes,
 
-	TextWarningCollision,
-	PlayWarningCollision,
-
 	TextPhasing,
 	PlayPhasing,
 	TextTutorialOver,
@@ -59,6 +56,7 @@ public:
 private:
 	void CreateStages();
 	void StartCurrentStage();
+	void ShowPhaseRange();
 
 private:
 	TutorialPlayerLayer* m_pTutorialPlayer;

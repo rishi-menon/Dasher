@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 
-extern std::string g_strCurrentDirectory;
-
 struct TextureProperties
 {
 	TextureProperties();

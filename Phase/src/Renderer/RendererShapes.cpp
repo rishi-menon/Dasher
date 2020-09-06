@@ -35,6 +35,27 @@ namespace RendererShapes
 			outQuad[i].m_col = col;
 		}
 	}
+	void RectangleBottomLeft(RendererVertex outQuad[4], const glm::vec3& posBottomLeft, const glm::vec2& size, const glm::vec4& col)
+	{
+		//Set the position
+		outQuad[0].m_pos = { posBottomLeft.x, posBottomLeft.y, posBottomLeft.z };
+		outQuad[1].m_pos = { posBottomLeft.x + size.x, posBottomLeft.y, posBottomLeft.z };
+		outQuad[2].m_pos = { posBottomLeft.x + size.x, posBottomLeft.y + size.y, posBottomLeft.z };
+		outQuad[3].m_pos = { posBottomLeft.x, posBottomLeft.y + size.y, posBottomLeft.z };
+
+		outQuad[0].m_textureCoord = { 0.0, 0.0 };
+		outQuad[1].m_textureCoord = { 1.0, 0.0 };
+		outQuad[2].m_textureCoord = { 1.0, 1.0 };
+		outQuad[3].m_textureCoord = { 0.0, 1.0 };
+
+		//set col
+		for (int i = 0; i < 4; i++)
+		{
+			outQuad[i].m_col = col;
+		}
+	}
+
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	//										Triangle											//

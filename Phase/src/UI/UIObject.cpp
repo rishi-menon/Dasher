@@ -76,6 +76,26 @@ namespace UI {
 			return false;
 		}
 
+		index = static_cast<unsigned int>(UITypes::PushButton1);
+		const char* path = "Assets/Textures/UI/PushButton1.png";
+		UITexIds[index] = Texture::LoadTexturePreserve(path, UITexDimension[index]);
+
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: {0}", path);
+			return false;
+		}
+
+		index = static_cast<unsigned int>(UITypes::PushButton1_E);
+		path = "Assets/Textures/UI/PushButton1_E.png";
+		UITexIds[index] = Texture::LoadTexturePreserve(path, UITexDimension[index]);
+
+		if (UITexIds[index] == (unsigned int)(-1))
+		{
+			LOG_CLIENT_ERROR("Could not find image: {0}", path);
+			return false;
+		}
+
 		return true;
 	}
 	void UICleanup()

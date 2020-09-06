@@ -18,6 +18,8 @@ namespace RendererShapes
 
 	extern void Rectangle(RendererVertex outQuad[4], const glm::vec3& pos, const glm::vec2& size, const glm::vec4& col);
 
+	extern void RectangleBottomLeft(RendererVertex outQuad[4], const glm::vec3& posBottomLeft, const glm::vec2& size, const glm::vec4& col);
+
 	//returns a scaled version of an equilateral triangle. 
 	extern void TriangleRegular(RendererVertex outTriangle[3], const glm::vec3& pos, const glm::vec3& size, const glm::vec4& col);
 }
