@@ -36,6 +36,8 @@ public:
 
 	inline unsigned int GetBlockCount() const { return m_blocks.Count(); }
 
+	void RecalculateBlockPhase(float mousePosX);
+
 protected:
 	typedef void (*CreateBlockFunc) (CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase);
 

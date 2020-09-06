@@ -15,6 +15,7 @@
 #include "Events/Layer.h"
 #include "Events/Player/ZenPlayerLayer.h"
 #include "Events/Player/NormalPlayerLayer.h"
+#include "Events/Player/NormalPlayerLayerUI.h"
 
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
@@ -26,6 +27,8 @@
 #include "Events/Tutorial/TutorialPlayerLayer.h"
 #include "Events/Tutorial/TutorialBlockSpawnerLayer.h"
 
+#include "CommandLineFeatures.h"
+#include "Constants.h"
 
 Application* Application::ms_currentApp = nullptr;
 int Application::m_nWidth = 0;
@@ -53,6 +56,19 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	m_vLayers.reserve(10);
 	m_nWidth = nWidth;
 	m_nHeight = nHeight;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+#ifdef RM_OPENGL_CORE_PROFILE
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+
+#ifdef RM_WINDOW_NO_RESIZE
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+#endif
+
 	m_pWindow = glfwCreateWindow(nWidth, nHeight, strTitle, nullptr, nullptr);
 	if (!m_pWindow)
 	{
@@ -66,6 +82,11 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 	if (glewInit() != GLEW_OK)
 	{
 		ASSERT(false, "Could not initialise GLEW");
+		return false;
+	}
+
+	if (CommandLineFeatures::ParseCommandLineAfterGlew(g_argc, g_argv))
+	{
 		return false;
 	}
 
@@ -132,35 +153,23 @@ void Application::RegisterEvents(Layers layerId, LayerIndex index)
 
 void Application::Run()
 {
-	const float fCol = 0.18f;
+	const float fCol = 0.0f;
 	glClearColor(fCol, fCol, fCol, 1);
 
 	const double dMaxDeltaTime = 1.0/30.0;
 
-	//unsigned int nid = Texture::LoadTexture("Assets\\Textures\\img1.jpg", nullptr, nullptr, TextureProperties(GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
-
-	//unsigned int w, h;
-	//unsigned int idd = Texture::LoadTexture("Assets/Textures/UI/Button0.png", &w, &h);
-
-	//float width = 450;
-	//float height = 120;
-	//RendererVertex v[4];
-	//v[0].SetPosColTex({ 20, 20, 0 },				{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 0 });
-	//v[1].SetPosColTex({ 20+width, 20, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 0 });
-	//v[2].SetPosColTex({ 20+width, 20+height, 0 },	{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 1, 1 });
-	//v[3].SetPosColTex({ 20, 20+height, 0 },			{ 218.0f/255.0f, 157.0f/255.0f, 0.0,0.9 }, { 0, 1 });
-
-	constexpr int nSleep = 1;
-	std::chrono::milliseconds sleepDuration(nSleep);
+	constexpr int nRegularSleepMils = 1;	//mils = milliseconds
+	constexpr int nGameSecondsBeforeSleep = 2;
+	constexpr int nGameSleepMils = 2;
 	
-	constexpr int nGameTimeBetweenSleep = 2;	//in seconds
+	std::chrono::milliseconds chronoRegularSleep(nRegularSleepMils);
+	std::chrono::milliseconds chronoGameSleep(nGameSleepMils);
 
-	constexpr int nSleepTimeGameMode = 2;
-	std::chrono::milliseconds sleepDurationGame(nSleepTimeGameMode);
+	double dCurrentTime;
 
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
-		double dCurrentTime = glfwGetTime();
+		dCurrentTime = glfwGetTime();
 		m_dDeltaTime = dCurrentTime - m_dCurrentTime;	//in seconds
 		m_dCurrentTime = dCurrentTime;
 		if (m_dDeltaTime > dMaxDeltaTime)
@@ -192,9 +201,6 @@ void Application::Run()
 			}
 		}
 
-
-		//Renderer::DrawQuadTexture(v, RendererShapes::Shape::ShapeQuad, idd);
-
 		//Change the menu mode if applicable
 		if (m_CurMenu != m_NextMenu) { ChangeMenuState(); }
 
@@ -203,19 +209,19 @@ void Application::Run()
 		glfwSwapBuffers(m_pWindow);
 		glfwPollEvents();
 
-		// if (m_dDeltaTime < 1.0 / 70.0)
+		//Sleep
 		if (m_CurMenu == Menu::NormalMode || m_CurMenu == Menu::ZenMode || m_CurMenu == Menu::TutorialMode)
 		{
 			if (dCurrentTime > m_dGameLastSleepTime)
 			{
 				//while running the game sleep
-				std::this_thread::sleep_for(sleepDurationGame);
-				m_dGameLastSleepTime = dCurrentTime + nGameTimeBetweenSleep;
+				std::this_thread::sleep_for(chronoGameSleep);
+				m_dGameLastSleepTime = dCurrentTime + nGameSecondsBeforeSleep;
 			}
 		}
 		else
 		{
-			std::this_thread::sleep_for(sleepDuration);
+			std::this_thread::sleep_for(chronoRegularSleep);
 		}
 	}
 
@@ -242,9 +248,10 @@ void Application::ClearLayers()
 {
 	std::vector <Layer*>& vec = m_vLayers;
 	//Do not change to std::size_t as it is unsigned and the for loop breaks when the value becomes negative
-	for (int i = vec.size() - 1; i >= 0; i--)
+	for (int i = (int)(vec.size() - 1); i >= 0; i--)
 	{
-		delete vec[i];
+		if (vec[i])
+			delete vec[i];
 	}
 	m_vLayers.clear();
 
@@ -338,6 +345,8 @@ void Application::StartMenuNormalMode()
 	InsertLayer(new NormalPlayerLayer);
 	InsertLayer(new BlockSpawnerLayer);
 	InsertLayer(new FadeoutScreenLayer);
+	InsertLayer(new NormalPlayerLayerUI);
+
 	OnStart();
 }
 void  Application::StartMenuZenMode()

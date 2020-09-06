@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(phase LANGUAGES CXX)
+project(Phase LANGUAGES CXX)
 
 
 INCLUDE_DIRECTORIES(../Phase/src ../Phase/vendor/Freetype ../Phase/vendor/GLEW/include ../Phase/vendor/GLFW/include ../Phase/vendor/glm ../Phase/vendor/spdlog/include ../Phase/vendor/stb_image)
 
 
-add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp 
+add_executable(Phase ../Phase/vendor/stb_image/stb_image.cpp 
 
 ../Phase/src/main.cpp 
 ../Phase/src/Maths.cpp 
@@ -43,7 +43,8 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 ../Phase/src/Events/UILayer.cpp 
 ../Phase/src/Events/MainMenu/MainMenuLayer.cpp 
 ../Phase/src/Events/Player/AbstractPlayerLayer.cpp 
-../Phase/src/Events/Player/NormalPlayerLayer.cpp 
+../Phase/src/Events/Player/NormalPlayerLayer.cpp
+../Phase/src/Events/Player/NormalPlayerLayerUI.cpp 
 ../Phase/src/Events/Player/ZenPlayerLayer.cpp 
 ../Phase/src/Events/Tutorial/TutorialBlockSpawnerLayer.cpp 
 
@@ -63,7 +64,7 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 
 add_compile_definitions (GLEW_STATIC RM_MAC)
 
-TARGET_LINK_LIBRARIES(phase /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLEW/lib/Release/mac/glew.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLFW/lib-mac/glfw3.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/Freetype/lib-mac/freetype.a)
+TARGET_LINK_LIBRARIES(Phase /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLEW/lib/Release/mac/glew.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLFW/lib-mac/glfw3.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/Freetype/lib-mac/freetype.a)
 
 target_link_libraries(phase "-framework Cocoa")
 target_link_libraries(phase "-framework IOKit")

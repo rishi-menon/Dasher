@@ -8,7 +8,9 @@ namespace StringHelper {
 };
 
 namespace CommandLineFeatures {
-    extern bool ParseCommandLine(int argc, const char* argv[]);
+    extern bool ParseCommandLineBeforeWindow(int argc, const char* argv[]);
+    extern bool ParseCommandLineAfterGlew(int argc, const char* argv[]);
+
     std::string GetMyCurrentDirectory(const char* argv1);
 
 };

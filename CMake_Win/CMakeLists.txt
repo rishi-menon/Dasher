@@ -3,14 +3,14 @@ cmake_minimum_required(VERSION 3.10)
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(MyProject LANGUAGES CXX)
+project(Phase LANGUAGES CXX)
 
 
 INCLUDE_DIRECTORIES(../Phase/src ../Phase/vendor/Freetype ../Phase/vendor/GLEW/include ../Phase/vendor/GLFW/include ../Phase/vendor/glm ../Phase/vendor/spdlog/include ../Phase/vendor/stb_image)
 
 LINK_DIRECTORIES(../Phase/vendor/Freetype/lib-x64 ../Phase/vendor/GLEW/lib/Release/x64 ../Phase/vendor/GLFW/lib-x64)
 
-add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp 
+add_executable(Phase ../Phase/vendor/stb_image/stb_image.cpp 
 
 ../Phase/src/main.cpp 
 ../Phase/src/Maths.cpp 
@@ -46,6 +46,7 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 ../Phase/src/Events/MainMenu/MainMenuLayer.cpp 
 ../Phase/src/Events/Player/AbstractPlayerLayer.cpp 
 ../Phase/src/Events/Player/NormalPlayerLayer.cpp 
+../Phase/src/Events/Player/NormalPlayerLayerUI.cpp
 ../Phase/src/Events/Player/ZenPlayerLayer.cpp 
 ../Phase/src/Events/Tutorial/TutorialBlockSpawnerLayer.cpp 
 
@@ -65,5 +66,5 @@ add_executable(phase ../Phase/vendor/stb_image/stb_image.cpp
 
 add_compile_definitions (GLEW_STATIC RM_WIN)
 
-TARGET_LINK_LIBRARIES(phase glew32s glfw3 freetype opengl32)
+TARGET_LINK_LIBRARIES(Phase glew32s glfw3 freetype opengl32)
 

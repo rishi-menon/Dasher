@@ -3,53 +3,41 @@
 #include "AbstractPlayerLayer.h"
 #include "UI/Button.h"
 #include "Events/FadeoutScreenLayer.h"
-#include "UI/UIImage.h"
+
+class BlockSpawnerLayer;
+class NormalPlayerLayerUI;
 
 class NormalPlayerLayer : public AbstractPlayerLayer
 {
+	friend class NormalPlayerLayerUI;
 public:
 	NormalPlayerLayer();
 	virtual void OnStart() override;
 	virtual void OnUpdate(float deltaTime) override;
 	
 	virtual void TakeDamage(double damage) override;
+	virtual void TakePhaseDamage() override;
 	virtual void TakeNoDamage() override;
 
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 	virtual bool OnWindowResize(int x, int y) override;
 
-protected:
-	inline void SetScore(double score) { m_dScore = score; }	//This is mainly for the tutorial layer
-	inline Button& GetBackButton() { return m_BackButton; }
-	inline void SetLives(int livesUsed) { m_nLivesUsed = livesUsed; }
-
+	virtual bool CanPhase() const override { return m_dPhaseTimeRemaining > 0.0; }
 
 private:
 	void Die();
-	void SetLifeUI();
-
-
-private:
-	const glm::vec2 m_vHealthUISize;
-	const float m_fHealthUIOffsetX;
 
 private:
 	enum : int {PlayerLives = 4};
-
-	glm::vec2 m_vScorePos;
-	const float m_fScoreScale;
-	const glm::vec4 m_vScoreCol;
 
 	glm::vec2 m_vAngularVelocities[PlayerLives];
 	glm::vec2 m_vSizes[PlayerLives];
 
 private:
-	Button m_BackButton;
-	Button m_restartButton;
-
 	bool m_bCanCollide;
 	bool m_bIsColliding;
 	bool m_bIsAlive;
+	bool m_bStartedPhasing;
 
 	int m_nLivesUsed;
 
@@ -58,7 +46,13 @@ private:
 
 	double m_dScore;
 
-	FadeoutScreenLayer* m_pFadeoutLayer;
+	const double m_dTotalPhaseTime;
+	const double m_dTimeTakenToRegen;
+	double m_dPhaseTimeRemaining;
 
-	UIImage m_HealthUI[PlayerLives];
+	double m_dNextPhaseRegenTime;
+
+	FadeoutScreenLayer* m_pFadeoutLayer;
+	BlockSpawnerLayer* m_pBlockSpawnerLayer;
+	NormalPlayerLayerUI* m_pPlayerLayerUI;
 };

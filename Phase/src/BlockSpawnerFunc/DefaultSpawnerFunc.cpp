@@ -18,10 +18,10 @@ static const glm::vec4 s_standardCol[s_nBlockColCount] =
 };
 static const glm::vec2 s_standardPhase[s_nBlockColCount] =
 {
-	{0.05,0.3},
-	{0.05,0.3},
-	{0.7, 0.95 },
-	{0.7, 0.95 }
+	{0.0,0.25},
+	{0.0,0.25},
+	{0.75, 1.0 },
+	{0.75, 1.0 }
 };
 
 static void CreateBlocksGeneric(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase, bool* bDirections, int nBlockCount);
@@ -141,8 +141,8 @@ static void CreateBlocksGeneric(CircularQueue<Block>& blocks, double& nextSpawnT
 static void CreatePhasableOnly(CircularQueue<Block>& blocks, double& nextSpawnTime, double curPhase)
 {
 	const glm::vec2 sizeX = { 80, 100 };
-	constexpr float fDistanceBeforeSpawn = 400.0f;
-	constexpr float fDistToNextSpawn = 900.0f;
+	constexpr float fDistanceBeforeSpawn = 100.0f;
+	constexpr float fDistToNextSpawn = 800.0f;
 	
 	const int width = Application::GetWidth();
 

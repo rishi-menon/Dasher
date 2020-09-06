@@ -3,27 +3,21 @@
 #include "Maths.h"
 #include "Constants.h"
 
-#include "AssetManagement/Texture.h"
 #include "CommandLineFeatures.h"
 
 int main(int argc, const char* argv[])
 {
+	g_argc = argc;
+	g_argv = argv;
 	CoreLogger::Init();
 	Random::Init();
 
-	if (CommandLineFeatures::ParseCommandLine(argc, argv))
+	if (CommandLineFeatures::ParseCommandLineBeforeWindow(g_argc, g_argv))
 	{
 		return 0;
 	}
 	
-	LOG_CLIENT_TRACE("Started Application");
-
-	
-
-#ifdef RM_MAC
-	g_strCurrentDirectory = CommandLineFeatures::GetMyCurrentDirectory(argv[0]);
-	LOG_INFO ("Current Directory: {0}", g_strCurrentDirectory.c_str());
-#endif
+	LOG_TRACE("Started Application");
 
 	glfwSetErrorCallback([](int error, const char* const desc)
 	{
@@ -36,21 +30,8 @@ int main(int argc, const char* argv[])
 		return 0;
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-#ifdef RM_MAC
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
-
-#ifdef RM_WINDOW_NO_RESIZE
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-#endif
-
 #if 1
 	const GLFWvidmode* modes = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	
 	const int nStartingWidth = static_cast<int>(modes->width / 1.2);
 	const int nStartingHeight = static_cast<int>(modes->height / 1.2);
 #else
@@ -63,7 +44,7 @@ int main(int argc, const char* argv[])
 		pApplication->Run();
 	}
 
-	LOG_CLIENT_TRACE("Terminating Application");
+	LOG_TRACE("Terminating Application");
 	delete pApplication;
 	glfwTerminate();
 	return 0;

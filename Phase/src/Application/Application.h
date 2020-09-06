@@ -39,6 +39,8 @@ public:
 	inline static void SetWidth(int nWidth)   { m_nWidth = nWidth; }
 	inline static void SetHeight(int nHeight) { m_nHeight = nHeight; }
 
+	inline float GetDeltaTime() const { return static_cast<float>(m_dDeltaTime); }
+
 	bool Initialise(int nWidth, int nHeight, const char* const strTitle);
 	void Run();
 
