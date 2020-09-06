@@ -2,7 +2,28 @@
 #include "Log.h"
 #include "Application/Application.h"
 #include "Renderer/Renderer.h"
-#include "NormalPlayerLayer.h"
+
+NormalPlayerLayerUI::Data::Data() :
+	pbIsAlive (nullptr),
+	pdScore(nullptr),
+	pnLivesUsed(nullptr),
+	pfPhaseTimeRemaining(nullptr),
+	pdPhaseTimeTotal(nullptr)
+{
+}
+void NormalPlayerLayerUI::Data::SetDataNormalPlayerLayer(NormalPlayerLayer* playerLayer)
+{
+	pbIsAlive = &playerLayer->m_bIsAlive;
+	pdScore = &playerLayer->m_dScore;
+	pnLivesUsed = &playerLayer->m_nLivesUsed;
+	pfPhaseTimeRemaining = &playerLayer->m_dPhaseTimeRemaining;
+	pdPhaseTimeTotal = &playerLayer->m_dTotalPhaseTime;
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 NormalPlayerLayerUI::NormalPlayerLayerUI() :
 	//constants
@@ -12,9 +33,7 @@ NormalPlayerLayerUI::NormalPlayerLayerUI() :
 	m_vScorePos(0.0f, 0.0),
 
 	m_vPhaseTimeBaseSize(0.0f, 50.0f),	//Size X is calculated dynamically (But size y is needed)
-	m_vPhaseTimeBasePos(0.0f, 0.0f, 0.0f),
-
-	m_pNormalPlayerLayer (nullptr)
+	m_vPhaseTimeBasePos(0.0f, 0.0f, 0.0f)
 {
 	
 }
@@ -23,6 +42,7 @@ void NormalPlayerLayerUI::RegisterEvents(Application* pApp, int nIndex)
 {
 	pApp->RegisterEvents(LayerWindowResize, nIndex);
 }
+
 
 void NormalPlayerLayerUI::OnStart()
 {
@@ -58,6 +78,7 @@ void NormalPlayerLayerUI::OnStart()
 	}
 
 	//Restart button
+	//Note: the tutorial also uses this layer and so technically a restart button would be created but never shown as the player will not die. This is a hack for now
 	{
 		const glm::vec2 sizeDefault = { 105,105 };
 		const glm::vec4 colDefault = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -90,19 +111,15 @@ void NormalPlayerLayerUI::OnStart()
 
 	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
 
+	//Gets set automatically for the player layer. The tutorial layer will explicily set it on its own
 	for (Layer* pLayer : layers)
 	{
 		NormalPlayerLayer* pPlayerLayer = dynamic_cast <NormalPlayerLayer*> (pLayer);
 		if (pPlayerLayer)
 		{
-			m_pNormalPlayerLayer = pPlayerLayer;
+			m_data.SetDataNormalPlayerLayer(pPlayerLayer);
+			break;
 		}
-	}
-
-	if (!m_pNormalPlayerLayer)
-	{
-		LOG_WARN("Normal player layer was not found inside normal player layer UI");
-		return;
 	}
 
 	//Health UI
@@ -129,6 +146,7 @@ void NormalPlayerLayerUI::OnStart()
 	const glm::vec4 colPhaseBarBase(fColGrayPhaseBarBase, fColGrayPhaseBarBase, fColGrayPhaseBarBase, 1.0f);
 	RendererShapes::RectangleBottomLeft(m_vertexPhaseTimeBase, m_vPhaseTimeBasePos, m_vPhaseTimeBaseSize, colPhaseBarBase);
 	
+	SetLifeUI();	//enable/disable the life and show the correct life count
 
 	NormalPlayerLayerUI::OnWindowResize(Application::GetWidth(), Application::GetHeight());
 
@@ -143,18 +161,18 @@ void NormalPlayerLayerUI::OnStart()
 ///////////////////////////////////////////////////////////////////////////////
 void NormalPlayerLayerUI::OnUpdate(float deltaTime)
 {
-	if (!m_pNormalPlayerLayer) { return; }
+	if (!m_data.pbIsAlive) { return; }
 
-	if (m_pNormalPlayerLayer->m_bIsAlive)
+	if (*m_data.pbIsAlive)
 	{
 		//render score
-		if (m_pNormalPlayerLayer->m_dScore >= 0)
+		if (m_data.pdScore && *m_data.pdScore >= 0)
 		{
 			constexpr float textScale = 0.7f;
 			const glm::vec4 textCol = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 			char buffer[10];
-			std::snprintf(buffer, 10, "%.1f", m_pNormalPlayerLayer->m_dScore);
+			std::snprintf(buffer, 10, "%.1f", *m_data.pdScore);
 			Renderer::DrawTextColor(buffer, 10, m_vScorePos, textScale, textCol);
 		}
 
@@ -164,32 +182,40 @@ void NormalPlayerLayerUI::OnUpdate(float deltaTime)
 	else
 	{
 		//player is dead.. Show the score
-		if (m_pNormalPlayerLayer->m_dScore >= 0)
+		if (m_data.pdScore && *m_data.pdScore >= 0)
 		{
 			constexpr float textScale = 0.8f;
 			const glm::vec4 textCol = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 			char buffer[20];
-			std::snprintf(buffer, 20, "Score: %.1f", m_pNormalPlayerLayer->m_dScore);
+			std::snprintf(buffer, 20, "Score: %.1f", *m_data.pdScore);
 			Renderer::DrawTextColor(buffer, 20, m_vScorePos, textScale, textCol);
 		}
 	}
-
 }
 
 void NormalPlayerLayerUI::SetLifeUI()
 {
-	if (!m_pNormalPlayerLayer) { return; }
+	if (!m_data.pnLivesUsed) 
+	{ 
+		for (int i = 0; i < NormalPlayerLayer::PlayerLives; i++)
+		{
+			m_HealthUI[i].SetIsActive(false);
+		}
+		return; 
+	}
 
-	int nCurLives = NormalPlayerLayer::PlayerLives - m_pNormalPlayerLayer->m_nLivesUsed;
+	int nCurLives = NormalPlayerLayer::PlayerLives - *m_data.pnLivesUsed;
 
 	int i = 0;
 	for (; i < nCurLives; i++)
 	{
+		m_HealthUI[i].SetIsActive(true);
 		m_HealthUI[i].SetTextureId(StandardTexture::LifeFull);
 	}
 	for (; i < NormalPlayerLayer::PlayerLives; i++)
 	{
+		m_HealthUI[i].SetIsActive(true);
 		m_HealthUI[i].SetTextureId(StandardTexture::LifeEmpty);
 	}
 }
@@ -199,8 +225,8 @@ void NormalPlayerLayerUI::PlayerHasDied()
 	//Change score pos to the center of the screen
 	constexpr float percentX = 500.0f / 1600.0f;
 	constexpr float percentY = 670.0f / 1200.0f;
-	m_vScorePos.x = Math::Lerp(0, Application::GetWidth(), percentX);
-	m_vScorePos.y = Math::Lerp(0, Application::GetHeight(), percentY);
+	m_vScorePos.x = (float)Math::Lerp(0, Application::GetWidth(), percentX);
+	m_vScorePos.y = (float)Math::Lerp(0, Application::GetHeight(), percentY);
 
 	m_restartButton.SetIsActive(true);
 }
@@ -219,11 +245,10 @@ bool NormalPlayerLayerUI::OnWindowResize(int x, int y)
 		const glm::vec3 buttonPos = { posX, 110, 0.8f };
 		m_restartButton.SetPosition(buttonPos);
 	}
-
-	if (!m_pNormalPlayerLayer) { return false; }
 	
-	if (m_pNormalPlayerLayer->m_bIsAlive)
+	if (!m_data.pbIsAlive || *m_data.pbIsAlive)
 	{
+		//if alive or null
 		m_vScorePos.x = x - 280.0f;
 		m_vScorePos.y = y - 140.0f;
 	}
@@ -231,22 +256,24 @@ bool NormalPlayerLayerUI::OnWindowResize(int x, int y)
 	{
 		constexpr float percentX = 500.0f / 1600.0f;
 		constexpr float percentY = 670.0f / 1200.0f;
-		m_vScorePos.x = Math::Lerp(0, x, percentX);
-		m_vScorePos.y = Math::Lerp(0, y, percentY);
+		m_vScorePos.x = (float)Math::Lerp(0, x, percentX);
+		m_vScorePos.y = (float)Math::Lerp(0, y, percentY);
 	}
 	return false;
 }
 
 void NormalPlayerLayerUI::DrawPhaseTimeRemainingBar()
 {
+
+	if (!m_data.pfPhaseTimeRemaining || !m_data.pdPhaseTimeTotal) { return; }
 	//Base
 	Renderer::DrawQuadColor(m_vertexPhaseTimeBase, RendererShapes::Shape::ShapeQuad);
 
 	//Time Rem
 	glm::vec2 size = { 0.0f, m_vPhaseTimeBaseSize.y };
 
-	float timeRem = Math::ClampLeft(0, m_pNormalPlayerLayer->m_dPhaseTimeRemaining);
-	float phasePercent = (float)Math::GetPercent(0.0, m_pNormalPlayerLayer->m_dTotalPhaseTime, timeRem);
+	float timeRem = (float)Math::ClampLeft(0, *m_data.pfPhaseTimeRemaining);
+	float phasePercent = (float)Math::GetPercent(0.0, *m_data.pdPhaseTimeTotal, timeRem);
 	size.x = phasePercent * m_vPhaseTimeBaseSize.x;
 
 	glm::vec4 col = { 0.1f, 1.0f, 0.3f, 0.8f };

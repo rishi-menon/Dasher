@@ -365,6 +365,7 @@ void  Application::StartMenuTutorialMode()
 	InsertLayer(new BackgroundLayer(BackgroundLayerProps(StandardTexture::Background4)));
 	InsertLayer(new TutorialPlayerLayer);
 	InsertLayer(new TutorialBlockSpawnerLayer);
+	InsertLayer(new NormalPlayerLayerUI);
 	OnStart();
 }
 void  Application::StartMenuCredits()

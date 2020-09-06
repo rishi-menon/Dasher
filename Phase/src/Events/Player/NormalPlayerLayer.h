@@ -11,6 +11,7 @@ class NormalPlayerLayer : public AbstractPlayerLayer
 {
 	friend class NormalPlayerLayerUI;
 public:
+	enum : int { PlayerLives = 4 };
 	NormalPlayerLayer();
 	virtual void OnStart() override;
 	virtual void OnUpdate(float deltaTime) override;
@@ -28,8 +29,6 @@ private:
 	void Die();
 
 private:
-	enum : int {PlayerLives = 4};
-
 	glm::vec2 m_vAngularVelocities[PlayerLives];
 	glm::vec2 m_vSizes[PlayerLives];
 

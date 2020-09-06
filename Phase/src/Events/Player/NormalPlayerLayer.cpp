@@ -137,7 +137,7 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 				//it just went from -ve to +ve... Recalculate the phase
 				double x, y;
 				Application::GetCurrentApp()->GetMousePos(x, y);
-				m_pBlockSpawnerLayer->RecalculateBlockPhase(x);
+				m_pBlockSpawnerLayer->RecalculateBlockPhase((float)x);
 			}
 		}
 
@@ -148,7 +148,7 @@ void NormalPlayerLayer::OnUpdate(float deltaTime)
 		RendererShapes::Rectangle(m_Vertex, m_vPos, m_vSize, m_vCol);
 		Renderer::DrawQuadColor(m_Vertex, RendererShapes::ShapeQuad);
 
-		constexpr float blockSpeedMultiplier = 1.0f / 0.5f;	//denominator is the Time taken to increase the block speed by 1 unit
+		constexpr float blockSpeedMultiplier = 1.0f / 0.75f;	//denominator is the Time taken to increase the block speed by 1 unit
 		g_fBlockSpeed += deltaTime * blockSpeedMultiplier;
 		m_dApparantVelocityX = g_fBlockSpeed;
 	}
@@ -228,7 +228,7 @@ void NormalPlayerLayer::TakePhaseDamage()
 		//it just went from +ve to -ve... Recalculate the phase
 		double x, y;
 		Application::GetCurrentApp()->GetMousePos(x, y);
-		m_pBlockSpawnerLayer->RecalculateBlockPhase(x);
+		m_pBlockSpawnerLayer->RecalculateBlockPhase((float)x);
 	}
 }
 

@@ -3,22 +3,87 @@
 #include "Events/Layer.h"
 #include "UI/UIImage.h"
 #include "UI/Button.h"
-#include "NormalPlayerLayer.h"
 #include "Renderer/RendererVertex.h"
+#include "Log.h"
+#include "NormalPlayerLayer.h"
 
+class NormalPlayerLayer;
 class NormalPlayerLayerUI : public Layer
 {
 public:
-#if 0
 	struct Data
 	{
+		Data();
+		void SetDataNormalPlayerLayer(NormalPlayerLayer* playerLayer);
+#if 0
+		inline bool& GetIsAlive() {
+#ifdef RM_DEBUG
+			if (!pbIsAlive)
+			{
+				ASSERT(false, "Data: Is Alive is nullptr");
+			}
+#endif
+			return *pbIsAlive; 
+		}
+
+		inline double& GetScore() {
+#ifdef RM_DEBUG
+			if (!pdScore)
+			{
+				ASSERT(false, "Data: Is Alive is nullptr");
+			}
+#endif
+			return *pdScore;
+		}
+
+		inline int& GetLivesUsed() {
+#ifdef RM_DEBUG
+			if (!pnLivesUsed)
+			{
+				ASSERT(false, "Data: Is Alive is nullptr");
+			}
+#endif
+			return *pnLivesUsed;
+		}
+
+		inline double& GetPhaseTimeRemaining() {
+#ifdef RM_DEBUG
+			if (!pfPhaseTimeRemaining)
+			{
+				ASSERT(false, "Data: Is Alive is nullptr");
+			}
+#endif
+			return *pfPhaseTimeRemaining;
+		}
+
+		inline double GetPhaseTimeTotal() {
+#ifdef RM_DEBUG
+			if (!pdPhaseTimeTotal)
+			{
+				ASSERT(false, "Data: Is Alive is nullptr");
+			}
+#endif
+			return *pdPhaseTimeTotal;
+		}
+#endif
 		bool* pbIsAlive;
 		double* pdScore;
 		int* pnLivesUsed;
-		float* pfPhaseTimeRemaining;
-		double* pdPhaseTimeTotal;
+		double* pfPhaseTimeRemaining;
+		const double* pdPhaseTimeTotal;
 	};
-#endif
+
+	struct DefaultData
+	{
+		DefaultData() = default;
+		DefaultData(const DefaultData&) = default;
+		bool bIsAlive;
+		double dScore;
+		int nLivesUsed;
+		double fPhaseTimeRemaining;
+		double dPhaseTimeTotal;
+	};
+
 public:
 	NormalPlayerLayerUI();
 
@@ -31,6 +96,9 @@ public:
 	void SetLifeUI();
 	void PlayerHasDied();	//Change the score to the center
 
+	inline Data& GetData() { return m_data; }
+	inline Button& GetBackButton() { return m_BackButton; }
+
 private:
 	void DrawPhaseTimeRemainingBar();
 private:
@@ -42,7 +110,7 @@ private:
 	glm::vec2 m_vPhaseTimeBaseSize;
 	glm::vec3 m_vPhaseTimeBasePos;
 private:
-	NormalPlayerLayer* m_pNormalPlayerLayer;
+	Data m_data;
 
 	RendererVertex m_vertexPhaseTimeBase[4];	//Base layer
 
