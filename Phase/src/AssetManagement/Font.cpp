@@ -1,6 +1,7 @@
 #include "Font.h"
 #include "Log.h"
 #include "Texture.h"
+#include "Constants.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H  

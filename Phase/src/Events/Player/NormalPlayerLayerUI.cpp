@@ -259,6 +259,29 @@ bool NormalPlayerLayerUI::OnWindowResize(int x, int y)
 		m_vScorePos.x = (float)Math::Lerp(0, x, percentX);
 		m_vScorePos.y = (float)Math::Lerp(0, y, percentY);
 	}
+
+	//Health UI
+	const glm::vec4 colHealthUI = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float healthUIStartingPosX = Application::GetWidth() - m_vHealthUISize.x / 2 - (NormalPlayerLayer::PlayerLives - 1) * m_fHealthUIOffsetX - 40;
+	glm::vec3 posHealthUI = { healthUIStartingPosX, Application::GetHeight() - 200, 0.5 };	//The health ui disappears when the player dies because the z value is less than 0.7 (which is the z value of the fade out layer)
+	for (int i = 0; i < NormalPlayerLayer::PlayerLives; i++)
+	{
+		m_HealthUI[i].SetPos (posHealthUI);
+		posHealthUI.x += m_fHealthUIOffsetX;
+	}
+	
+
+	//Phase time bar
+	//For the UI, the x position is the center of the image instead of the left edge
+	//For the UI, the y pos is the center. Also, we need the y coordinate of the bottom left corner so subtract the height
+	m_vPhaseTimeBasePos = { healthUIStartingPosX - m_vHealthUISize.x / 2,
+		posHealthUI.y - m_vHealthUISize.y/2 - m_vPhaseTimeBaseSize.y - 10, 0.5 };
+	m_vPhaseTimeBaseSize.x = Application::GetWidth() - m_vPhaseTimeBasePos.x - 20;
+
+	constexpr float fColGrayPhaseBarBase = 0.65f;
+	const glm::vec4 colPhaseBarBase(fColGrayPhaseBarBase, fColGrayPhaseBarBase, fColGrayPhaseBarBase, 1.0f);
+	RendererShapes::RectangleBottomLeft(m_vertexPhaseTimeBase, m_vPhaseTimeBasePos, m_vPhaseTimeBaseSize, colPhaseBarBase);
+
 	return false;
 }
 

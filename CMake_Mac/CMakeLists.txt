@@ -64,11 +64,14 @@ add_executable(Phase ../Phase/vendor/stb_image/stb_image.cpp
 
 add_compile_definitions (GLEW_STATIC RM_MAC)
 
-TARGET_LINK_LIBRARIES(Phase /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLEW/lib/Release/mac/glew.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/GLFW/lib-mac/glfw3.a /Users/rishimenon/Desktop/dev/Dasher/Dasher/Phase/vendor/Freetype/lib-mac/freetype.a)
+TARGET_LINK_LIBRARIES(Phase 
+/Users/rishimenon/Desktop/dev/Dasher/Phase/Phase/vendor/GLEW/lib/Release/mac/glew.a 
+/Users/rishimenon/Desktop/dev/Dasher/Phase/Phase/vendor/GLFW/lib-mac/glfw3.a 
+/Users/rishimenon/Desktop/dev/Dasher/Phase/Phase/vendor/Freetype/lib-mac/freetype.a)
 
-target_link_libraries(phase "-framework Cocoa")
-target_link_libraries(phase "-framework IOKit")
-target_link_libraries(phase "-framework OpenGL")
+target_link_libraries(Phase "-framework Cocoa")
+target_link_libraries(Phase "-framework IOKit")
+target_link_libraries(Phase "-framework OpenGL")
 
-target_link_libraries(phase /usr/lib/libbz2.1.0.dylib)
-target_link_libraries(phase /usr/lib/libz.1.dylib)
+target_link_libraries(Phase /usr/lib/libbz2.1.0.dylib)
+target_link_libraries(Phase /usr/lib/libz.1.dylib)
