@@ -164,7 +164,7 @@ void MainMenuLayer::OnStart()
 }
 void MainMenuLayer::OnUpdate(float deltaTime) 
 {
-	Renderer::DrawTextColor(m_strShowTraj.c_str(), m_strShowTraj.size(), m_ShowTrajTextPos, m_ShowTrajTextScale, m_vShowTrajTextCol);
+	Renderer::DrawTextColor(m_strShowTraj.c_str(), (int)m_strShowTraj.size(), m_ShowTrajTextPos, m_ShowTrajTextScale, m_vShowTrajTextCol);
 }
 
 bool MainMenuLayer::OnWindowResize(int x, int y)
@@ -174,8 +174,8 @@ bool MainMenuLayer::OnWindowResize(int x, int y)
 		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
 		float percentX = (740.0f) / (1600.0f);	//original position vs original width
 		float percentY = (1000.0f) / (1200.0f);
-		buttonPos.x = Math::Lerp(0, x, percentX);
-		buttonPos.y = Math::Lerp(0, y, percentY);
+		buttonPos.x = (float)Math::Lerp(0, x, percentX);
+		buttonPos.y = (float)Math::Lerp(0, y, percentY);
 		m_buttonMainMenu.SetPosition(buttonPos);
 	}
 
@@ -184,8 +184,8 @@ bool MainMenuLayer::OnWindowResize(int x, int y)
 		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
 		float percentX = (740.0f) / (1600.0f);	//original position vs original width
 		float percentY = (800.0f) / (1200.0f);
-		buttonPos.x = Math::Lerp(0, x, percentX);
-		buttonPos.y = Math::Lerp(0, y, percentY);
+		buttonPos.x = (float)Math::Lerp(0, x, percentX);
+		buttonPos.y = (float)Math::Lerp(0, y, percentY);
 		m_buttonPracticeMode.SetPosition(buttonPos);
 
 	}
@@ -195,8 +195,8 @@ bool MainMenuLayer::OnWindowResize(int x, int y)
 		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
 		float percentX = (740.0f) / (1600.0f);	//original position vs original width
 		float percentY = (600.0f) / (1200.0f);
-		buttonPos.x = Math::Lerp(0, x, percentX);
-		buttonPos.y = Math::Lerp(0, y, percentY);
+		buttonPos.x = (float)Math::Lerp(0, x, percentX);
+		buttonPos.y = (float)Math::Lerp(0, y, percentY);
 		m_buttonTutorial.SetPosition(buttonPos);
 
 	}
@@ -206,8 +206,8 @@ bool MainMenuLayer::OnWindowResize(int x, int y)
 		glm::vec3 buttonPos = { 0.0f, 0.0f, 0.0f };
 		float percentX = (740.0f) / (1600.0f);	//original position vs original width
 		float percentY = (400.0f) / (1200.0f);
-		buttonPos.x = Math::Lerp(0, x, percentX);
-		buttonPos.y = Math::Lerp(0, y, percentY);
+		buttonPos.x = (float)Math::Lerp(0, x, percentX);
+		buttonPos.y = (float)Math::Lerp(0, y, percentY);
 		m_buttonCredits.SetPosition(buttonPos);
 	}
 

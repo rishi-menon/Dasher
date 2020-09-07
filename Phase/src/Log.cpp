@@ -10,23 +10,24 @@ namespace CoreLogger
 
 	void Init()
 	{
-		spdlog::set_pattern("%^[%T] %n: %v%$");
 		g_CoreLogger = spdlog::stdout_color_mt("Core");
 		g_CoreLogger->set_level(spdlog::level::trace);
-		
+		g_CoreLogger->set_pattern("%^[%T] %n: %v%$");
+
 		g_ClientLogger = spdlog::stdout_color_mt("Logger");
 		g_ClientLogger->set_level(spdlog::level::trace);
+		g_ClientLogger->set_pattern("%^%v%$");
 
 		LOG_TRACE("Initialised logging");
 	}
-	extern void glClearError()
+	void glClearError()
 	{
 		int i = 0;
 		for (; glGetError() && i < 30; i++);
 		ASSERT(i < 30, "Infinite loop while checking for OpenGl errors");
 	}
 
-	extern void glCheckError(int line, const char* const functionDesc)
+	void glCheckError(int line, const char* const functionDesc)
 	{
 		bool bShouldAssert = false;
 		unsigned int error = glGetError();

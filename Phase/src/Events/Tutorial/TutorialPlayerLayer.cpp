@@ -17,6 +17,8 @@ TutorialPlayerLayer::TutorialPlayerLayer() :
 void TutorialPlayerLayer::OnStart()
 {
 	AbstractPlayerLayer::OnStart();
+
+	AbstractPlayerLayer::OnStart();
 	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
 	for (Layer* pLayer : layers)
 	{
@@ -73,8 +75,6 @@ void TutorialPlayerLayer::OnStart()
 		constexpr int nEscapeKey = 256;
 		m_BackButton.SetOptionalKey(nEscapeKey);
 	}
-#else
-	//m_BackButton.SetIsActive(false);
 #endif
 
 	m_DefData.bIsAlive = true;

@@ -25,6 +25,11 @@ void AbstractPlayerLayer::RegisterEvents(Application* pApp, int nIndex)
 	pApp->RegisterEvents(LayerMouseMove, nIndex);
 }
 
+void AbstractPlayerLayer::OnStart()
+{
+	RecalculateAngularVelocity();
+}
+
 void AbstractPlayerLayer::OnUpdate(float deltaTime)
 {
 	//Update position
