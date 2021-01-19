@@ -1,0 +1,23 @@
+Version 1.5
+
+Version 1.4
+Part1:
+-Added a command line option to print graphics infomation (-ginfo)
+-Added a timer limit to phasing which regenerates over time
+Part2:
+-Modified the tutorial to explain the phase timer.
+
+Version 1.3
+-Changed the switch button to a checkbox
+-Changed the title of the window (Phaze -> Phase)
+-Increased number of lives in the main mode
+-Automatically starts the tutorial when you open the game
+-Fixed game lagging a bit while playing
+-Added a UI for lives
+
+Version 1.2
+-Removed the secondary speed in zen mode
+-Removed the take damage part of the tutorial
+
+Version 1.0
+-Initial Build

@@ -32,6 +32,8 @@ ZenPlayerLayer::ZenPlayerLayer() :
 }
 void ZenPlayerLayer::OnStart()
 {
+	AbstractPlayerLayer::OnStart();
+
 	//Back button
 	{
 		const glm::vec2 sizeDefault = { 105,105 };

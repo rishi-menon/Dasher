@@ -4,5 +4,5 @@
 
 namespace Collision
 {
-	extern bool CheckCollision(const RendererVertex shapeA[], size_t countA, const RendererVertex shapeB[], size_t countB);
+	extern bool CheckCollision(const RendererVertex shapeA[], std::size_t countA, const RendererVertex shapeB[], std::size_t countB);
 }

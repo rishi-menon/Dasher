@@ -49,6 +49,10 @@ void BlockSpawnerLayer::OnStart()
 	ASSERT(m_pPlayerLayer, "Player layer was not found");
 
 	m_nBlockTextureId = GetStandardTextureId(StandardTexture::SpecialEffect0);
+
+	double x, y;
+	Application::GetCurrentApp()->GetMousePos(x, y);
+	RecalculateBlockPhase((float)x);
 }
 
 void BlockSpawnerLayer::ClearOutOfBoundsBlocks()
@@ -195,7 +199,7 @@ void BlockSpawnerLayer::RecalculateBlockPhase(float mousePosX)
 bool BlockSpawnerLayer::OnMouseMove(int x, int y)
 {
 	//Recalculate phasable blocks
-	RecalculateBlockPhase(x);
+	RecalculateBlockPhase((float)x);
 	return false;
 }
 

@@ -4,18 +4,15 @@ namespace Collision
 {
 
 	//Checks Axis theorem for all edges of A with B
-	static bool CheckCollisionHelper(const RendererVertex shapeA[], size_t countA, const RendererVertex shapeB[], size_t countB)
+	static bool CheckCollisionHelper(const RendererVertex shapeA[], std::size_t countA, const RendererVertex shapeB[], std::size_t countB)
 	{
-		for (size_t i = 0; i < countA; i++)
-		{
-			//temp line
-			const size_t nextVertexIndex = (i + 1) % countA;
-		
+		for (std::size_t i = 0; i < countA; i++)
+		{		
 			const glm::vec2 dirToNextVertex = shapeA[(i + 1) % countA].m_pos - shapeA[i].m_pos;
 			const glm::vec2 axisNormal = { -dirToNextVertex.y, dirToNextVertex.x };	//this vector will be normal to the line segment joining the two vertices
 
 			float minA = FLT_MAX, maxA = -FLT_MAX;
-			for (size_t j = 0; j < countA; j++)
+			for (std::size_t j = 0; j < countA; j++)
 			{
 				float dotProduct = axisNormal.x * shapeA[j].m_pos.x + axisNormal.y * shapeA[j].m_pos.y;
 
@@ -24,7 +21,7 @@ namespace Collision
 			}
 
 			float minB = FLT_MAX, maxB = -FLT_MAX;
-			for (size_t j = 0; j < countB; j++)
+			for (std::size_t j = 0; j < countB; j++)
 			{
 				float dotProduct = axisNormal.x * shapeB[j].m_pos.x + axisNormal.y * shapeB[j].m_pos.y;
 
@@ -42,7 +39,7 @@ namespace Collision
 	}
 
 	//Uses seperating axis theorem to check collision
-	bool CheckCollision(const RendererVertex shapeA[], size_t countA, const RendererVertex shapeB[], size_t countB)
+	bool CheckCollision(const RendererVertex shapeA[], std::size_t countA, const RendererVertex shapeB[], std::size_t countB)
 	{
 		if (shapeA == shapeB)
 			return true;

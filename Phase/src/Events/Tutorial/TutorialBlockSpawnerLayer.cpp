@@ -122,7 +122,7 @@ void TutorialBlockSpawnerLayer::OnUpdate(float deltaTime)
 					ASSERT(false, "Wait time does not exist in the map");
 					waitTime = 3.0;
 				}
-				m_dNextStageSwitchTime = Application::GetGameTime() + waitTime;
+				m_dNextStageSwitchTime = (float)(Application::GetGameTime()) + waitTime;
 			}
 		}
 		else
@@ -220,7 +220,7 @@ void TutorialBlockSpawnerLayer::ShowPhaseRange()
 	CircularQueue<Block>& blocks = GetBlocks();
 	int nIndex = blocks.Begin();
 	bool bFound = false;
-	for (int i = 0; i < blocks.Count(); i++)
+	for (std::size_t i = 0; i < blocks.Count(); i++)
 	{
 		if (blocks.Buffer()[nIndex].position.x > playerPos.x)
 		{

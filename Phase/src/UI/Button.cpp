@@ -56,7 +56,7 @@ void Button::OnUpdate(float deltaTime)
 		float posX = m_vPos.x - prop.size.x * 0.5f + prop.textPosOffset.x;
 		float posY = m_vPos.y + prop.textPosOffset.y;
 
-		Renderer::DrawTextColor(prop.text.c_str(), prop.text.size(), posX, posY, prop.textScale, prop.textColor);
+		Renderer::DrawTextColor(prop.text.c_str(), (int)prop.text.size(), posX, posY, prop.textScale, prop.textColor);
 	}
 }
 

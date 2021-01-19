@@ -16,6 +16,7 @@ class AbstractPlayerLayer : public Layer
 public:
 	AbstractPlayerLayer();
 
+	virtual void OnStart() override;
 	virtual void RegisterEvents(Application* pApp, int nIndex) override;
 
 	virtual void OnUpdate(float deltaTime) override;	//in seconds

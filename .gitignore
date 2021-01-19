@@ -1,6 +1,7 @@
 bin/
 bin-int/
 .vs/
+.vscode/
 Build/
 build/
 builds/
@@ -10,3 +11,5 @@ Builds/
 
 **.filters
 **.user
+
+Phase/.ionide/

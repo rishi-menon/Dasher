@@ -49,6 +49,8 @@ NormalPlayerLayer::NormalPlayerLayer() :
 
 void NormalPlayerLayer::OnStart()
 {
+	AbstractPlayerLayer::OnStart();
+
 	//Get the fade out layer to play an animation when the player dies
 	const std::vector<Layer*>& layers = Application::GetCurrentApp()->GetLayers();
 	for (Layer* pLayer : layers)
