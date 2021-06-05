@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{7785376b-217a-46ef-bc37-8116171af749}</ProjectGuid>
+    <RootNamespace>Phase</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(PlatformTarget)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(PlatformTarget)\</IntDir>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)vendor\Freetype;$(SolutionDir)vendor\GLEW\include;$(SolutionDir)vendor\GLFW\include;$(SolutionDir)vendor\glm;$(SolutionDir)vendor\spdlog\include;$(SolutionDir)vendor\stb_image;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(PlatformTarget)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(PlatformTarget)\</IntDir>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)vendor\Freetype;$(SolutionDir)vendor\GLEW\include;$(SolutionDir)vendor\GLFW\include;$(SolutionDir)vendor\glm;$(SolutionDir)vendor\spdlog\include;$(SolutionDir)vendor\stb_image;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;RM_WIN</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vendor\GLEW\lib\Release\x64\;$(SolutionDir)vendor\GLFW\lib-x64\;$(SolutionDir)vendor\Freetype\lib-x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;RM_WIN</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vendor\GLEW\lib\Release\x64\;$(SolutionDir)vendor\GLFW\lib-x64\;$(SolutionDir)vendor\Freetype\lib-x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application\Application.cpp" />
+    <ClCompile Include="src\Application\EventCallbacks.cpp" />
+    <ClCompile Include="src\AssetManagement\Font.cpp" />
+    <ClCompile Include="src\AssetManagement\StandardTexture.cpp" />
+    <ClCompile Include="src\AssetManagement\Texture.cpp" />
+    <ClCompile Include="src\BlockSpawnerFunc\DefaultSpawnerFunc.cpp" />
+    <ClCompile Include="src\BlockSpawnerFunc\TutorialSpawnerFunc.cpp" />
+    <ClCompile Include="src\Collision\Collision.cpp" />
+    <ClCompile Include="src\CommandLineFeatures.cpp" />
+    <ClCompile Include="src\Constants.cpp" />
+    <ClCompile Include="src\Core\CircularQueue.cpp" />
+    <ClCompile Include="src\Core\StringHelper.cpp" />
+    <ClCompile Include="src\Events\BackgroundLayer.cpp" />
+    <ClCompile Include="src\Events\BlockSpawnerLayer.cpp" />
+    <ClCompile Include="src\Events\CreditLayer.cpp" />
+    <ClCompile Include="src\Events\FadeoutScreenLayer.cpp" />
+    <ClCompile Include="src\Events\Layer.cpp" />
+    <ClCompile Include="src\Events\MainMenu\MainMenuLayer.cpp" />
+    <ClCompile Include="src\Events\Player\AbstractPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Player\NormalPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Player\NormalPlayerLayerUI.cpp" />
+    <ClCompile Include="src\Events\Player\ZenPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.cpp" />
+    <ClCompile Include="src\Events\Tutorial\TutorialPlayerLayer.cpp" />
+    <ClCompile Include="src\Events\UILayer.cpp" />
+    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Maths.cpp" />
+    <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Renderer\RendererShapes.cpp" />
+    <ClCompile Include="src\Renderer\RendererVertex.cpp" />
+    <ClCompile Include="src\UI\Button.cpp" />
+    <ClCompile Include="src\UI\PushButton.cpp" />
+    <ClCompile Include="src\UI\UIImage.cpp" />
+    <ClCompile Include="src\UI\UIObject.cpp" />
+    <ClCompile Include="vendor\stb_image\stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Application\Application.h" />
+    <ClInclude Include="src\Application\EventCallbacks.h" />
+    <ClInclude Include="src\AssetManagement\Font.h" />
+    <ClInclude Include="src\AssetManagement\StandardTexture.h" />
+    <ClInclude Include="src\AssetManagement\Texture.h" />
+    <ClInclude Include="src\BlockSpawnerFunc\DefaultSpawnerFunc.h" />
+    <ClInclude Include="src\BlockSpawnerFunc\TutorialSpawnerFunc.h" />
+    <ClInclude Include="src\Collision\Collision.h" />
+    <ClInclude Include="src\CommandLineFeatures.h" />
+    <ClInclude Include="src\Constants.h" />
+    <ClInclude Include="src\Core\CircularQueue.h" />
+    <ClInclude Include="src\Core\StringHelper.h" />
+    <ClInclude Include="src\Events\BackgroundLayer.h" />
+    <ClInclude Include="src\Events\BlockSpawnerLayer.h" />
+    <ClInclude Include="src\Events\CreditLayer.h" />
+    <ClInclude Include="src\Events\FadeoutScreenLayer.h" />
+    <ClInclude Include="src\Events\Layer.h" />
+    <ClInclude Include="src\Events\MainMenu\MainMenuLayer.h" />
+    <ClInclude Include="src\Events\Player\AbstractPlayerLayer.h" />
+    <ClInclude Include="src\Events\Player\NormalPlayerLayer.h" />
+    <ClInclude Include="src\Events\Player\NormalPlayerLayerUI.h" />
+    <ClInclude Include="src\Events\Player\ZenPlayerLayer.h" />
+    <ClInclude Include="src\Events\Tutorial\TutorialBlockSpawnerLayer.h" />
+    <ClInclude Include="src\Events\Tutorial\TutorialPlayerLayer.h" />
+    <ClInclude Include="src\Events\UILayer.h" />
+    <ClInclude Include="src\Log.h" />
+    <ClInclude Include="src\Maths.h" />
+    <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\RendererShapes.h" />
+    <ClInclude Include="src\Renderer\RendererUtils.h" />
+    <ClInclude Include="src\Renderer\RendererVertex.h" />
+    <ClInclude Include="src\UI\Button.h" />
+    <ClInclude Include="src\UI\PushButton.h" />
+    <ClInclude Include="src\UI\UIImage.h" />
+    <ClInclude Include="src\UI\UIObject.h" />
+    <ClInclude Include="vendor\stb_image\stb_image.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

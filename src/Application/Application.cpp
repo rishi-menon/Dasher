@@ -11,12 +11,10 @@
 #include "Log.h"
 
 #include "EventCallbacks.h"
-
 #include "Events/Layer.h"
 #include "Events/Player/ZenPlayerLayer.h"
 #include "Events/Player/NormalPlayerLayer.h"
 #include "Events/Player/NormalPlayerLayerUI.h"
-
 #include "Events/BackgroundLayer.h"
 #include "Events/BlockSpawnerLayer.h"
 #include "Events/UILayer.h"
@@ -114,7 +112,7 @@ bool Application::Initialise(int nWidth, int nHeight, const char* const strTitle
 		return false;
 	}
 
-	m_NextMenu = Menu::TutorialMode;
+	m_NextMenu = Menu::MainMenu;
 	ChangeMenuState();
 
 	return true;
@@ -191,6 +189,7 @@ void Application::Run()
 			{
 				m_vLayers[i]->OnUpdate((float)m_dDeltaTime);
 			}
+			//Update the UI layer
 			m_vLayers[g_nUILayerIndex]->OnUpdate((float)m_dDeltaTime);
 		}
 		else
