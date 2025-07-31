@@ -1,7 +1,7 @@
 #include "Log.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 namespace CoreLogger
 {

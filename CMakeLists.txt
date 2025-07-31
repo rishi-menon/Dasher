@@ -56,7 +56,10 @@ ${rishi_src_dir}/UI/UIImage.cpp
 
 target_compile_definitions(Phase PRIVATE GLEW_STATIC RM_MAC)
 
-target_include_directories(Phase PRIVATE ./Phase/src ./Phase/vendor/Freetype ./Phase/vendor/GLEW/include ./Phase/vendor/GLFW/include ./Phase/vendor/glm ./Phase/vendor/spdlog/include ./Phase/vendor/stb_image)
+target_include_directories(Phase PRIVATE ./Phase/src ./Phase/vendor/Freetype ./Phase/vendor/GLEW/include ./Phase/vendor/GLFW/include ./Phase/vendor/glm ./Phase/vendor/spdlog/include ./Phase/vendor/stb_image /usr/include/)
+
+message ("rishi hello world")
+message (${CMAKE_SYSTEM_NAME})
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	message ("rishi darwin")
@@ -82,6 +85,20 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     ${rishi_lib_path}/GLFW/lib-x64/glfw3 
     ${rishi_lib_path}/Freetype/lib-x64/freetype 
     opengl32
+    )
+
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    message ("rishi linux")
+    set(rishi_lib_path "/home/rishi/Desktop/dev/cpp/dasher/Phase/vendor")
+
+    TARGET_LINK_LIBRARIES (Phase 
+    # ${rishi_lib_path}/GLEW/lib/Release/x64/glew32s.lib 
+    # ${rishi_lib_path}/GLFW/lib-x64/glfw3.lib 
+    # ${rishi_lib_path}/Freetype/lib-x64/freetype.lib
+    GLEW
+    glfw
+    freetype
+    GL
     )
 
 endif()
